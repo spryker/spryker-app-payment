@@ -126,27 +126,6 @@ class AppPaymentHelper extends Module
         return $initializePaymentRequestTransfer;
     }
 
-    /**
-     * TODO: Remove when Helukabel fix gets removed
-     */
-    public function haveInitializePaymentRequestWithAppConfigForHelukabelTransfer(array $seed = []): InitializePaymentRequestTransfer
-    {
-        $tenantIdentifier = $seed[InitializePaymentRequestTransfer::TENANT_IDENTIFIER] ?? Uuid::uuid4()->toString();
-        $quoteBuilder = new QuoteBuilder($seed);
-        $quoteBuilder->withItem()
-            ->withAnotherItem();
-
-        $initializePaymentRequestTransfer = (new InitializePaymentRequestBuilder($seed))->build();
-        $initializePaymentRequestTransfer->setOrderData($quoteBuilder->build());
-        $initializePaymentRequestTransfer->setTenantIdentifier($tenantIdentifier);
-
-        $appConfigTransfer = $this->getAppConfigHelper()->haveAppConfigForTenant($tenantIdentifier, ['accountId' => 'acct_1OaAxQKVZGfuzYL6', 'mode' => 'test']);
-
-        $initializePaymentRequestTransfer->setAppConfig($appConfigTransfer);
-
-        return $initializePaymentRequestTransfer;
-    }
-
     public function havePaymentPageRequestTransfer(array $seed = []): PaymentPageRequestTransfer
     {
         $tenantIdentifier = Uuid::uuid4()->toString();
