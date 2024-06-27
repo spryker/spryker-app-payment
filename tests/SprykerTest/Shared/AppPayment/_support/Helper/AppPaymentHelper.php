@@ -119,7 +119,7 @@ class AppPaymentHelper extends Module
         $initializePaymentRequestTransfer->setOrderData($quoteBuilder->build());
         $initializePaymentRequestTransfer->setTenantIdentifier($tenantIdentifier);
 
-        $appConfigTransfer = $this->getAppConfigHelper()->haveAppConfigForTenant($tenantIdentifier);
+        $appConfigTransfer = $this->getAppConfigHelper()->haveAppConfigForTenant($tenantIdentifier, $seed);
 
         $initializePaymentRequestTransfer->setAppConfig($appConfigTransfer);
 
@@ -152,7 +152,7 @@ class AppPaymentHelper extends Module
         $tenantIdentifier = Uuid::uuid4()->toString();
         $transactionId = Uuid::uuid4()->toString();
 
-        $appConfigTransfer = $this->getAppConfigHelper()->haveAppConfigForTenant($tenantIdentifier);
+        $appConfigTransfer = $this->getAppConfigHelper()->haveAppConfigForTenant($tenantIdentifier, $seed);
         $paymentTransfer = $this->havePaymentForTransactionId($transactionId, $tenantIdentifier);
 
         $paymentPageRequestTransfer = new PaymentPageRequestTransfer();
@@ -169,7 +169,7 @@ class AppPaymentHelper extends Module
         $tenantIdentifier = Uuid::uuid4()->toString();
         $transactionId = Uuid::uuid4()->toString();
 
-        $appConfigTransfer = $this->getAppConfigHelper()->haveAppConfigForTenant($tenantIdentifier);
+        $appConfigTransfer = $this->getAppConfigHelper()->haveAppConfigForTenant($tenantIdentifier, $seed);
         $paymentTransfer = $this->havePaymentForTransactionId($transactionId, $tenantIdentifier);
 
         $paymentStatusRequestTransfer = new PaymentStatusRequestTransfer();
@@ -186,7 +186,7 @@ class AppPaymentHelper extends Module
         $tenantIdentifier = $seed['tenantIdentifier'] ?? Uuid::uuid4()->toString();
         $transactionId = $seed['transactionId'] ?? Uuid::uuid4()->toString();
 
-        $appConfigTransfer = $this->getAppConfigHelper()->haveAppConfigForTenant($tenantIdentifier);
+        $appConfigTransfer = $this->getAppConfigHelper()->haveAppConfigForTenant($tenantIdentifier, $seed);
         $paymentTransfer = $this->havePaymentForTransactionId($transactionId, $tenantIdentifier, $status);
 
         $capturePaymentRequestTransfer = (new CapturePaymentRequestBuilder($seed))->build();
@@ -203,7 +203,7 @@ class AppPaymentHelper extends Module
         $tenantIdentifier = $seed['tenantIdentifier'] ?? Uuid::uuid4()->toString();
         $transactionId = $seed['transactionId'] ?? Uuid::uuid4()->toString();
 
-        $appConfigTransfer = $this->getAppConfigHelper()->haveAppConfigForTenant($tenantIdentifier);
+        $appConfigTransfer = $this->getAppConfigHelper()->haveAppConfigForTenant($tenantIdentifier, $seed);
         $paymentTransfer = $this->havePaymentForTransactionId($transactionId, $tenantIdentifier, $status);
 
         $cancelPaymentRequestTransfer = (new CancelPaymentRequestBuilder($seed))->build();
