@@ -20,5 +20,5 @@ class AppPaymentConstants
     /**
      * @var string
      */
-    public const APP_IDENTIFIER = '';
+    public const APP_IDENTIFIER = 'PAYMENT:APP_IDENTIFIER';
 }
