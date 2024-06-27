@@ -19,35 +19,11 @@ GTAGS
 .DS_Store
 
 # Y&Z
-/config/Shared/config_local*
 !/config/Shared/config_local.dist.php
 /config/Shared/console_env_local.php
-/config/Shared/cubes.*
-/config/Zed/behat.local.yml
-/config/Zed/phpunit.core.xml
-/config/Zed/phpunit.xml
-/config/cubes.*
-config/accumulated-config.json
 
 src/Generated/
 /vendor/
-FOSS.md
-/public/Backoffice/maintenance/maintenance.marker
-
-/data/*
-!/data/import/
-!/data/export/
-
-# grunt stuff
-.grunt
-.sass-cache
-/node_modules/
-.yarn/
-
-# docker stuff
-/.docker-sync/
-/.unison*
-/deploy.local.yml
 
 # profiling
 /profiler
@@ -60,10 +36,9 @@ npm-debug.log
 !/tests/_output/.gitkeep
 /tests/_support/_generated/*
 !/tests/_support/_generated/.gitkeep
-/codeception.local.yml
 
-/tests/PyzTest/*/*/_output/*
-/tests/PyzTest/*/*/_support/_generated/*
+/tests/SprykerTest/*/*/_output/*
+/tests/SprykerTest/*/*/_support/_generated/*
 
 # propel classes
 /src/Orm/Zed/*/Persistence/Base
