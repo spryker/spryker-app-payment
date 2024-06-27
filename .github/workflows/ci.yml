@@ -1,0 +1,79 @@
+name: CI
+
+on:
+    pull_request:
+    push:
+        branches:
+            - main
+            - feature/[a-z]+-[0-9]+/dev-*
+    workflow_dispatch:
+
+jobs:
+    validation:
+        name: "CS, ArchSniffer, PHPStan, Security"
+        runs-on: ubuntu-latest
+        env:
+            APPLICATION_ENV: testing
+        strategy:
+            fail-fast: false
+            matrix:
+                php-version: [
+                    '8.1',
+                    '8.2',
+                ]
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php-version }}
+                  extensions: mbstring, intl, pdo_mysql, redis
+                  tools: composer:v2
+
+            - name: Composer get cache directory
+              id: composer-cache
+              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+            - name: Composer cache
+              uses: actions/cache@v3
+              with:
+                  path: ${{ steps.composer-cache.outputs.dir }}
+                  key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-composer-
+
+            - name: Composer validate
+              run: composer validate
+
+            - name: Composer version
+              run: composer --version
+
+            - name: Composer install
+              run: composer install --optimize-autoloader
+
+            - name: Setup Database
+              run: |
+                  mkdir -p tests/_data
+                  touch tests/_data/app_payment_db
+
+            - name: Setup AppPayment
+              run: composer setup
+
+            - name: Run PHPStan
+              run: composer stan
+
+            - name: Run Rector checks
+              run: composer rector-ci
+
+            - name: Run CodeStyle checks
+              run: composer cs-check
+
+            - name: Codecept tests with coverage
+              run: composer test-cover
+
+            - name: Code Coverage Report
+              if: success() && matrix.php-version == '8.2'
+              uses: codecov/codecov-action@v3
+              with:
+                  file: ./tests/_output/coverage.xml

@@ -1,0 +1,98 @@
+{
+    "name": "spryker/app-payment",
+    "type": "library",
+    "description": "AppPayment module",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.1",
+        "spryker/app-webhook": "dev-main",
+        "spryker/glue-application-extension": "^1.0.0",
+        "spryker/kernel": "^3.30.0",
+        "spryker/log": "^3.0.0",
+        "spryker/message-broker": "^1.11.0",
+        "spryker/propel-encryption-behavior": "^0.1.1",
+        "spryker/secrets-manager": "^1.0.0",
+        "spryker/secrets-manager-extension": "^1.0.0",
+        "spryker/symfony": "^3.0.0",
+        "spryker/transfer": "^3.33.0",
+        "spryker/util-encoding": "^2.0.0",
+        "spryker/util-text": "^1.0.0"
+    },
+    "require-dev": {
+        "codeception/codeception": "^5.0",
+        "codeception/module-asserts": "^3.0.0",
+        "codeception/module-cli": "^2.0.0",
+        "codeception/module-filesystem": "^3.0.0",
+        "codeception/module-phpbrowser": "^3.0.0",
+        "codeception/module-rest": "^3.0.0",
+        "codeception/module-webdriver": "^3.0.0",
+        "codeception/phpunit-wrapper": "^9.0.0",
+        "galbar/jsonpath": "^3.0",
+        "infection/codeception-adapter": "^0.4.3",
+        "infection/infection": "^0.29.6",
+        "phpstan/phpdoc-parser": "1.25.0",
+        "phpstan/phpstan": "1.10.66",
+        "rector/rector": "^0.19.0",
+        "spryker-sdk/async-api": "dev-feature/resolve-remote-references as 0.3.1",
+        "spryker/app-kernel": "dev-feature/extract-payment-template",
+        "spryker/code-sniffer": "*",
+        "spryker/container": "*",
+        "spryker/development": "^3.34.0",
+        "spryker/event-dispatcher": "^1.6",
+        "spryker/glue-backend-api-application": "*",
+        "spryker/glue-json-api-convention": "^1.3",
+        "spryker/http": "^1.11",
+        "spryker/message-broker-aws": "*",
+        "spryker/propel": "*",
+        "spryker/router": "^1.19",
+        "spryker/testify": "*",
+        "spryker/testify-async-api": "*",
+        "spryker/translator": "^1.13"
+    },
+    "autoload": {
+        "psr-4": {
+            "Spryker\\": "src/Spryker/",
+            "Orm\\": "src/Orm/",
+            "SprykerTest\\AsyncApi\\AppPayment\\Helper\\": "tests/SprykerTest/AsyncApi/AppPayment/_support/Helper/",
+            "SprykerTest\\Glue\\AppPaymentBackendApi\\Helper\\": "tests/SprykerTest/Glue/AppPaymentBackendApi/_support/Helper/",
+            "SprykerTest\\Glue\\Testify\\Helper\\": "tests/SprykerTest/Glue/Testify/_support/Helper/",
+            "SprykerTest\\Zed\\Testify\\Helper\\": "tests/SprykerTest/Zed/Testify/_support/Helper/",
+            "SprykerTest\\Shared\\AppPayment\\Helper\\": "tests/SprykerTest/Shared/AppPayment/_support/Helper/",
+            "SprykerTest\\Zed\\AppPayment\\Helper\\": "tests/SprykerTest/Zed/AppPayment/_support/Helper/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SprykerTest\\": "tests/SprykerTest/",
+            "Generated\\": "src/Generated/",
+            "Orm\\": "src/Orm/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "setup": "tests/bin/console app-payment:setup && tests/bin/console transfer:generate && tests/bin/console transfer:databuilder:generate && tests/bin/console dev:ide-auto-completion:zed:generate && tests/bin/console dev:ide-auto-completion:glue:generate",
+        "cs-check": "phpcs -p src/ tests/",
+        "cs-fix": "phpcbf -p src/ tests/",
+        "stan": "phpstan analyze src/Spryker/",
+        "test": "codecept build && codecept run",
+        "test-cover": "codecept build && codecept run --coverage-xml",
+        "test-strict": "vendor/bin/infection --threads=max --min-msi=100 --min-covered-msi=100",
+        "test-strict-ci": "vendor/bin/infection --threads=max --logger-github=true --min-msi=100 --min-covered-msi=100",
+        "rector": "vendor/bin/rector process src/Spryker/ --config rector.php --ansi",
+        "rector-ci": "vendor/bin/rector process src/Spryker/ --config rector.php --ansi --dry-run",
+        "local-ci": "composer cs-fix && composer cs-check && composer stan && composer rector-ci && composer test"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "infection/extension-installer": true
+        }
+    }
+}

@@ -1,0 +1,295 @@
+<?xml version="1.0"?>
+<transfers xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="spryker:transfer-01 http://static.spryker.com/transfer-01.xsd">
+
+    <transfer name="AppConfig" strict="true">
+        <property name="locale" type="string"/>
+        <property name="tenantIdentifier" type="string"/>
+    </transfer>
+
+    <transfer name="AppConfigValidateResponse" strict="true">
+        <property name="isSuccessful" type="bool"/>
+        <property name="configurationValidationErrors" type="ConfigurationValidationError[]" singular="configurationValidationError"/>
+    </transfer>
+
+    <transfer name="ConfigurationValidationError" strict="true">
+        <property name="property" type="string"/>
+        <property name="errorMessages" type="array" singular="errorMessage"/>
+    </transfer>
+
+    <transfer name="PaymentPageRequest" strict="true">
+        <property name="requestData" type="array"/>
+        <property name="payment" type="Payment"/>
+        <property name="appConfig" type="AppConfig"/>
+        <property name="transactionId" type="string"/>
+        <property name="redirectUrl" type="string"/>
+    </transfer>
+
+    <transfer name="PaymentPageResponse" strict="true">
+        <property name="isSuccessful" type="bool"/>
+        <property name="paymentPageTemplate" type="string"/>
+        <property name="paymentPageData" type="array"/>
+    </transfer>
+
+    <transfer name="InitializePaymentRequest" strict="true">
+        <property name="orderData" type="Quote"/>
+        <property name="appConfig" type="AppConfig"/>
+        <property name="redirectSuccessUrl" type="string"/>
+        <property name="redirectCancelUrl" type="string"/>
+        <property name="checkoutSummaryPageUrl" type="string"/>
+        <property name="tenantIdentifier" type="string"/>
+    </transfer>
+
+    <transfer name="InitializePaymentResponse" strict="true">
+        <property name="isSuccessful" type="bool"/>
+        <property name="transactionId" type="string"/>
+        <property name="redirectUrl" type="string"/>
+        <property name="message" type="string"/>
+    </transfer>
+
+    <transfer name="CapturePaymentRequest" strict="true">
+        <property name="appConfig" type="AppConfig"/>
+        <property name="payment" type="Payment"/>
+        <property name="transactionId" type="string"/>
+        <property name="amount" type="int"/>
+    </transfer>
+
+    <transfer name="CapturePaymentResponse" strict="true">
+        <property name="isSuccessful" type="bool"/>
+        <property name="transactionId" type="string"/>
+        <property name="message" type="string"/>
+        <property name="status" type="string"/>
+    </transfer>
+
+    <transfer name="CancelPaymentRequest" strict="true">
+        <property name="appConfig" type="AppConfig"/>
+        <property name="payment" type="Payment"/>
+        <property name="transactionId" type="string"/>
+    </transfer>
+
+    <transfer name="CancelPaymentResponse" strict="true">
+        <property name="isSuccessful" type="bool"/>
+        <property name="transactionId" type="string"/>
+        <property name="message" type="string"/>
+        <property name="status" type="string"/>
+    </transfer>
+
+    <transfer name="RefundPaymentRequest" strict="true">
+        <property name="appConfig" type="AppConfig"/>
+        <property name="payment" type="Payment"/>
+        <property name="transactionId" type="string"/>
+        <property name="amount" type="int"/>
+        <property name="currencyCode" type="string"/>
+        <property name="quoteItems" type="QuoteItem[]" singular="quoteItem"/>
+    </transfer>
+
+    <transfer name="RefundPaymentResponse" strict="true">
+        <property name="isSuccessful" type="bool"/>
+        <property name="refundId" type="string"/>
+        <property name="message" type="string"/>
+        <property name="status" type="string"/>
+        <property name="orderItemIds" type="array" singular="orderItemId"/>
+    </transfer>
+
+    <transfer name="Quote">
+        <property name="orderReference" type="string"/>
+        <property name="storeName" type="string"/>
+        <property name="localeName" type="string"/>
+        <property name="countryCode" type="string"/>
+        <property name="customerFirstName" type="string"/>
+        <property name="customerLastName" type="string"/>
+        <property name="customerEmail" type="string"/>
+        <property name="customerReference" type="string"/>
+        <property name="currencyCode" type="string"/>
+        <property name="grandTotal" type="string"/>
+        <property name="paymentMethod" type="string"/>
+        <property name="items" type="QuoteItem[]" singular="item"/>
+    </transfer>
+
+    <transfer name="QuoteItem" strict="true">
+        <property name="idSalesOrderItem" type="string"/>
+        <property name="name" type="string"/>
+        <property name="sku" type="string"/>
+    </transfer>
+
+    <transfer name="Payment" strict="true">
+        <property name="orderReference" type="string"/>
+        <property name="transactionId" type="string"/>
+        <property name="tenantIdentifier" type="string"/>
+        <property name="quote" type="Quote"/>
+        <property name="status" type="string"/>
+        <property name="redirectSuccessUrl" type="string"/>
+        <property name="redirectCancelUrl" type="string"/>
+    </transfer>
+
+    <transfer name="PaymentRefund" strict="true">
+        <property name="transactionId" type="string"/>
+        <property name="refundId" type="string"/>
+        <property name="orderItemIds" type="array" singular="orderItemId"/>
+        <property name="amount" type="int"/>
+        <property name="currencyCode" type="string"/>
+        <property name="status" type="string"/>
+    </transfer>
+
+    <transfer name="PaymentStatusRequest" strict="true">
+        <property name="transactionId" type="string"/>
+        <property name="appConfig" type="AppConfig"/>
+        <property name="payment" type="Payment"/>
+    </transfer>
+
+    <transfer name="PaymentStatusResponse" strict="true">
+        <property name="isSuccessful" type="bool"/>
+    </transfer>
+
+    <transfer name="RedirectRequest" strict="true">
+        <property name="transactionId" type="string"/>
+    </transfer>
+
+    <transfer name="RedirectResponse" strict="true">
+        <property name="url" type="string"/>
+    </transfer>
+
+    <transfer name="CancelPayment" strict="true">
+        <property name="orderReference" type="string"/>
+        <property name="orderItemIds" type="array" strict="true" singular="orderItemId"/>
+        <property name="amount" type="int"/>
+        <property name="currencyIsoCode" type="string"/>
+        <property name="messageAttributes" type="MessageAttributes"/>
+    </transfer>
+
+    <transfer name="WebhookRequest" strict="true">
+        <!-- The transactionId is the unique identifier of the payment. It is generated by the payment provider and is used to identify the payment. Set this as early as possible e.g. in the GlueRequestWebhookMapperPluginInterface -->
+        <property name="transactionId" type="string"/>
+        <property name="type" type="string"/>
+        <property name="refund" type="PaymentRefund"/>
+        <property name="content" type="string"/>
+        <property name="payment" type="Payment"/>
+        <property name="appConfig" type="AppConfig"/>
+    </transfer>
+
+    <transfer name="WebhookResponse" strict="true">
+        <property name="isSuccessful" type="bool"/>
+        <!-- The new status to be used for the payment @see PaymentStatus. MUST be set from the PlatformPluginInterface implementation -->
+        <property name="paymentStatus" type="string"/>
+        <!-- The new status to be used for the payment @see PaymentRefundStatus. MUST be set from the PlatformPluginInterface implementation -->
+        <property name="refundStatus" type="string"/>
+        <!-- A message to be displayed to the user/developer in case of an error. MUST be set from the PlatformPluginInterface implementation -->
+        <property name="message" type="string"/>
+    </transfer>
+
+    <transfer name="MessageAttributes"/>
+
+    <transfer name="CapturePayment" strict="true">
+        <property name="orderReference" type="string"/>
+        <property name="orderItemIds" type="array" singular="orderItemId"/>
+        <property name="amount" type="int"/>
+        <property name="currencyIsoCode" type="string"/>
+        <property name="messageAttributes" type="MessageAttributes"/>
+    </transfer>
+
+    <transfer name="RefundPayment" strict="true">
+        <property name="orderReference" type="string"/>
+        <property name="orderItems" type="OrderItem[]" singular="orderItem"/>
+        <property name="amount" type="int"/>
+        <property name="currencyIsoCode" type="string"/>
+        <property name="messageAttributes" type="MessageAttributes"/>
+    </transfer>
+
+    <transfer name="OrderItem" strict="true">
+        <property name="orderItemId" type="int"/>
+        <property name="sku" type="string"/>
+    </transfer>
+
+    <transfer name="PaymentAuthorized" strict="true">
+        <property name="orderReference" type="string"/>
+        <property name="orderItemIds" type="array" singular="orderItemId"/>
+        <property name="amount" type="int"/>
+        <property name="currencyIsoCode" type="string"/>
+        <property name="messageAttributes" type="MessageAttributes"/>
+    </transfer>
+
+    <transfer name="PaymentAuthorizationFailed" strict="true">
+        <property name="orderReference" type="string"/>
+        <property name="orderItemIds" type="array" singular="orderItemId"/>
+        <property name="amount" type="int"/>
+        <property name="currencyIsoCode" type="string"/>
+        <property name="messageAttributes" type="MessageAttributes"/>
+    </transfer>
+
+    <transfer name="PaymentCaptured" strict="true">
+        <property name="orderReference" type="string"/>
+        <property name="orderItemIds" type="array" singular="orderItemId"/>
+        <property name="amount" type="int"/>
+        <property name="currencyIsoCode" type="string"/>
+        <property name="messageAttributes" type="MessageAttributes"/>
+    </transfer>
+
+    <transfer name="PaymentCaptureFailed" strict="true">
+        <property name="orderReference" type="string"/>
+        <property name="orderItemIds" type="array" singular="orderItemId"/>
+        <property name="amount" type="int"/>
+        <property name="currencyIsoCode" type="string"/>
+        <property name="messageAttributes" type="MessageAttributes"/>
+    </transfer>
+
+    <transfer name="PaymentRefunded" strict="true">
+        <property name="orderReference" type="string"/>
+        <property name="orderItemIds" type="array" singular="orderItemId"/>
+        <property name="amount" type="int"/>
+        <property name="currencyIsoCode" type="string"/>
+        <property name="messageAttributes" type="MessageAttributes"/>
+    </transfer>
+
+    <transfer name="PaymentRefundFailed" strict="true">
+        <property name="orderReference" type="string"/>
+        <property name="orderItemIds" type="array" singular="orderItemId"/>
+        <property name="amount" type="int"/>
+        <property name="currencyIsoCode" type="string"/>
+        <property name="messageAttributes" type="MessageAttributes"/>
+    </transfer>
+
+    <transfer name="PaymentCanceled" strict="true">
+        <property name="orderReference" type="string"/>
+        <property name="orderItemIds" type="array" singular="orderItemId"/>
+        <property name="amount" type="int"/>
+        <property name="currencyIsoCode" type="string"/>
+        <property name="messageAttributes" type="MessageAttributes"/>
+    </transfer>
+
+    <transfer name="PaymentCancellationFailed" strict="true">
+        <property name="orderReference" type="string"/>
+        <property name="orderItemIds" type="array" singular="orderItemId"/>
+        <property name="amount" type="int"/>
+        <property name="currencyIsoCode" type="string"/>
+        <property name="messageAttributes" type="MessageAttributes"/>
+    </transfer>
+
+    <transfer name="AddPaymentMethod" strict="true">
+        <property name="name" type="string"/>
+        <property name="providerName" type="string"/>
+        <property name="paymentAuthorizationEndpoint" type="string"/>
+        <property name="messageAttributes" type="MessageAttributes"/>
+    </transfer>
+
+    <transfer name="DeletePaymentMethod" strict="true">
+        <property name="name" type="string"/>
+        <property name="providerName" type="string"/>
+        <property name="paymentAuthorizationEndpoint" type="string"/>
+        <property name="messageAttributes" type="MessageAttributes"/>
+    </transfer>
+
+    <transfer name="PaymentCreated" strict="true">
+        <property name="entityReference" type="string"/>
+        <property name="paymentReference" type="string"/>
+        <property name="messageAttributes" type="MessageAttributes"/>
+    </transfer>
+
+    <transfer name="MessageContext" strict="true">
+        <property name="orderItemsIds" type="array" singular="orderItemId"/>
+        <property name="amount" type="string"/>
+    </transfer>
+
+    <transfer name="PaymentCollectionDeleteCriteria" strict="true">
+        <property name="tenantIdentifier" type="string"/>
+    </transfer>
+
+</transfers>

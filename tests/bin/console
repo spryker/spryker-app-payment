@@ -1,0 +1,83 @@
+#!/usr/bin/env php
+<?php
+
+require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../_data/Environment.php';
+
+use Spryker\Zed\Development\Communication\Console\GenerateGlueBackendIdeAutoCompletionConsole;use Spryker\Zed\Development\Communication\Console\GenerateGlueIdeAutoCompletionConsole;use Spryker\Zed\Development\Communication\Console\GenerateZedIdeAutoCompletionConsole;
+use Spryker\Zed\Propel\Communication\Console\BuildModelConsole;
+use Spryker\Zed\Propel\Communication\Console\CreateDatabaseConsole;
+use Spryker\Zed\Propel\Communication\Console\DiffConsole;
+use Spryker\Zed\Propel\Communication\Console\EntityTransferGeneratorConsole;
+use Spryker\Zed\Propel\Communication\Console\MigrateConsole;
+use Spryker\Zed\Propel\Communication\Console\PostgresqlCompatibilityConsole;
+use Spryker\Zed\Propel\Communication\Console\PropelInstallConsole;
+use Spryker\Zed\Propel\Communication\Console\SchemaCopyConsole;
+use Symfony\Component\Console\Application;
+use Spryker\Zed\Transfer\Communication\Console\TransferGeneratorConsole;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
+use Spryker\Zed\Transfer\Communication\Console\DataBuilderGeneratorConsole;
+use Spryker\Glue\GlueApplication\Plugin\Console\ControllerCacheCollectorConsole;
+
+$application = new Application();
+$application->addCommands([
+    new TransferGeneratorConsole(),
+    new DataBuilderGeneratorConsole(),
+    new PropelInstallConsole(),
+    new CreateDatabaseConsole(),
+    new PostgresqlCompatibilityConsole(),
+    new SchemaCopyConsole(),
+    new BuildModelConsole(),
+    new EntityTransferGeneratorConsole(),
+    new DiffConsole(),
+    new MigrateConsole(),
+    new GenerateZedIdeAutoCompletionConsole(),
+    new GenerateGlueIdeAutoCompletionConsole(),
+    new GenerateGlueBackendIdeAutoCompletionConsole(),
+    new ControllerCacheCollectorConsole(),
+    new class extends Command
+    {
+        /**
+         * @return void
+         */
+        protected function configure(): void
+        {
+            parent::configure();
+            $this
+                ->setName('app-payment:setup')
+                ->setDescription('Sets up required system to run tests within');
+        }
+
+        /**
+         * @param InputInterface $input
+         * @param OutputInterface $output
+         *
+         * @return int
+         */
+        protected function execute(InputInterface $input, OutputInterface $output): int
+        {
+            $this->overwriteCorePropel($output);
+
+            return Command::SUCCESS;
+        }
+
+        /**
+         * @return void
+         */
+        protected function overwriteCorePropel(OutputInterface $output): void
+        {
+            $source = __DIR__ . '/../_data/CreateMySqlDatabase.php';
+            $target = __DIR__ . '/../../vendor/spryker/propel/src/Spryker/Zed/Propel/Business/Model/PropelDatabase/Adapter/MySql/CreateMySqlDatabase.php';
+
+            $filesystem = new Filesystem();
+            $filesystem->copy($source, $target);
+
+            $output->writeln('Overwrote Core CreateMySqlDatabase to be able to use SQLite Database.');
+        }
+    },
+]);
+
+$application->run();

@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<database xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="zed" xsi:noNamespaceSchemaLocation="http://static.spryker.com/schema-01.xsd" namespace="Orm\Zed\AppPayment\Persistence" package="src.Orm.Zed.AppPayment.Persistence">
+    <table name="spy_payment" idMethod="native" class="SpyPayment">
+        <column name="id_payment" type="INTEGER" required="true" autoIncrement="true" primaryKey="true"/>
+        <column name="order_reference" type="CHAR" size="36"/>
+        <column name="transaction_id" type="CHAR" size="36"/>
+        <column name="tenant_identifier" type="CHAR" size="60"/>
+        <column name="quote" type="LONGVARCHAR"/>
+        <column name="status" type="CHAR" size="64"/>
+        <column name="redirect_success_url" type="LONGVARCHAR"/>
+        <column name="redirect_cancel_url" type="LONGVARCHAR"/>
+
+        <unique name="spy_payment-unique-order_reference">
+            <unique-column name="order_reference"/>
+            <unique-column name="tenant_identifier"/>
+        </unique>
+
+        <unique name="spy_payment-unique-transaction_id">
+            <unique-column name="transaction_id"/>
+        </unique>
+
+        <behavior name="timestampable">
+            <parameter name="create_column" value="created_at"/>
+            <parameter name="update_column" value="updated_at"/>
+        </behavior>
+    </table>
+
+    <table name="spy_payment_refund" idMethod="native" class="SpyPaymentRefund">
+        <column name="id_payment_refund" required="true" type="INTEGER" autoIncrement="true" primaryKey="true"/>
+        <column name="transaction_id" type="CHAR" size="36"/>
+        <column name="refund_id" type="CHAR" size="36"/>
+        <column name="status" required="true" type="VARCHAR" size="255"/>
+        <column name="amount" required="true" type="INTEGER"/>
+        <column name="currency_code" required="true" type="VARCHAR" size="10"/>
+        <column name="order_item_ids" type="ARRAY"/>
+
+        <behavior name="timestampable">
+            <parameter name="create_column" value="created_at"/>
+            <parameter name="update_column" value="updated_at"/>
+        </behavior>
+
+        <foreign-key name="spy_payment_refund-transaction_id" foreignTable="spy_payment" phpName="Payment" refPhpName="PaymentRefund" onDelete="cascade">
+            <reference local="transaction_id" foreign="transaction_id"/>
+        </foreign-key>
+
+        <index name="spy_payment_refund-search_index">
+            <index-column name="transaction_id"/>
+            <index-column name="status"/>
+            <index-column name="order_item_ids" size="255"/>
+        </index>
+    </table>
+</database>

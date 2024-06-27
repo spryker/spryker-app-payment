@@ -1,0 +1,151 @@
+<?xml version="1.0"?>
+<transfers xmlns="spryker:databuilder-01" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="spryker:databuilder-01 http://static.spryker.com/databuilder-01.xsd">
+    <transfer name="InitializePaymentRequest" strict="true">
+        <property name="redirectSuccessUrl" dataBuilderRule="url()"/>
+        <property name="redirectCancelUrl" dataBuilderRule="url()"/>
+        <property name="checkoutSummaryPageUrl" dataBuilderRule="url()"/>
+    </transfer>
+
+    <transfer name="Payment" strict="true">
+        <property name="redirectSuccessUrl" dataBuilderRule="url()"/>
+        <property name="redirectCancelUrl" dataBuilderRule="url()"/>
+    </transfer>
+
+    <transfer name="PaymentRefund" strict="true">
+        <property name="orderItemIds" dataBuilderRule="randomElements([1, 2, 3, 4 , 5, 6])"/>
+        <property name="amount" dataBuilderRule="numerify('###')"/>
+        <property name="currencyCode" dataBuilderRule="lexify('???')"/>
+    </transfer>
+
+    <transfer name="Quote">
+        <property name="orderReference" dataBuilderRule="unique()->uuid()"/>
+        <property name="storeName" dataBuilderRule="=DE"/>
+        <property name="localeName" dataBuilderRule="=de_DE"/>
+        <property name="countryCode" dataBuilderRule="=DE"/>
+        <property name="currencyCode" dataBuilderRule="=EUR"/>
+        <property name="customerFirstName" dataBuilderRule="name()"/>
+        <property name="customerLastName" dataBuilderRule="name()"/>
+        <property name="customerEmail" dataBuilderRule="email()"/>
+        <property name="customerReference" dataBuilderRule="unique()->uuid()"/>
+        <property name="grandTotal" dataBuilderRule="=10000"/>
+        <property name="paymentMethod" dataBuilderRule="=PayPal"/>
+    </transfer>
+
+    <transfer name="QuoteItem" strict="true">
+        <property name="name" dataBuilderRule="word()"/>
+    </transfer>
+
+    <transfer name="CancelPayment" strict="true">
+        <property name="orderReference" dataBuilderRule="unique()->uuid()"/>
+        <property name="orderItemIds" dataBuilderRule="randomElements([1, 2, 3, 4 , 5, 6])"/>
+        <property name="amount" dataBuilderRule="randomDigit()"/>
+        <property name="currencyIsoCode" dataBuilderRule="word()"/>
+    </transfer>
+
+    <transfer name="CapturePayment" strict="true">
+        <property name="orderReference" dataBuilderRule="unique()->uuid()"/>
+        <property name="orderItemIds" dataBuilderRule="randomElements([1, 2, 3, 4 , 5, 6])"/>
+        <property name="amount" dataBuilderRule="randomDigit()"/>
+        <property name="currencyIsoCode" dataBuilderRule="word()"/>
+        <property name="messageAttributes" type="MessageAttributes" dataBuilderRule="MessageAttributes"/>
+    </transfer>
+
+    <transfer name="RefundPayment" strict="true">
+        <property name="orderReference" dataBuilderRule="unique()->uuid()"/>
+        <property name="amount" dataBuilderRule="numerify('###')"/>
+        <property name="currencyIsoCode" dataBuilderRule="lexify('???')"/>
+    </transfer>
+
+    <transfer name="OrderItem" strict="true">
+        <property name="orderItemId" dataBuilderRule="randomDigit()"/>
+        <property name="sku" dataBuilderRule="bothify('???###')"/>
+    </transfer>
+
+    <transfer name="PaymentAuthorized" strict="true">
+        <property name="orderReference" dataBuilderRule="unique()->uuid()"/>
+        <property name="orderItemIds" dataBuilderRule="randomElements([1, 2, 3, 4 , 5, 6])"/>
+        <property name="amount" dataBuilderRule="randomDigit()"/>
+        <property name="currencyIsoCode" dataBuilderRule="word()"/>
+    </transfer>
+
+    <transfer name="PaymentAuthorizationFailed" strict="true">
+        <property name="orderReference" dataBuilderRule="unique()->uuid()"/>
+        <property name="orderItemIds" dataBuilderRule="randomElements([1, 2, 3, 4 , 5, 6])"/>
+        <property name="amount" dataBuilderRule="randomDigit()"/>
+        <property name="currencyIsoCode" dataBuilderRule="word()"/>
+    </transfer>
+
+    <transfer name="PaymentCaptured" strict="true">
+        <property name="orderReference" dataBuilderRule="unique()->uuid()"/>
+        <property name="orderItemIds" dataBuilderRule="randomElements([1, 2, 3, 4 , 5, 6])"/>
+        <property name="amount" dataBuilderRule="randomDigit()"/>
+        <property name="currencyIsoCode" dataBuilderRule="word()"/>
+    </transfer>
+
+    <transfer name="PaymentCaptureFailed" strict="true">
+        <property name="orderReference" dataBuilderRule="unique()->uuid()"/>
+        <property name="orderItemIds" dataBuilderRule="randomElements([1, 2, 3, 4 , 5, 6])"/>
+        <property name="amount" dataBuilderRule="randomDigit()"/>
+        <property name="currencyIsoCode" dataBuilderRule="word()"/>
+    </transfer>
+
+    <transfer name="PaymentRefunded" strict="true">
+        <property name="orderReference" dataBuilderRule="unique()->uuid()"/>
+        <property name="orderItemIds" dataBuilderRule="randomElements([1, 2, 3, 4 , 5, 6])"/>
+        <property name="amount" dataBuilderRule="numerify('###')"/>
+        <property name="currencyIsoCode" dataBuilderRule="lexify('???')"/>
+    </transfer>
+
+    <transfer name="PaymentRefundFailed" strict="true">
+        <property name="orderReference" dataBuilderRule="unique()->uuid()"/>
+        <property name="orderItemIds" dataBuilderRule="randomElements([1, 2, 3, 4 , 5, 6])"/>
+        <property name="amount" dataBuilderRule="numerify('###')"/>
+        <property name="currencyIsoCode" dataBuilderRule="lexify('???')"/>
+    </transfer>
+
+    <transfer name="PaymentCanceled" strict="true">
+        <property name="orderReference" dataBuilderRule="unique()->uuid()"/>
+        <property name="orderItemIds" dataBuilderRule="randomElements([1, 2, 3, 4 , 5, 6])"/>
+        <property name="amount" dataBuilderRule="randomDigit()"/>
+        <property name="currencyIsoCode" dataBuilderRule="word()"/>
+    </transfer>
+
+    <transfer name="PaymentCancellationFailed" strict="true">
+        <property name="orderReference" dataBuilderRule="unique()->uuid()"/>
+        <property name="orderItemIds" dataBuilderRule="randomElements([1, 2, 3, 4 , 5, 6])"/>
+        <property name="amount" dataBuilderRule="randomDigit()"/>
+        <property name="currencyIsoCode" dataBuilderRule="word()"/>
+    </transfer>
+
+    <transfer name="AddPaymentMethod" strict="true">
+        <property name="name" dataBuilderRule="word()"/>
+        <property name="providerName" dataBuilderRule="word()"/>
+        <property name="paymentAuthorizationEndpoint" dataBuilderRule="word()"/>
+    </transfer>
+
+    <transfer name="DeletePaymentMethod" strict="true">
+        <property name="name" dataBuilderRule="word()"/>
+        <property name="providerName" dataBuilderRule="word()"/>
+        <property name="paymentAuthorizationEndpoint" dataBuilderRule="word()"/>
+    </transfer>
+
+    <transfer name="PaymentCreated" strict="true">
+        <property name="entityReference" dataBuilderRule="unique()->uuid()"/>
+        <property name="paymentReference" dataBuilderRule="unique()->uuid()"/>
+    </transfer>
+
+    <transfer name="MessageAttributes">
+        <property name="tenantIdentifier" type="string" dataBuilderRule="lexify('??????????')"/>
+    </transfer>
+
+    <transfer name="CapturePaymentRequest" strict="true">
+        <property name="transactionId" dataBuilderRule="unique()->uuid()"/>
+        <property name="amount" dataBuilderRule="=1000"/>
+        <property name="payment" dataBuilderRule="Payment"/>
+    </transfer>
+
+    <transfer name="RefundPaymentRequest" strict="true">
+        <property name="amount" dataBuilderRule="numerify('###')"/>
+    </transfer>
+
+</transfers>
