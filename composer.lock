@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "54139d0baf1fc7b58d10ada817a2eae5",
+    "content-hash": "283a6e5f7516166272323b5f353c58f0",
     "packages": [
         {
             "name": "brick/math",
@@ -1643,6 +1643,82 @@
                 "source": "https://github.com/spryker/acl-merchant-portal-extension/tree/1.0.0"
             },
             "time": "2023-03-10T14:11:16+00:00"
+        },
+        {
+            "name": "spryker/app-webhook",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spryker/app-webhook.git",
+                "reference": "4ee478ee517d2add3a1624fc375bfb187c465cbf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spryker/app-webhook/zipball/4ee478ee517d2add3a1624fc375bfb187c465cbf",
+                "reference": "4ee478ee517d2add3a1624fc375bfb187c465cbf",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1",
+                "spryker/glue-application-extension": "^1.0.0",
+                "spryker/kernel": "^3.30.0",
+                "spryker/log": "^3.0.0",
+                "spryker/message-broker": "^1.11.0",
+                "spryker/propel-encryption-behavior": "^0.1.1",
+                "spryker/secrets-manager": "^1.0.0",
+                "spryker/secrets-manager-extension": "^1.0.0",
+                "spryker/symfony": "^3.0.0",
+                "spryker/transfer": "^3.33.0",
+                "spryker/util-encoding": "^2.0.0",
+                "spryker/util-text": "^1.0.0"
+            },
+            "require-dev": {
+                "codeception/codeception": "^5.0",
+                "codeception/module-asserts": "^3.0",
+                "codeception/module-cli": "^2.0.0",
+                "codeception/module-filesystem": "^3.0.0",
+                "codeception/module-phpbrowser": "^3.0.0",
+                "codeception/module-rest": "^3.0.0",
+                "codeception/module-webdriver": "^3.0.0",
+                "infection/codeception-adapter": "^0.4.3",
+                "infection/infection": "^0.27.8",
+                "phpstan/phpdoc-parser": "1.25.0",
+                "phpstan/phpstan": "1.10.66",
+                "rector/rector": "^0.19.0",
+                "spryker/app-kernel": "dev-feature/extract-payment-template",
+                "spryker/code-sniffer": "*",
+                "spryker/container": "*",
+                "spryker/development": "^3.34.0",
+                "spryker/glue-application": "^1.64",
+                "spryker/message-broker-aws": "^1.7.0",
+                "spryker/propel": "*",
+                "spryker/testify": "*",
+                "spryker/testify-async-api": "^0.1.4"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Spryker\\": "src/Spryker/",
+                    "SprykerTest\\Shared\\AppWebhook\\Helper\\": "tests/SprykerTest/Shared/AppWebhook/_support/Helper/",
+                    "SprykerTest\\Glue\\AppWebhookBackendApi\\Helper\\": "tests/SprykerTest/Glue/AppWebhookBackendApi/_support/Helper/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "proprietary"
+            ],
+            "description": "AppWebhook module",
+            "support": {
+                "issues": "https://github.com/spryker/app-webhook/issues",
+                "source": "https://github.com/spryker/app-webhook/tree/main"
+            },
+            "time": "2024-06-26T06:51:10+00:00"
         },
         {
             "name": "spryker/application-extension",

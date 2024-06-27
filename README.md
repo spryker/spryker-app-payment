@@ -27,13 +27,7 @@ $config[AppConstants::APP_IDENTIFIER] = getenv('APP_IDENTIFIER') ?: 'hello-world
 You can test the AppPayment as usual with Codeception. Before that you need to run some commands:
 
 ```
-tests/bin/console app-payment:setup
-tests/bin/console transfer:generate
-tests/bin/console transfer:databuilder:generate
-tests/bin/console propel:install
-tests/bin/console dev:ide-auto-completion:zed:generate
-tests/bin/console dev:ide-auto-completion:glue:generate
-tests/bin/console dev:ide-auto-completion:glue-backend:generate
+composer setup
 ```
 
 With these commands you've set up the AppPayment and can start the tests
@@ -42,3 +36,36 @@ With these commands you've set up the AppPayment and can start the tests
 vendor/bin/codecept build
 vendor/bin/codecept run
 ```
+
+## Plugins
+
+The following plugins can be used inside your Payment Service Provider App.
+
+### GlueApplication
+
+#### \Spryker\Glue\AppPaymentBackendApi\Plugin\GlueApplication\AppPaymentBackendApiRouteProviderPlugin
+
+This plugin provides the routes for the AppPaymentBackendApi module.
+
+
+###### Routes provided
+
+- /private/initialize-payment - Used from the Tenant side to initialize a payment.
+
+
+### AppKernel
+- \Spryker\Glue\AppPaymentBackendApi\Plugin\AppKernel\PaymentConfigurationValidatorPlugin
+- \Spryker\Zed\AppPayment\Communication\Plugin\AppKernel\DeleteTenantPaymentsConfigurationAfterDeletePlugin
+- \Spryker\Zed\AppPayment\Communication\Plugin\AppKernel\SendAddPaymentMethodMessageConfigurationAfterSavePlugin
+- \Spryker\Zed\AppPayment\Communication\Plugin\AppKernel\SendDeletePaymentMethodMessageConfigurationAfterDeletePlugin
+
+### AppWebhook
+- \Spryker\Zed\AppPayment\Communication\Plugin\AppWebhook\PaymentWebhookHandlerPlugin
+
+### MessageBroker
+- \Spryker\Zed\AppPayment\Communication\Plugin\MessageBroker\CancelPaymentMessageHandlerPlugin
+- \Spryker\Zed\AppPayment\Communication\Plugin\MessageBroker\CapturePaymentMessageHandlerPlugin
+- \Spryker\Zed\AppPayment\Communication\Plugin\MessageBroker\RefundPaymentMessageHandlerPlugin
+
+### MessageBrokerAws
+- \Spryker\Zed\AppPayment\Communication\Plugin\MessageBrokerAws\ConsumerIdHttpChannelMessageReceiverRequestExpanderPlugin
