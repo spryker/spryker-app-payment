@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "82eb78233819f05d7429324584f27668",
+    "content-hash": "72fecea1419104f424ac96b0c35efece",
     "packages": [
         {
             "name": "brick/math",
@@ -15045,15 +15045,15 @@
         },
         {
             "name": "spryker/app-merchant",
-            "version": "dev-feature/app-merchant-extraction",
+            "version": "dev-feature/acp-2626/master-stripe-marketplace-payment-flow-marketplace-oms-workflow-transfers-to-merchants",
             "source": {
                 "type": "git",
                 "url": "git@github.com:spryker/app-merchant.git",
-                "reference": "456c153e70f13fd1ebb8dcac770ae4e44d7a616b"
+                "reference": "3187bd5ee5a08871faff82a7fe6e55b84cbedd5f"
             },
             "require": {
                 "php": ">=8.1",
-                "spryker/app-payment": "dev-feature/app-payment-extraction",
+                "spryker/app-payment": "dev-feature/acp-2626/master-stripe-marketplace-payment-flow-marketplace-oms-workflow-transfers-to-merchants",
                 "spryker/app-webhook": "dev-main",
                 "spryker/glue-application-extension": "^1.0.0",
                 "spryker/kernel": "^3.30.0",
@@ -15159,7 +15159,7 @@
                 "proprietary"
             ],
             "description": "AppMerchant module",
-            "time": "2024-06-27T10:06:15+00:00"
+            "time": "2024-07-01T08:07:57+00:00"
         },
         {
             "name": "spryker/application",

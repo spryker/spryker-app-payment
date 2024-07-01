@@ -141,9 +141,13 @@ class PaymentTransfer
         array $paymentTransferCollection
     ): GeneratedPaymentTransfer {
         foreach ($paymentTransferCollection as $paymentTransfer) {
+            // This will never be not set, but we need to check it for static analysis
+            // @codeCoverageIgnoreStart
             if ($paymentTransfer->getTenantIdentifierOrFail() !== $tenantIdentifier) {
                 continue;
             }
+
+            // @codeCoverageIgnoreEnd
 
             if ($paymentTransfer->getOrderReferenceOrFail() !== $orderReference) {
                 continue;

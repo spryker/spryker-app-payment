@@ -20,6 +20,7 @@ use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentQuery;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentTransferQuery;
 use Ramsey\Uuid\Uuid;
+use Spryker\Zed\AppMerchant\Communication\Plugin\AppPayment\MerchantsPaymentsTransmissionsRequestExtenderPlugin;
 use Spryker\Zed\AppPayment\AppPaymentConfig;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
@@ -126,7 +127,9 @@ class PaymentsTransfersWithMerchantsApiTest extends Unit
         ]);
 
         $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
-        $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGINS_PAYMENTS_TRANSMISSIONS_REQUEST_EXPANDER, []);
+        $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGINS_PAYMENTS_TRANSMISSIONS_REQUEST_EXPANDER, [
+            new MerchantsPaymentsTransmissionsRequestExtenderPlugin(),
+        ]);
 
         // Act
         $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
