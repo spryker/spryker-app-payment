@@ -62,6 +62,38 @@ paths:
                             schema:
                                 type: string
 
+    '/private/payments/transfers':
+        post:
+            x-spryker:
+                module: PaymentBackendApi
+                controller: PaymentsTransfersResourceController
+            summary: 'Endpoint which will be used by SCOS to to transfer money to Merchants or to reverse previously made transfers.'
+            parameters:
+                -   $ref: '#/components/parameters/tenantIdentifier'
+            requestBody:
+                description: 'Provides data needed to do transfers or reverse transfers.'
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/MerchantsTransfersRequest'
+            responses:
+                201:
+                    description: 'Response when transfers are initiated.'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/MerchantsTransfersResponse'
+                400:
+                    description: 'Bad request.'
+                default:
+                    description: 'Expected response to a bad request.'
+                    content:
+                        text/plain:
+                            schema:
+                                type: string
+
+
 components:
     schemas:
         InitializePaymentResponse:
@@ -159,6 +191,60 @@ components:
                     type: string
                     example: "Oryx Figurine"
 
+        MerchantsTransfersRequest:
+            properties:
+                orderItems:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/OrderItem'
+                    minItems: 1
+
+        MerchantsTransfersResponse:
+            properties:
+                transfers:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Transfer'
+        Transfer:
+            properties:
+                merchantReference:
+                    type: string
+                orderReference:
+                    type: string
+                amount:
+                    type: string
+                orderItems:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/OrderItem'
+                isSuccessful:
+                    type: boolean
+                    description: 'Indicates if the transfer was successful or not.'
+                failureMessage:
+                    type: string
+                    description: 'Message in case of failure to know the issue on the Tenant side.'
+        OrderItem:
+            properties:
+                merchantReference:
+                    type: string
+                    description: 'UUID of the merchant.'
+                orderReference:
+                    type: string
+                    description: 'UUID of the sales order.'
+                itemReference:
+                    type: string
+                    description: 'UUID of the sales order item.'
+                amount:
+                    type: string
+                    description: 'Amount in lowest denominator (cents, YEN). When negative money has to be refunded, when positive money has to be transferred.'
+                    example:
+                        - '1000' # Positive number used for transfer
+                        - '-1000' # Negative number used for transfer reversal
+            required:
+                - merchantReference
+                - orderReference
+                - amount
+                - itemReference
     parameters:
         tenantIdentifier:
             name: X-Tenant-Identifier

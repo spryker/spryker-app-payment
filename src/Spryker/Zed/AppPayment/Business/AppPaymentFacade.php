@@ -17,6 +17,8 @@ use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
 use Generated\Shared\Transfer\PaymentCollectionDeleteCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentPageRequestTransfer;
 use Generated\Shared\Transfer\PaymentPageResponseTransfer;
+use Generated\Shared\Transfer\PaymentsTransmissionsRequestTransfer;
+use Generated\Shared\Transfer\PaymentsTransmissionsResponseTransfer;
 use Generated\Shared\Transfer\RedirectRequestTransfer;
 use Generated\Shared\Transfer\RedirectResponseTransfer;
 use Generated\Shared\Transfer\RefundPaymentTransfer;
@@ -140,5 +142,10 @@ class AppPaymentFacade extends AbstractFacade implements AppPaymentFacadeInterfa
         PaymentCollectionDeleteCriteriaTransfer $paymentCollectionDeleteCriteriaTransfer
     ): void {
         $this->getEntityManager()->deletePaymentCollection($paymentCollectionDeleteCriteriaTransfer);
+    }
+
+    public function transferPayments(PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer): PaymentsTransmissionsResponseTransfer
+    {
+        return $this->getFactory()->createPayment()->transferPayments($paymentsTransmissionsRequestTransfer);
     }
 }

@@ -52,6 +52,28 @@ class AppPaymentRepository extends AbstractRepository implements AppPaymentRepos
     }
 
     /**
+     * @param array<string> $orderReferences
+     *
+     * @return array<\Generated\Shared\Transfer\PaymentTransfer>
+     */
+    public function getPaymentsByTenantIdentifierAndOrderReferences(string $tenantIdentifier, array $orderReferences): array
+    {
+        /** @var array<\Orm\Zed\AppPayment\Persistence\SpyPayment> $spyPaymentCollection */
+        $spyPaymentCollection = $this->getFactory()->createPaymentQuery()
+            ->filterByTenantIdentifier($tenantIdentifier)
+            ->filterByOrderReference_In($orderReferences)
+            ->find();
+
+        $paymentTransfers = [];
+
+        foreach ($spyPaymentCollection as $spyPaymentEntity) {
+            $paymentTransfers[] = $this->mapPaymentEntityToPaymentTransfer($spyPaymentEntity);
+        }
+
+        return $paymentTransfers;
+    }
+
+    /**
      * @throws \Spryker\Zed\AppPayment\Persistence\Exception\RefundByRefundIdNotFoundException
      */
     public function getRefundByRefundId(string $refundId): PaymentRefundTransfer

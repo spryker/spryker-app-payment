@@ -19,6 +19,8 @@ use Generated\Shared\Transfer\PaymentPageRequestTransfer;
 use Generated\Shared\Transfer\PaymentPageResponseTransfer;
 use Generated\Shared\Transfer\PaymentStatusRequestTransfer;
 use Generated\Shared\Transfer\PaymentStatusResponseTransfer;
+use Generated\Shared\Transfer\PaymentsTransmissionsRequestTransfer;
+use Generated\Shared\Transfer\PaymentsTransmissionsResponseTransfer;
 use Generated\Shared\Transfer\RefundPaymentRequestTransfer;
 use Generated\Shared\Transfer\RefundPaymentResponseTransfer;
 use Generated\Shared\Transfer\WebhookRequestTransfer;
@@ -59,6 +61,11 @@ class AppPaymentDependencyProvider extends AbstractBundleDependencyProvider
      */
     public const SERVICE_UTIL_ENCODING = 'PAYMENT:SERVICE_UTIL_ENCODING';
 
+    /**
+     * @var string
+     */
+    public const PLUGINS_PAYMENTS_TRANSMISSIONS_REQUEST_EXPANDER = 'PAYMENT:PLUGINS_PAYMENTS_TRANSMISSIONS_REQUEST_EXPANDER';
+
     public function provideBusinessLayerDependencies(Container $container): Container
     {
         $container = parent::provideBusinessLayerDependencies($container);
@@ -68,7 +75,7 @@ class AppPaymentDependencyProvider extends AbstractBundleDependencyProvider
         $container = $this->addMessageBrokerFacade($container);
         $container = $this->addUtilEncodingService($container);
 
-        return $container;
+        return $this->addPaymentsTransmissionRequestExpanderPluginsPlugins($container);
     }
 
     protected function addPlatformPlugin(Container $container): Container
@@ -131,6 +138,11 @@ class AppPaymentDependencyProvider extends AbstractBundleDependencyProvider
             {
                 return (new PaymentPageResponseTransfer())->setIsSuccessful(true);
             }
+
+            public function transferPayments(PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer): PaymentsTransmissionsResponseTransfer
+            {
+                return (new PaymentsTransmissionsResponseTransfer())->setIsSuccessful(true);
+            }
         };
         // @codeCoverageIgnoreEnd
     }
@@ -160,5 +172,22 @@ class AppPaymentDependencyProvider extends AbstractBundleDependencyProvider
         });
 
         return $container;
+    }
+
+    protected function addPaymentsTransmissionRequestExpanderPluginsPlugins(Container $container): Container
+    {
+        $container->set(static::PLUGINS_PAYMENTS_TRANSMISSIONS_REQUEST_EXPANDER, function (): array {
+            return $this->getPaymentsTransmissionRequestExpanderPluginsPlugins();
+        });
+
+        return $container;
+    }
+
+    /**
+     * @return array<\Spryker\Zed\AppPayment\Dependency\Plugin\PaymentsTransmissionsRequestExtenderPluginInterface>
+     */
+    private function getPaymentsTransmissionRequestExpanderPluginsPlugins(): array
+    {
+        return [];
     }
 }

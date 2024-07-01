@@ -23,6 +23,13 @@ interface AppPaymentRepositoryInterface
     public function getPaymentByTenantIdentifierAndOrderReference(string $tenantIdentifier, string $orderReference): PaymentTransfer;
 
     /**
+     * @param array<string> $orderReferences
+     *
+     * @return array<\Generated\Shared\Transfer\PaymentTransfer>
+     */
+    public function getPaymentsByTenantIdentifierAndOrderReferences(string $tenantIdentifier, array $orderReferences): array;
+
+    /**
      * @throws \Spryker\Zed\AppPayment\Persistence\Exception\RefundByRefundIdNotFoundException
      */
     public function getRefundByRefundId(string $refundId): PaymentRefundTransfer;

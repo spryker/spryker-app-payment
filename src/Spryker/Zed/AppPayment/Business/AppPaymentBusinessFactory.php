@@ -25,6 +25,7 @@ use Spryker\Zed\AppPayment\Business\Payment\Payment;
 use Spryker\Zed\AppPayment\Business\Payment\Refund\PaymentRefunder;
 use Spryker\Zed\AppPayment\Business\Payment\Refund\PaymentRefundValidator;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatusTransitionValidator;
+use Spryker\Zed\AppPayment\Business\Payment\Transfer\PaymentTransfer;
 use Spryker\Zed\AppPayment\Business\Payment\Validate\ConfigurationValidator;
 use Spryker\Zed\AppPayment\Business\Payment\Webhook\Handler\PaymentRefundWebhookHandler;
 use Spryker\Zed\AppPayment\Business\Payment\Webhook\Handler\PaymentWebhookHandler;
@@ -52,6 +53,7 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
             $this->getPlatformPlugin(),
             $this->createConfigurationValidator(),
             $this->createPaymentInitializer(),
+            $this->createPaymentTransfer(),
             $this->createPaymentPage(),
             $this->createWebhookHandler(),
         );
@@ -65,6 +67,18 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
     public function createPaymentInitializer(): PaymentInitializer
     {
         return new PaymentInitializer($this->getPlatformPlugin(), $this->getEntityManager(), $this->createMessageSender(), $this->getConfig(), $this->createAppConfigLoader());
+    }
+
+    public function createPaymentTransfer(): PaymentTransfer
+    {
+        return new PaymentTransfer(
+            $this->getPlatformPlugin(),
+            $this->getEntityManager(),
+            $this->getRepository(),
+            $this->getConfig(),
+            $this->createAppConfigLoader(),
+            $this->getPaymentsTransmissionsRequestExtenderPlugins(),
+        );
     }
 
     public function createPaymentPage(): PaymentPage
@@ -122,6 +136,15 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
     public function createWebhookMessageSender(): WebhookMessageSender
     {
         return new WebhookMessageSender($this->createMessageSender());
+    }
+
+    /**
+     * @return array<\Spryker\Zed\AppPayment\Dependency\Plugin\PaymentsTransmissionsRequestExtenderPluginInterface>
+     */
+    protected function getPaymentsTransmissionsRequestExtenderPlugins(): array
+    {
+        /** @phpstan-var array<\Spryker\Zed\AppPayment\Dependency\Plugin\PaymentsTransmissionsRequestExtenderPluginInterface> */
+        return $this->getProvidedDependency(AppPaymentDependencyProvider::PLUGINS_PAYMENTS_TRANSMISSIONS_REQUEST_EXPANDER);
     }
 
     public function getPlatformPlugin(): PlatformPluginInterface

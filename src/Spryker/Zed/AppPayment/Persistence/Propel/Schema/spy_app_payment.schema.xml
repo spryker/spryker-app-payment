@@ -25,6 +25,28 @@
         </behavior>
     </table>
 
+    <table name="spy_payment_transfer" idMethod="native" class="SpyPayment">
+        <column name="id_payment_transfer" type="INTEGER" required="true" autoIncrement="true" primaryKey="true"/>
+        <column name="tenant_identifier" type="CHAR" size="60"/>
+        <column name="transaction_id" type="CHAR" size="36"/>
+        <column name="transfer_id" type="CHAR" size="36"/>
+        <column name="order_reference" type="CHAR" size="36"/>
+        <column name="item_references" type="LONGVARCHAR"/>
+        <column name="amount" type="INTEGER"/>
+        <column name="commission" type="INTEGER"/>
+
+        <unique name="spy_payment_transfer-unique-transfer">
+            <unique-column name="tenant_identifier"/>
+            <unique-column name="transaction_id"/>
+            <unique-column name="transfer_id"/>
+        </unique>
+
+        <behavior name="timestampable">
+            <parameter name="create_column" value="created_at"/>
+            <parameter name="update_column" value="updated_at"/>
+        </behavior>
+    </table>
+
     <table name="spy_payment_refund" idMethod="native" class="SpyPaymentRefund">
         <column name="id_payment_refund" required="true" type="INTEGER" autoIncrement="true" primaryKey="true"/>
         <column name="transaction_id" type="CHAR" size="36"/>

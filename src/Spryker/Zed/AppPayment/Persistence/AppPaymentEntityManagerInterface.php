@@ -10,12 +10,15 @@ namespace Spryker\Zed\AppPayment\Persistence;
 use Generated\Shared\Transfer\PaymentCollectionDeleteCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentRefundTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 
 interface AppPaymentEntityManagerInterface
 {
     public function createPayment(PaymentTransfer $paymentTransfer): PaymentTransfer;
 
     public function savePayment(PaymentTransfer $paymentTransfer): PaymentTransfer;
+
+    public function savePaymentTransfer(PaymentTransmissionTransfer $paymentTransmissionTransfer): PaymentTransmissionTransfer;
 
     public function createPaymentRefund(PaymentRefundTransfer $paymentRefundTransfer): PaymentRefundTransfer;
 
