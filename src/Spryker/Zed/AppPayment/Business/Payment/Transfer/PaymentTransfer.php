@@ -124,6 +124,10 @@ class PaymentTransfer
         PaymentsTransmissionsResponseTransfer $paymentsTransmissionsResponseTransfer
     ): PaymentsTransmissionsResponseTransfer {
         foreach ($paymentsTransmissionsResponseTransfer->getPaymentsTransmissions() as $paymentsTransmission) {
+            if (!$paymentsTransmission->getIsSuccessful()) {
+                continue;
+            }
+
             $this->appPaymentEntityManager->savePaymentTransfer($paymentsTransmission);
         }
 

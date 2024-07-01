@@ -76,14 +76,14 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/MerchantsTransfersRequest'
+                            $ref: '#/components/schemas/TransfersRequest'
             responses:
                 201:
                     description: 'Response when transfers are initiated.'
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/MerchantsTransfersResponse'
+                                $ref: '#/components/schemas/TransfersResponse'
                 400:
                     description: 'Bad request.'
                 default:
@@ -191,7 +191,7 @@ components:
                     type: string
                     example: "Oryx Figurine"
 
-        MerchantsTransfersRequest:
+        TransfersRequest:
             properties:
                 orderItems:
                     type: array
@@ -199,7 +199,7 @@ components:
                         $ref: '#/components/schemas/OrderItem'
                     minItems: 1
 
-        MerchantsTransfersResponse:
+        TransfersResponse:
             properties:
                 transfers:
                     type: array

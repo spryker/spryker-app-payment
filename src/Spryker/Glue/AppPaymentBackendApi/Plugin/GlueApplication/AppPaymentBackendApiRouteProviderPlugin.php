@@ -45,6 +45,7 @@ class AppPaymentBackendApiRouteProviderPlugin extends AbstractPlugin implements 
             ->setDefaults([
                 '_controller' => [PaymentsTransfersResourceController::class, 'postAction'],
                 '_resourceName' => 'payments-transfers',
+                '_method' => 'post',
             ])
             ->setMethods(Request::METHOD_POST);
     }

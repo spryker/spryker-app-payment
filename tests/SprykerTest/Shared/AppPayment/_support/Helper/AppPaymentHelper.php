@@ -273,6 +273,18 @@ class AppPaymentHelper extends Module
         }
     }
 
+    public function assertPaymentTransferIsNotPersisted(
+        string $tenantIdentifier,
+        string $merchantReference
+    ): void {
+        $paymentTransferEntity = SpyPaymentTransferQuery::create()
+            ->filterByTenantIdentifier($tenantIdentifier)
+            ->filterByMerchantReference($merchantReference)
+            ->findOne();
+
+        $this->assertNull($paymentTransferEntity, 'Payment transfer is persisted which is not expected. Only successful transmissions have to be persisted on the App side.');
+    }
+
     public function haveOrderItem(array $seed = []): OrderItemTransfer
     {
         return (new OrderItemBuilder($seed))->build();

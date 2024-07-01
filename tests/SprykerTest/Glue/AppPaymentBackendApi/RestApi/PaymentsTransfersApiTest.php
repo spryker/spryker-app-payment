@@ -74,7 +74,7 @@ class PaymentsTransfersApiTest extends Unit
 
                 // Add transferId to each PaymentTransmissionTransfer.
                 foreach ($paymentsTransmissionsRequestTransfer->getPaymentsTransmissions() as $paymentsTransmission) {
-                    $paymentsTransmission->setTransferId($transferId);
+                    $paymentsTransmission->setTransferId($transferId)->setIsSuccessful(true);
                     $paymentsTransmissionsResponseTransfer->addPaymentTransmission($paymentsTransmission);
                 }
 

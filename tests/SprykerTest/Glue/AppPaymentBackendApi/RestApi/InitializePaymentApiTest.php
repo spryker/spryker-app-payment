@@ -65,12 +65,14 @@ class InitializePaymentApiTest extends Unit
 
         // Act
         $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $initializePaymentRequestTransfer->getTenantIdentifier());
-        $this->tester->sendPost($this->tester->buildPaymentUrl(), [RequestOptions::FORM_PARAMS => $initializePaymentRequestTransfer->toArray()]);
+        $this->tester->addHeader('Content-Type', 'application/json');
+
+        $response = $this->tester->sendPost($this->tester->buildPaymentUrl(), [RequestOptions::FORM_PARAMS => $initializePaymentRequestTransfer->toArray()]);
 
         // Assert
         $this->tester->seeResponseCodeIs(Response::HTTP_OK);
         $this->tester->seeResponseIsJson();
-        $this->tester->seeResponseJsonContainsPayment();
+        $this->tester->seeResponseJsonContainsPayment($response);
 
         $this->tester->assertPaymentWithTransactionIdExists($transactionId);
         $this->tester->assertSamePaymentQuoteAndRequestQuote($transactionId, $initializePaymentRequestTransfer->getOrderData());
@@ -105,12 +107,14 @@ class InitializePaymentApiTest extends Unit
 
         // Act
         $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $initializePaymentRequestTransfer->getTenantIdentifier());
-        $this->tester->sendPost($this->tester->buildPaymentUrl(), [RequestOptions::FORM_PARAMS => $initializePaymentRequestTransfer->toArray()]);
+        $this->tester->addHeader('Content-Type', 'application/json');
+
+        $response = $this->tester->sendPost($this->tester->buildPaymentUrl(), [RequestOptions::FORM_PARAMS => $initializePaymentRequestTransfer->toArray()]);
 
         // Assert
         $this->tester->seeResponseCodeIs(Response::HTTP_OK);
         $this->tester->seeResponseIsJson();
-        $this->tester->seeResponseJsonContainsPayment();
+        $this->tester->seeResponseJsonContainsPayment($response);
 
         $this->tester->assertPaymentWithTransactionIdExists($transactionId);
         $this->tester->assertSamePaymentQuoteAndRequestQuote($transactionId, $initializePaymentRequestTransfer->getOrderData());
@@ -132,6 +136,8 @@ class InitializePaymentApiTest extends Unit
 
         // Act
         $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $initializePaymentRequestTransfer->getTenantIdentifier());
+        $this->tester->addHeader('Content-Type', 'application/json');
+
         $this->tester->sendPost($url, [RequestOptions::FORM_PARAMS => $initializePaymentRequestTransfer->toArray()]);
 
         // Assert
@@ -156,6 +162,8 @@ class InitializePaymentApiTest extends Unit
 
         // Act
         $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $initializePaymentRequestTransfer->getTenantIdentifier());
+        $this->tester->addHeader('Content-Type', 'application/json');
+
         $this->tester->sendPost($this->tester->buildPaymentUrl(), [RequestOptions::FORM_PARAMS => $initializePaymentRequestTransfer->toArray()]);
 
         // Assert
@@ -171,7 +179,7 @@ class InitializePaymentApiTest extends Unit
 
         $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
             'initializePayment' => static function (): never {
-                throw new Exception();
+                throw new Exception('An Error occurred in the platform plugin.');
             },
         ]);
 
@@ -179,10 +187,12 @@ class InitializePaymentApiTest extends Unit
 
         // Act
         $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $initializePaymentRequestTransfer->getTenantIdentifier());
+        $this->tester->addHeader('Content-Type', 'application/json');
+
         $response = $this->tester->sendPost($url, [RequestOptions::FORM_PARAMS => $initializePaymentRequestTransfer->toArray()]);
 
         // Assert
         $this->tester->seeResponseCodeIs(Response::HTTP_OK);
-        $this->tester->assertResponseHasErrorMessage($response);
+        $this->tester->assertResponseHasErrorMessage($response, 'An Error occurred in the platform plugin.');
     }
 }

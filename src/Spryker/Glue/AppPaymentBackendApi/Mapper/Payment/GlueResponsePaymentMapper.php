@@ -53,15 +53,9 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
         InitializePaymentResponseTransfer $initializePaymentResponseTransfer,
         GlueResponseTransfer $glueResponseTransfer
     ): GlueResponseTransfer {
-        $glueResourceTransfer = new GlueResourceTransfer();
-        $glueResourceTransfer->setAttributes($initializePaymentResponseTransfer);
-        $glueResourceTransfer->setType('payment');
-
         $glueResponseTransfer->setContent(
             (string)json_encode($initializePaymentResponseTransfer->toArray()),
         );
-
-        $glueResponseTransfer->addResource($glueResourceTransfer);
 
         // SCOS Checkout expects a 200 response code and check isSuccessful property to show error message.
         $glueResponseTransfer->setHttpStatus(Response::HTTP_OK);
@@ -77,6 +71,8 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
 
         foreach ($paymentsTransmissionsResponseTransfer->getPaymentsTransmissions() as $paymentsTransmission) {
             $responseContent['transfers'][] = [
+                'isSuccessful' => $paymentsTransmission->getIsSuccessful(),
+                'failureMessage' => $paymentsTransmission->getMessage(),
                 'merchantReference' => $paymentsTransmission->getMerchantReference(),
                 'orderReference' => $paymentsTransmission->getOrderReference(),
                 'orderItems' => $this->formatOrderItemsForTransferResponse($paymentsTransmission->getOrderItems()),

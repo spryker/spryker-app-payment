@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace SprykerTest\Glue\AppPaymentBackendApi;
 
 use Codeception\Actor;
+use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Inherited Methods
@@ -31,8 +33,12 @@ class AppPaymentBackendApiTester extends Actor
 {
     use _generated\AppPaymentBackendApiTesterActions;
 
-    public function seeResponseJsonContainsPayment(): void
+    public function seeResponseJsonContainsPayment(Response $response): void
     {
-        $this->seeResponseJsonPathContains(['data' => ['type' => 'payment']]);
+        $response = json_decode($response->getContent(), true);
+
+        $initializePaymentResponseTransfer = (new InitializePaymentResponseTransfer())->fromArray($response);
+
+        $this->assertTrue($initializePaymentResponseTransfer->getIsSuccessful());
     }
 }

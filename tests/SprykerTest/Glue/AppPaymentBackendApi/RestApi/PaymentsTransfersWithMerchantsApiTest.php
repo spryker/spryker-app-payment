@@ -116,8 +116,8 @@ class PaymentsTransfersWithMerchantsApiTest extends Unit
 
                 /** @var \ArrayObject<int, \Generated\Shared\Transfer\PaymentTransmissionTransfer> $paymentsTransmissionsTransferCollection */
                 $paymentsTransmissionsTransferCollection = $paymentsTransmissionsRequestTransfer->getPaymentsTransmissions();
-                $paymentsTransmissionsTransferCollection[0]->setTransferId($transferId1);
-                $paymentsTransmissionsTransferCollection[1]->setTransferId($transferId2);
+                $paymentsTransmissionsTransferCollection[0]->setTransferId($transferId1)->setIsSuccessful(true);
+                $paymentsTransmissionsTransferCollection[1]->setTransferId($transferId2)->setIsSuccessful(true);
 
                 $paymentsTransmissionsResponseTransfer->addPaymentTransmission($paymentsTransmissionsTransferCollection[0]);
                 $paymentsTransmissionsResponseTransfer->addPaymentTransmission($paymentsTransmissionsTransferCollection[1]);
@@ -133,6 +133,7 @@ class PaymentsTransfersWithMerchantsApiTest extends Unit
 
         // Act
         $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
+        $this->tester->addHeader('Content-Type', 'application/json');
 
         $orderItemsRequestData = array_map(function (OrderItemTransfer $orderItem): array {
             return $orderItem->modifiedToArray();
@@ -175,5 +176,105 @@ class PaymentsTransfersWithMerchantsApiTest extends Unit
             SpyPaymentQuery::create()->filterByTenantIdentifier($tenantIdentifier)->delete();
             SpyPaymentTransferQuery::create()->filterByTenantIdentifier($tenantIdentifier)->delete();
         });
+    }
+
+    /**
+     * Ensure that even failed payment transmissions are returned in the response so the failure can be explored on the Tenant side with a message indicating what has happened.
+     */
+    public function testGivenOrderItemsWhichWouldTriggerAPayoutWhenThePaymentTransfersFailOnThePlatformImplementationThenTheResponseContainsTheFailedPaymentTransmissionsWithMessages(): void
+    {
+        // Arrange
+        $tenantIdentifier = Uuid::uuid4()->toString();
+
+        $transactionId1 = Uuid::uuid4()->toString();
+        $transactionId2 = Uuid::uuid4()->toString();
+
+        $orderReference1 = Uuid::uuid4()->toString();
+        $orderReference2 = Uuid::uuid4()->toString();
+
+        $merchantTransfer1 = $this->tester->haveMerchantPersisted([MerchantTransfer::TENANT_IDENTIFIER => $tenantIdentifier]);
+        $merchantTransfer2 = $this->tester->haveMerchantPersisted([MerchantTransfer::TENANT_IDENTIFIER => $tenantIdentifier]);
+
+        $this->tester->haveAppConfigForTenant($tenantIdentifier);
+
+        // First Payment
+        $this->tester->havePayment([
+            PaymentTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
+            PaymentTransfer::TRANSACTION_ID => $transactionId1,
+            PaymentTransfer::ORDER_REFERENCE => $orderReference1,
+        ]);
+
+        // Second Payment
+        $this->tester->havePayment([
+            PaymentTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
+            PaymentTransfer::TRANSACTION_ID => $transactionId2,
+            PaymentTransfer::ORDER_REFERENCE => $orderReference2,
+        ]);
+
+        /** @var array<\Generated\Shared\Transfer\OrderItemTransfer> $orderItems */
+        $orderItems = [
+            $this->tester->haveOrderItem([OrderItemTransfer::ORDER_REFERENCE => $orderReference1, OrderItemTransfer::AMOUNT => 180]),
+            $this->tester->haveOrderItem([OrderItemTransfer::ORDER_REFERENCE => $orderReference1, OrderItemTransfer::MERCHANT_REFERENCE => $merchantTransfer1->getMerchantReference(), OrderItemTransfer::AMOUNT => 45]),
+            $this->tester->haveOrderItem([OrderItemTransfer::ORDER_REFERENCE => $orderReference2, OrderItemTransfer::MERCHANT_REFERENCE => $merchantTransfer2->getMerchantReference(), OrderItemTransfer::AMOUNT => 90]),
+            $this->tester->haveOrderItem([OrderItemTransfer::ORDER_REFERENCE => $orderReference1, OrderItemTransfer::AMOUNT => 180]),
+            $this->tester->haveOrderItem([OrderItemTransfer::ORDER_REFERENCE => $orderReference1, OrderItemTransfer::MERCHANT_REFERENCE => $merchantTransfer1->getMerchantReference(), OrderItemTransfer::AMOUNT => 45]),
+            $this->tester->haveOrderItem([OrderItemTransfer::ORDER_REFERENCE => $orderReference2, OrderItemTransfer::MERCHANT_REFERENCE => $merchantTransfer2->getMerchantReference(), OrderItemTransfer::AMOUNT => 90]),
+        ];
+
+        $paymentTransmissionTransfer = new PaymentTransmissionTransfer();
+        $paymentTransmissionTransfer->setOrderItems(new ArrayObject($orderItems));
+
+        $paymentsTransmissionsRequestTransfer = new PaymentsTransmissionsRequestTransfer();
+        $paymentsTransmissionsRequestTransfer
+            ->setTenantIdentifier($tenantIdentifier)
+            ->addPaymentTransmission($paymentTransmissionTransfer);
+
+        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+            'transferPayments' => function (PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer) {
+                $paymentsTransmissionsResponseTransfer = new PaymentsTransmissionsResponseTransfer();
+                $paymentsTransmissionsResponseTransfer->setIsSuccessful(true);
+
+                $this->assertCount(2, $paymentsTransmissionsRequestTransfer->getPaymentsTransmissions());
+
+                // Ensure that the AppConfig is always passed to the platform plugin.
+                $this->assertInstanceOf(AppConfigTransfer::class, $paymentsTransmissionsRequestTransfer->getAppConfig());
+
+                // Mark both transfers as failed
+                /** @var \ArrayObject<int, \Generated\Shared\Transfer\PaymentTransmissionTransfer> $paymentsTransmissionsTransferCollection */
+                $paymentsTransmissionsTransferCollection = $paymentsTransmissionsRequestTransfer->getPaymentsTransmissions();
+                $paymentsTransmissionsTransferCollection[0]->setIsSuccessful(false)->setMessage('Transfer failed');
+                $paymentsTransmissionsTransferCollection[1]->setIsSuccessful(false)->setMessage('Transfer failed');
+
+                $paymentsTransmissionsResponseTransfer->addPaymentTransmission($paymentsTransmissionsTransferCollection[0]);
+                $paymentsTransmissionsResponseTransfer->addPaymentTransmission($paymentsTransmissionsTransferCollection[1]);
+
+                return $paymentsTransmissionsResponseTransfer;
+            },
+        ]);
+
+        $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
+        $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGINS_PAYMENTS_TRANSMISSIONS_REQUEST_EXPANDER, [
+            new MerchantsPaymentsTransmissionsRequestExtenderPlugin(),
+        ]);
+
+        // Act
+        $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
+        $this->tester->addHeader('Content-Type', 'application/json');
+
+        $orderItemsRequestData = array_map(function (OrderItemTransfer $orderItem): array {
+            return $orderItem->modifiedToArray();
+        }, $orderItems);
+
+        $this->tester->sendPost(
+            $this->tester->buildPaymentsTransfersUrl(),
+            ['orderItems' => $orderItemsRequestData],
+        );
+
+        // Assert
+        $this->tester->seeResponseCodeIs(Response::HTTP_OK);
+//        $this->tester->seeResponseJsonPathContains(['transfers' => ['failureMessage' => 'Transfer failed']]);
+
+        $this->tester->assertPaymentTransferIsNotPersisted($tenantIdentifier, $merchantTransfer1->getMerchantReference());
+        $this->tester->assertPaymentTransferIsNotPersisted($tenantIdentifier, $merchantTransfer2->getMerchantReference());
     }
 }

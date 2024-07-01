@@ -30,6 +30,8 @@
     </transfer>
 
     <transfer name="PaymentTransmission" strict="true">
+        <property name="isSuccessful" type="string"/>
+        <property name="message" type="string"/>
         <property name="tenantIdentifier" type="string"/>
         <property name="transactionId" type="string"/>
         <property name="transferId" type="string" description="The ID returned from the Platform implementation"/>
