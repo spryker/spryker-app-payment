@@ -16,6 +16,7 @@
     </transfer>
 
     <transfer name="OrderItem" strict="true">
+        <property name="merchantReference" type="string"/>
         <property name="orderReference" type="string"/>
         <property name="itemReference" type="string" description="UUID of the sales_order_item"/>
         <property name="amount" type="string" description="Amount in lowest denominator (cents, YEN). When negative money has to be refunded, when positive money has to be transferred."/>
@@ -33,11 +34,23 @@
         <property name="transactionId" type="string"/>
         <property name="transferId" type="string" description="The ID returned from the Platform implementation"/>
         <property name="currency" type="Currency"/>
+        <property name="merchantReference" type="string"/>
         <property name="orderReference" type="string"/>
         <property name="itemReferences" type="array" singular="itemReference" description="UUIDs of the sales_order_item(s)"/>
         <property name="orderItems" type="OrderItem[]" singular="orderItem"/>
         <property name="amount" type="string" description="Amount in lowest denominator (cents, YEN). When negative money has to be refunded, when positive money has to be transferred."/>
-        <property name="commission" type="string"/>
+        <property name="payment" type="Payment"/>
+    </transfer>
+
+
+    <transfer name="Payment" strict="true">
+        <property name="orderReference" type="string"/>
+        <property name="transactionId" type="string"/>
+        <property name="tenantIdentifier" type="string"/>
+        <property name="quote" type="Quote"/>
+        <property name="status" type="string"/>
+        <property name="redirectSuccessUrl" type="string"/>
+        <property name="redirectCancelUrl" type="string"/>
     </transfer>
 
     <transfer name="Currency">

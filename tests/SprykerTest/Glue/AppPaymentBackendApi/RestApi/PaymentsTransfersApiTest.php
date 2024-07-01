@@ -45,9 +45,6 @@ class PaymentsTransfersApiTest extends Unit
     public function testGivenPaymentsTransfersPostRequestWhenRequestIsValidThenAHttpResponseCode200IsReturnedAndTransfersArePersisted(): void
     {
         // Arrange
-        // Disable expander plugins for this test.
-//        $this->getDependencyHelper()->setDependency(PaymentDependencyProvider::PLUGINS_PAYMENTS_TRANSMISSIONS_REQUEST_EXPANDER, []);
-
         $transactionId = Uuid::uuid4()->toString();
         $transferId = Uuid::uuid4()->toString();
         $tenantIdentifier = Uuid::uuid4()->toString();
@@ -93,14 +90,12 @@ class PaymentsTransfersApiTest extends Unit
                 OrderItemTransfer::ORDER_REFERENCE => $orderReference,
                 OrderItemTransfer::ITEM_REFERENCE => Uuid::uuid4()->toString(),
                 OrderItemTransfer::AMOUNT => 90,
-                OrderItemTransfer::COMMISSION => 10,
             ]),
             $this->tester->haveOrderItem([
                 OrderItemTransfer::MERCHANT_REFERENCE => $merchantReference,
                 OrderItemTransfer::ORDER_REFERENCE => $orderReference,
                 OrderItemTransfer::ITEM_REFERENCE => Uuid::uuid4()->toString(),
                 OrderItemTransfer::AMOUNT => 90,
-                OrderItemTransfer::COMMISSION => 10,
             ]),
         ];
 
@@ -129,8 +124,7 @@ class PaymentsTransfersApiTest extends Unit
             ->setTransferId($transferId)
             ->setOrderReference($orderReference)
             ->setItemReferences([$orderItems[0]->getItemReferenceOrFail(), $orderItems[1]->getItemReferenceOrFail()])
-            ->setAmount('180')
-            ->setCommission('20');
+            ->setAmount('180');
 
         $this->assertCount(1, $paymentsTransmissionsResponseTransfer->getPaymentsTransmissions());
         $paymentTransmissionTransfer = $paymentsTransmissionsResponseTransfer->getPaymentsTransmissions()[0];
@@ -166,13 +160,11 @@ class PaymentsTransfersApiTest extends Unit
                 OrderItemTransfer::ORDER_REFERENCE => $orderReference,
                 OrderItemTransfer::ITEM_REFERENCE => Uuid::uuid4()->toString(),
                 OrderItemTransfer::AMOUNT => 90,
-                OrderItemTransfer::COMMISSION => 10,
             ]),
             $this->tester->haveOrderItem([
                 OrderItemTransfer::ORDER_REFERENCE => $orderReference,
                 OrderItemTransfer::ITEM_REFERENCE => Uuid::uuid4()->toString(),
                 OrderItemTransfer::AMOUNT => 90,
-                OrderItemTransfer::COMMISSION => 10,
             ]),
         ];
 
@@ -224,13 +216,11 @@ class PaymentsTransfersApiTest extends Unit
                 OrderItemTransfer::ORDER_REFERENCE => $orderReference,
                 OrderItemTransfer::ITEM_REFERENCE => Uuid::uuid4()->toString(),
                 OrderItemTransfer::AMOUNT => 90,
-                OrderItemTransfer::COMMISSION => 10,
             ]),
             $this->tester->haveOrderItem([
                 OrderItemTransfer::ORDER_REFERENCE => $orderReference,
                 OrderItemTransfer::ITEM_REFERENCE => Uuid::uuid4()->toString(),
                 OrderItemTransfer::AMOUNT => 90,
-                OrderItemTransfer::COMMISSION => 10,
             ]),
         ];
 
@@ -272,13 +262,11 @@ class PaymentsTransfersApiTest extends Unit
                 OrderItemTransfer::ORDER_REFERENCE => $orderReference,
                 OrderItemTransfer::ITEM_REFERENCE => Uuid::uuid4()->toString(),
                 OrderItemTransfer::AMOUNT => 90,
-                OrderItemTransfer::COMMISSION => 10,
             ]),
             $this->tester->haveOrderItem([
                 OrderItemTransfer::ORDER_REFERENCE => $orderReference,
                 OrderItemTransfer::ITEM_REFERENCE => Uuid::uuid4()->toString(),
                 OrderItemTransfer::AMOUNT => 90,
-                OrderItemTransfer::COMMISSION => 10,
             ]),
         ];
 

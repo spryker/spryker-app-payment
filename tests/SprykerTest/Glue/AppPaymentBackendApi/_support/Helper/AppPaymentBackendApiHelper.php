@@ -34,6 +34,11 @@ class AppPaymentBackendApiHelper extends Module
         return $this->buildBackendApiUrl('webhooks');
     }
 
+    public function buildPaymentsTransfersUrl(): string
+    {
+        return $this->buildBackendApiUrl('private/payments/transfers');
+    }
+
     /**
      * @param array<mixed>|string $params
      */

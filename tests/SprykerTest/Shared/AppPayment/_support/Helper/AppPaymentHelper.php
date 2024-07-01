@@ -11,15 +11,25 @@ use Codeception\Module;
 use Generated\Shared\DataBuilder\CancelPaymentRequestBuilder;
 use Generated\Shared\DataBuilder\CapturePaymentRequestBuilder;
 use Generated\Shared\DataBuilder\InitializePaymentRequestBuilder;
+use Generated\Shared\DataBuilder\OrderItemBuilder;
 use Generated\Shared\DataBuilder\PaymentBuilder;
+use Generated\Shared\DataBuilder\PaymentsTransmissionsRequestBuilder;
+use Generated\Shared\DataBuilder\PaymentsTransmissionsResponseBuilder;
+use Generated\Shared\DataBuilder\PaymentTransmissionBuilder;
 use Generated\Shared\DataBuilder\QuoteBuilder;
 use Generated\Shared\Transfer\CancelPaymentRequestTransfer;
 use Generated\Shared\Transfer\CapturePaymentRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
+use Generated\Shared\Transfer\OrderItemTransfer;
 use Generated\Shared\Transfer\PaymentPageRequestTransfer;
 use Generated\Shared\Transfer\PaymentStatusRequestTransfer;
+use Generated\Shared\Transfer\PaymentsTransmissionsRequestTransfer;
+use Generated\Shared\Transfer\PaymentsTransmissionsResponseTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentQuery;
+use Orm\Zed\AppPayment\Persistence\SpyPaymentTransfer;
+use Orm\Zed\AppPayment\Persistence\SpyPaymentTransferQuery;
 use Ramsey\Uuid\Uuid;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentEntityManager;
@@ -213,5 +223,80 @@ class AppPaymentHelper extends Module
         $paymentQuery->filterByTenantIdentifier($tenantIdentifier);
 
         $this->assertGreaterThan(0, $paymentQuery->find()->count(), 'Did not find payment by tenant identifier');
+    }
+
+    // Transfer related code
+
+    public function havePaymentsTransmissionsRequestTransfer(array $seed = [], array $paymentsTransmissionsSeed = []): PaymentsTransmissionsRequestTransfer
+    {
+        $paymentsTransmissionsRequestTransferBuilder = new PaymentsTransmissionsRequestBuilder($seed);
+
+        foreach ($paymentsTransmissionsSeed as $paymentTransmissionSeed) {
+            $paymentTransmissionBuilder = new PaymentTransmissionBuilder($paymentTransmissionSeed);
+            $paymentsTransmissionsRequestTransferBuilder->withPaymentTransmission($paymentTransmissionBuilder);
+        }
+
+        return $paymentsTransmissionsRequestTransferBuilder->build();
+    }
+
+    // Transfer related code
+
+    public function havePaymentsTransmissionsResponseTransfer(array $seed = [], array $paymentsTransmissionsSeed = []): PaymentsTransmissionsResponseTransfer
+    {
+        $paymentsTransmissionsResponseTransferBuilder = new PaymentsTransmissionsResponseBuilder($seed);
+
+        foreach ($paymentsTransmissionsSeed as $paymentTransmissionSeed) {
+            $paymentTransmissionBuilder = new PaymentTransmissionBuilder($paymentTransmissionSeed);
+            $paymentsTransmissionsResponseTransferBuilder->withPaymentTransmission($paymentTransmissionBuilder);
+        }
+
+        return $paymentsTransmissionsResponseTransferBuilder->build();
+    }
+
+    public function assertPaymentTransferEqualsPaymentTransmission(
+        string $transferId,
+        PaymentTransmissionTransfer $paymentTransmissionTransfer,
+        ?string $merchantReference = null
+    ): void {
+        $paymentTransferEntity = SpyPaymentTransferQuery::create()->findOneByTransferId($transferId);
+
+        $this->assertInstanceOf(SpyPaymentTransfer::class, $paymentTransferEntity, 'Payment transfer not found in the database');
+        $this->assertEquals($paymentTransmissionTransfer->getTenantIdentifier(), $paymentTransferEntity->getTenantIdentifier(), 'Tenant Identifier does not match');
+        $this->assertEquals($paymentTransmissionTransfer->getTransactionId(), $paymentTransferEntity->getTransactionId(), 'Transaction ID does not match');
+        $this->assertEquals($paymentTransmissionTransfer->getTransferId(), $paymentTransferEntity->getTransferId(), 'Transfer ID does not match');
+        $this->assertEquals($paymentTransmissionTransfer->getOrderReference(), $paymentTransferEntity->getOrderReference(), 'Order references does not match');
+        $this->assertEquals(implode(',', $paymentTransmissionTransfer->getItemReferences()), $paymentTransferEntity->getItemReferences(), 'Item references does not match');
+        $this->assertEquals($paymentTransmissionTransfer->getAmount(), $paymentTransferEntity->getAmount(), 'Amount does not match');
+
+        if ($merchantReference) {
+            $this->assertEquals($merchantReference, $paymentTransferEntity->getMerchantReference(), 'Merchant reference does not match');
+        }
+    }
+
+    public function haveOrderItem(array $seed = []): OrderItemTransfer
+    {
+        return (new OrderItemBuilder($seed))->build();
+    }
+
+    /**
+     * @param array<\Generated\Shared\Transfer\OrderItemTransfer> $expectedOrderItems
+     */
+    public function assertPaymentTransmissionEquals(
+        PaymentTransmissionTransfer $paymentTransmissionTransfer,
+        array $expectedOrderItems,
+        ?string $merchantReference = null
+    ): void {
+        if ($merchantReference) {
+            $this->assertSame($merchantReference, $paymentTransmissionTransfer->getMerchantOrFail()->getMerchantReference(), 'Expected to have the same Merchant Reference but got different ones.');
+        }
+
+        /** @var \ArrayObject<int, \Generated\Shared\Transfer\OrderItemTransfer> $orderItems */
+        $orderItems = $paymentTransmissionTransfer->getOrderItems();
+        $this->assertCount(count($expectedOrderItems), $orderItems);
+
+        foreach ($expectedOrderItems as $position => $expectedOrderItemTransfer) {
+            $this->assertSame($expectedOrderItemTransfer->getOrderReference(), $orderItems[$position]->getOrderReference(), 'Expected to have the same Order Reference but got different ones.');
+            $this->assertSame($expectedOrderItemTransfer->getItemReference(), $orderItems[$position]->getItemReference(), 'Expected to have the same Item Reference but got different ones.');
+        }
     }
 }

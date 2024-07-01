@@ -17,9 +17,10 @@ use Generated\Shared\Transfer\PaymentsTransmissionsRequestTransfer;
 use Generated\Shared\Transfer\PaymentsTransmissionsResponseTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 use Generated\Shared\Transfer\PaymentTransmissionTransfer;
-use Orm\Zed\Payment\Persistence\SpyPaymentQuery;
-use Orm\Zed\Payment\Persistence\SpyPaymentTransferQuery;
+use Orm\Zed\AppPayment\Persistence\SpyPaymentQuery;
+use Orm\Zed\AppPayment\Persistence\SpyPaymentTransferQuery;
 use Ramsey\Uuid\Uuid;
+use Spryker\Zed\AppPayment\AppPaymentConfig;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
 use SprykerTest\Glue\AppPaymentBackendApi\AppPaymentBackendApiTester;
@@ -51,7 +52,7 @@ class PaymentsTransfersWithMerchantsApiTest extends Unit
 
     protected AppPaymentBackendApiTester $tester;
 
-    public function testGivenTwoOrdersEachWithThreeItemsWhereOneOfThemIsFromAMerchantWhenTheExtenderRunsThenPaymentTransmissionsAreAddedTwoItemsAndTwoWithMerchantsAndEachHasTwoItemsANdOrderItemsWithoutMerchantsAreIgnored(): void
+    public function testGivenTwoOrdersEachWithThreeItemsWhereOneOfThemIsFromAMerchantWhenTheExtenderRunsThenPaymentTransmissionsAreAddedTwoItemsAndTwoWithMerchantsAndEachHasTwoItemsAndOrderItemsWithoutMerchantsAreIgnored(): void
     {
         // Arrange
         $tenantIdentifier = Uuid::uuid4()->toString();
@@ -86,12 +87,12 @@ class PaymentsTransfersWithMerchantsApiTest extends Unit
 
         /** @var array<\Generated\Shared\Transfer\OrderItemTransfer> $orderItems */
         $orderItems = [
-            $this->tester->haveOrderItem([OrderItemTransfer::ORDER_REFERENCE => $orderReference1, OrderItemTransfer::AMOUNT => 180, OrderItemTransfer::COMMISSION => 20]),
-            $this->tester->haveOrderItem([OrderItemTransfer::ORDER_REFERENCE => $orderReference1, OrderItemTransfer::MERCHANT_REFERENCE => $merchantTransfer1->getMerchantReference(), OrderItemTransfer::AMOUNT => 45, OrderItemTransfer::COMMISSION => 5]),
-            $this->tester->haveOrderItem([OrderItemTransfer::ORDER_REFERENCE => $orderReference2, OrderItemTransfer::MERCHANT_REFERENCE => $merchantTransfer2->getMerchantReference(), OrderItemTransfer::AMOUNT => 90, OrderItemTransfer::COMMISSION => 10]),
-            $this->tester->haveOrderItem([OrderItemTransfer::ORDER_REFERENCE => $orderReference1, OrderItemTransfer::AMOUNT => 180, OrderItemTransfer::COMMISSION => 20]),
-            $this->tester->haveOrderItem([OrderItemTransfer::ORDER_REFERENCE => $orderReference1, OrderItemTransfer::MERCHANT_REFERENCE => $merchantTransfer1->getMerchantReference(), OrderItemTransfer::AMOUNT => 45, OrderItemTransfer::COMMISSION => 5]),
-            $this->tester->haveOrderItem([OrderItemTransfer::ORDER_REFERENCE => $orderReference2, OrderItemTransfer::MERCHANT_REFERENCE => $merchantTransfer2->getMerchantReference(), OrderItemTransfer::AMOUNT => 90, OrderItemTransfer::COMMISSION => 10]),
+            $this->tester->haveOrderItem([OrderItemTransfer::ORDER_REFERENCE => $orderReference1, OrderItemTransfer::AMOUNT => 180]),
+            $this->tester->haveOrderItem([OrderItemTransfer::ORDER_REFERENCE => $orderReference1, OrderItemTransfer::MERCHANT_REFERENCE => $merchantTransfer1->getMerchantReference(), OrderItemTransfer::AMOUNT => 45]),
+            $this->tester->haveOrderItem([OrderItemTransfer::ORDER_REFERENCE => $orderReference2, OrderItemTransfer::MERCHANT_REFERENCE => $merchantTransfer2->getMerchantReference(), OrderItemTransfer::AMOUNT => 90]),
+            $this->tester->haveOrderItem([OrderItemTransfer::ORDER_REFERENCE => $orderReference1, OrderItemTransfer::AMOUNT => 180]),
+            $this->tester->haveOrderItem([OrderItemTransfer::ORDER_REFERENCE => $orderReference1, OrderItemTransfer::MERCHANT_REFERENCE => $merchantTransfer1->getMerchantReference(), OrderItemTransfer::AMOUNT => 45]),
+            $this->tester->haveOrderItem([OrderItemTransfer::ORDER_REFERENCE => $orderReference2, OrderItemTransfer::MERCHANT_REFERENCE => $merchantTransfer2->getMerchantReference(), OrderItemTransfer::AMOUNT => 90]),
         ];
 
         $paymentTransmissionTransfer = new PaymentTransmissionTransfer();
@@ -125,9 +126,10 @@ class PaymentsTransfersWithMerchantsApiTest extends Unit
         ]);
 
         $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
+        $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGINS_PAYMENTS_TRANSMISSIONS_REQUEST_EXPANDER, []);
 
         // Act
-        $this->tester->addHeader(PaymentConfig::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
+        $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
 
         $orderItemsRequestData = array_map(function (OrderItemTransfer $orderItem): array {
             return $orderItem->modifiedToArray();
@@ -150,8 +152,7 @@ class PaymentsTransfersWithMerchantsApiTest extends Unit
             ->setTransferId($transferId1)
             ->setOrderReference($orderReference1)
             ->setItemReferences([$orderItems[1]->getItemReferenceOrFail(), $orderItems[4]->getItemReferenceOrFail()])
-            ->setAmount('90')
-            ->setCommission('10');
+            ->setAmount('90');
 
         $this->tester->assertPaymentTransferEqualsPaymentTransmission($transferId1, $expectedPaymentTransmissionTransfer, $merchantTransfer1->getMerchantReference());
 
@@ -163,8 +164,7 @@ class PaymentsTransfersWithMerchantsApiTest extends Unit
             ->setTransferId($transferId2)
             ->setOrderReference($orderReference2)
             ->setItemReferences([$orderItems[2]->getItemReferenceOrFail(), $orderItems[5]->getItemReferenceOrFail()])
-            ->setAmount('180')
-            ->setCommission('20');
+            ->setAmount('180');
 
         $this->tester->assertPaymentTransferEqualsPaymentTransmission($transferId2, $expectedPaymentTransmissionTransfer, $merchantTransfer2->getMerchantReference());
 

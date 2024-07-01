@@ -160,17 +160,14 @@ class PaymentTransfer
     ): PaymentsTransmissionsRequestTransfer {
         foreach ($paymentsTransmissionsRequestTransfer->getPaymentsTransmissions() as $paymentsTransmission) {
             $totalAmount = 0;
-            $totalCommission = 0;
             $itemReferences = [];
 
             foreach ($paymentsTransmission->getOrderItems() as $orderItemTransfer) {
                 $totalAmount += $orderItemTransfer->getAmount();
-                $totalCommission += $orderItemTransfer->getCommission();
                 $itemReferences[] = $orderItemTransfer->getItemReference();
             }
 
             $paymentsTransmission->setAmount($totalAmount);
-            $paymentsTransmission->setCommission($totalCommission);
             $paymentsTransmission->setItemReferences($itemReferences);
         }
 

@@ -62,6 +62,7 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
         );
 
         $glueResponseTransfer->addResource($glueResourceTransfer);
+
         // SCOS Checkout expects a 200 response code and check isSuccessful property to show error message.
         $glueResponseTransfer->setHttpStatus(Response::HTTP_OK);
 
@@ -101,7 +102,6 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
                 'orderReference' => $orderItem->getOrderReferenceOrFail(),
                 'itemReference' => $orderItem->getItemReferenceOrFail(),
                 'amount' => $orderItem->getAmountOrFail(),
-                'commission' => $orderItem->getCommission(),
             ];
         }
 

@@ -35,6 +35,7 @@
         "rector/rector": "^0.19.0",
         "spryker-sdk/async-api": "dev-feature/resolve-remote-references as 0.3.1",
         "spryker/app-kernel": "dev-feature/extract-payment-template",
+        "spryker/app-merchant": "dev-feature/app-merchant-extraction",
         "spryker/code-sniffer": "*",
         "spryker/container": "*",
         "spryker/development": "^3.34.0",
@@ -48,6 +49,9 @@
         "spryker/testify": "*",
         "spryker/testify-async-api": "*",
         "spryker/translator": "^1.13"
+    },
+    "replace": {
+        "spryker/app-payment": "*"
     },
     "autoload": {
         "psr-4": {
@@ -68,6 +72,12 @@
             "Orm\\": "src/Orm/"
         }
     },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "git@github.com:spryker/app-merchant.git"
+        }
+    ],
     "minimum-stability": "dev",
     "prefer-stable": true,
     "scripts": {
@@ -85,7 +95,8 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0.x-dev"
+            "dev-feature/app-payment-extraction": "1.0.x-dev",
+            "dev-main": "1.0.x-dev"
         }
     },
     "config": {
