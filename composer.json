@@ -72,12 +72,6 @@
             "Orm\\": "src/Orm/"
         }
     },
-    "repositories": [
-        {
-            "type": "git",
-            "url": "git@github.com:spryker/app-merchant.git"
-        }
-    ],
     "minimum-stability": "dev",
     "prefer-stable": true,
     "scripts": {
@@ -95,6 +89,7 @@
     },
     "extra": {
         "branch-alias": {
+            "dev-feature/acp-2626/master-stripe-marketplace-payment-flow-marketplace-oms-workflow-transfers-to-merchants": "1.0.x-dev",
             "dev-feature/app-payment-extraction": "1.0.x-dev",
             "dev-main": "1.0.x-dev"
         }
