@@ -75,7 +75,7 @@ class AppPaymentDependencyProvider extends AbstractBundleDependencyProvider
         $container = $this->addMessageBrokerFacade($container);
         $container = $this->addUtilEncodingService($container);
 
-        return $this->addPaymentsTransmissionRequestExpanderPluginsPlugins($container);
+        return $this->addPaymentsTransmissionRequestExtenderPlugins($container);
     }
 
     protected function addPlatformPlugin(Container $container): Container
@@ -174,10 +174,10 @@ class AppPaymentDependencyProvider extends AbstractBundleDependencyProvider
         return $container;
     }
 
-    protected function addPaymentsTransmissionRequestExpanderPluginsPlugins(Container $container): Container
+    protected function addPaymentsTransmissionRequestExtenderPlugins(Container $container): Container
     {
         $container->set(static::PLUGINS_PAYMENTS_TRANSMISSIONS_REQUEST_EXPANDER, function (): array {
-            return $this->getPaymentsTransmissionRequestExpanderPluginsPlugins();
+            return $this->getPaymentsTransmissionRequestExtenderPlugins();
         });
 
         return $container;
@@ -186,7 +186,7 @@ class AppPaymentDependencyProvider extends AbstractBundleDependencyProvider
     /**
      * @return array<\Spryker\Zed\AppPayment\Dependency\Plugin\PaymentsTransmissionsRequestExtenderPluginInterface>
      */
-    private function getPaymentsTransmissionRequestExpanderPluginsPlugins(): array
+    protected function getPaymentsTransmissionRequestExtenderPlugins(): array
     {
         return [];
     }
