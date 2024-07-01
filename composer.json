@@ -1,0 +1,28 @@
+{
+    "name": "spryker/app-payment",
+    "type": "library",
+    "description": "AppPayment module",
+    "license": "proprietary",
+    "require": {},
+    "require-dev": {},
+    "autoload": {
+        "psr-4": {}
+    },
+    "autoload-dev": {
+        "psr-4": {}
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.0.x-dev"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "infection/extension-installer": true
+        }
+    }
+}
