@@ -11,6 +11,7 @@ use ArrayObject;
 use Generated\Shared\Transfer\AddPaymentMethodTransfer;
 use Generated\Shared\Transfer\AppConfigTransfer;
 use Generated\Shared\Transfer\DeletePaymentMethodTransfer;
+use Generated\Shared\Transfer\EndpointTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
 use Generated\Shared\Transfer\MessageAttributesTransfer;
@@ -22,6 +23,7 @@ use Generated\Shared\Transfer\PaymentCancellationFailedTransfer;
 use Generated\Shared\Transfer\PaymentCapturedTransfer;
 use Generated\Shared\Transfer\PaymentCaptureFailedTransfer;
 use Generated\Shared\Transfer\PaymentCreatedTransfer;
+use Generated\Shared\Transfer\PaymentMethodAppConfigurationTransfer;
 use Generated\Shared\Transfer\PaymentRefundedTransfer;
 use Generated\Shared\Transfer\PaymentRefundFailedTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
@@ -49,11 +51,29 @@ class MessageSender
             return $appConfigTransfer;
         }
 
+        $paymentMethodAppConfigurationTransfer = new PaymentMethodAppConfigurationTransfer();
+        $paymentMethodAppConfigurationTransfer->setBaseUrl($this->appPaymentConfig->getGlueBaseUrl());
+
+        $authorizationEndpointTransfer = new EndpointTransfer();
+        $authorizationEndpointTransfer
+            ->setName('authorization')
+            ->setPath('/private/initialize-payment'); // Defined in app_payment_openapi.yml
+
+        $paymentMethodAppConfigurationTransfer->addEndpoint($authorizationEndpointTransfer);
+
+        $transferEndpointTransfer = new EndpointTransfer();
+        $transferEndpointTransfer
+            ->setName('transfer')
+            ->setPath('/private/payments/transfers'); // Defined in app_payment_openapi.yml
+
+        $paymentMethodAppConfigurationTransfer->addEndpoint($transferEndpointTransfer);
+
         $addPaymentMethodTransfer = new AddPaymentMethodTransfer();
         $addPaymentMethodTransfer
             ->setName($this->appPaymentConfig->getPaymentProviderName())
             ->setPaymentAuthorizationEndpoint(sprintf('%s/private/initialize-payment', $this->appPaymentConfig->getGlueBaseUrl()))
-            ->setProviderName($this->appPaymentConfig->getPaymentProviderName());
+            ->setProviderName($this->appPaymentConfig->getPaymentProviderName())
+            ->setPaymentMethodAppConfiguration($paymentMethodAppConfigurationTransfer);
 
         $addPaymentMethodTransfer->setMessageAttributes($this->getMessageAttributes(
             $appConfigTransfer->getTenantIdentifierOrFail(),
