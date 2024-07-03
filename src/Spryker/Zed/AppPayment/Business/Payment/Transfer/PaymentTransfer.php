@@ -15,7 +15,6 @@ use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 use Spryker\Shared\Log\LoggerTrait;
 use Spryker\Zed\AppPayment\AppPaymentConfig;
 use Spryker\Zed\AppPayment\Business\Exception\PaymentByTenantIdentifierAndOrderReferenceNotFoundException;
-use Spryker\Zed\AppPayment\Business\Exception\PaymentTransferByTransferIdNotFoundException;
 use Spryker\Zed\AppPayment\Business\Message\MessageBuilder;
 use Spryker\Zed\AppPayment\Business\Payment\AppConfig\AppConfigLoader;
 use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
