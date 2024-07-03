@@ -60,10 +60,6 @@ class PaymentTransfer
             return $paymentsTransmissionsResponseTransfer;
         }
 
-        if ($paymentsTransmissionsResponseTransfer->getIsSuccessful() !== true) {
-            return $paymentsTransmissionsResponseTransfer;
-        }
-
         /** @phpstan-var \Generated\Shared\Transfer\PaymentsTransmissionsResponseTransfer */
         return $this->getTransactionHandler()->handleTransaction(function () use ($paymentsTransmissionsResponseTransfer) {
             $this->savePaymentsTransfers($paymentsTransmissionsResponseTransfer);
@@ -109,6 +105,12 @@ class PaymentTransfer
                 ->setPayment($paymentTransfer)
                 ->setOrderItems(new ArrayObject($orderItems));
 
+            $previousPaymentTransmissionTransfer = $this->appPaymentRepository->findPaymentTransmissionByTransactionId($paymentTransfer->getTransactionIdOrFail());
+
+            if ($previousPaymentTransmissionTransfer instanceof PaymentTransmissionTransfer) {
+                $paymentTransmissionTransfer->setTransferId($previousPaymentTransmissionTransfer->getTransferIdOrFail());
+            }
+
             $paymentsTransmissionsRequestTransfer->addPaymentTransmission($paymentTransmissionTransfer);
         }
 
@@ -123,12 +125,12 @@ class PaymentTransfer
     protected function savePaymentsTransfers(
         PaymentsTransmissionsResponseTransfer $paymentsTransmissionsResponseTransfer
     ): PaymentsTransmissionsResponseTransfer {
-        foreach ($paymentsTransmissionsResponseTransfer->getPaymentsTransmissions() as $paymentsTransmission) {
-            if (!$paymentsTransmission->getIsSuccessful()) {
+        foreach ($paymentsTransmissionsResponseTransfer->getPaymentsTransmissions() as $paymentsTransmissionTransfer) {
+            if (!$paymentsTransmissionTransfer->getIsSuccessful()) {
                 continue;
             }
 
-            $this->appPaymentEntityManager->savePaymentTransfer($paymentsTransmission);
+            $this->appPaymentEntityManager->savePaymentTransfer($paymentsTransmissionTransfer);
         }
 
         return $paymentsTransmissionsResponseTransfer;

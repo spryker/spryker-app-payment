@@ -9,7 +9,9 @@ namespace Spryker\Zed\AppPayment\Persistence;
 
 use Generated\Shared\Transfer\PaymentRefundTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 use Orm\Zed\AppPayment\Persistence\SpyPayment;
+use Orm\Zed\AppPayment\Persistence\SpyPaymentTransfer;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTenantIdentifierAndOrderReferenceNotFoundException;
 use Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTransactionIdNotFoundException;
@@ -106,5 +108,16 @@ class AppPaymentRepository extends AbstractRepository implements AppPaymentRepos
     protected function mapPaymentEntityToPaymentTransfer(SpyPayment $spyPayment): PaymentTransfer
     {
         return $this->getFactory()->createPaymentMapper()->mapPaymentEntityToPaymentTransfer($spyPayment, new PaymentTransfer());
+    }
+
+    public function findPaymentTransmissionByTransactionId(string $getTransactionIdOrFail): ?PaymentTransmissionTransfer
+    {
+        $paymentTransferEntity = $this->getFactory()->createPaymentTransferQuery()->findOneByTransactionId($getTransactionIdOrFail);
+
+        if (!($paymentTransferEntity instanceof SpyPaymentTransfer)) {
+            return null;
+        }
+
+        return $this->getFactory()->createPaymentMapper()->mapPaymentTransmissionEntityToPaymentTransmissionTransfer($paymentTransferEntity, new PaymentTransmissionTransfer());
     }
 }

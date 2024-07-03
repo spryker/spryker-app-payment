@@ -114,6 +114,7 @@
     <transfer name="Payment" strict="true">
         <property name="orderReference" type="string"/>
         <property name="transactionId" type="string"/>
+        <property name="transferId" type="string"/>
         <property name="tenantIdentifier" type="string"/>
         <property name="quote" type="Quote"/>
         <property name="status" type="string"/>
