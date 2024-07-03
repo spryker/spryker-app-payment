@@ -77,6 +77,7 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
                 'orderReference' => $paymentsTransmission->getOrderReference(),
                 'orderItems' => $this->formatOrderItemsForTransferResponse($paymentsTransmission->getOrderItems()),
                 'amount' => $paymentsTransmission->getAmount(),
+                'transferId' => $paymentsTransmission->getTransferId(), // Return the transfer identifier as transaction id to be known on the Tenant side. May be empty in case oif a failure
             ];
         }
 

@@ -64,6 +64,20 @@ class AppPaymentHelper extends Module
         return $this->havePayment($seed);
     }
 
+    public function havePaymentTransmissionPersisted(
+        array $seed = []
+    ): PaymentTransmissionTransfer {
+        $paymentTransmissionTransfer = (new PaymentTransmissionBuilder($seed))->build();
+
+        $paymentTransferData = $paymentTransmissionTransfer->toArray();
+
+        $spyPaymentTransmissionEntity = new SpyPaymentTransfer();
+        $spyPaymentTransmissionEntity->fromArray($paymentTransferData);
+        $spyPaymentTransmissionEntity->save();
+
+        return $paymentTransmissionTransfer;
+    }
+
     public function havePayment(array $seed = []): PaymentTransfer
     {
         $quoteBuilder = new QuoteBuilder($seed);

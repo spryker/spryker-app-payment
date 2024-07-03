@@ -11,6 +11,7 @@
         <property name="appConfig" type="AppConfig"/>
         <property name="tenantIdentifier" type="string"/>
         <property name="transactionId" type="string"/>
+        <property name="transferId" type="string"/>
         <property name="orderItems" type="OrderItem[]" singular="orderItem"/>
         <property name="paymentsTransmissions" type="PaymentTransmission[]" singular="paymentTransmission"/>
     </transfer>
@@ -20,7 +21,6 @@
         <property name="orderReference" type="string"/>
         <property name="itemReference" type="string" description="UUID of the sales_order_item"/>
         <property name="amount" type="string" description="Amount in lowest denominator (cents, YEN). When negative money has to be refunded, when positive money has to be transferred."/>
-        <property name="commission" type="string"/>
     </transfer>
 
     <transfer name="PaymentsTransmissionsResponse" strict="true">

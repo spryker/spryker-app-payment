@@ -110,9 +110,9 @@ class AppPaymentRepository extends AbstractRepository implements AppPaymentRepos
         return $this->getFactory()->createPaymentMapper()->mapPaymentEntityToPaymentTransfer($spyPayment, new PaymentTransfer());
     }
 
-    public function findPaymentTransmissionByTransactionId(string $getTransactionIdOrFail): ?PaymentTransmissionTransfer
+    public function findPaymentTransmissionByTransferId(string $transferId): ?PaymentTransmissionTransfer
     {
-        $paymentTransferEntity = $this->getFactory()->createPaymentTransferQuery()->findOneByTransactionId($getTransactionIdOrFail);
+        $paymentTransferEntity = $this->getFactory()->createPaymentTransferQuery()->findOneByTransferId($transferId);
 
         if (!($paymentTransferEntity instanceof SpyPaymentTransfer)) {
             return null;

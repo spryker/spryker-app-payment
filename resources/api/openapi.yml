@@ -193,6 +193,9 @@ components:
 
         TransfersRequest:
             properties:
+                transferId:
+                    type: string
+                    description: 'ID of a previous made transfer, passed to make a reverse transfer.'
                 orderItems:
                     type: array
                     items:
@@ -213,6 +216,9 @@ components:
                     type: string
                 amount:
                     type: string
+                transferId:
+                    type: string
+                    description: 'Will be returned to the Tenant so that he knows about the transaction ID and to use the transaction ID for a reverse payout.'
                 orderItems:
                     type: array
                     items:

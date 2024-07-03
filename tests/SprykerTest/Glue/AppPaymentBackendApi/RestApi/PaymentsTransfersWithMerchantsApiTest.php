@@ -272,7 +272,6 @@ class PaymentsTransfersWithMerchantsApiTest extends Unit
 
         // Assert
         $this->tester->seeResponseCodeIs(Response::HTTP_OK);
-//        $this->tester->seeResponseJsonPathContains(['transfers' => ['failureMessage' => 'Transfer failed']]);
 
         $this->tester->assertPaymentTransferIsNotPersisted($tenantIdentifier, $merchantTransfer1->getMerchantReference());
         $this->tester->assertPaymentTransferIsNotPersisted($tenantIdentifier, $merchantTransfer2->getMerchantReference());

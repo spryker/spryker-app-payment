@@ -15,6 +15,7 @@ use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 use Spryker\Shared\Log\LoggerTrait;
 use Spryker\Zed\AppPayment\AppPaymentConfig;
 use Spryker\Zed\AppPayment\Business\Exception\PaymentByTenantIdentifierAndOrderReferenceNotFoundException;
+use Spryker\Zed\AppPayment\Business\Exception\PaymentTransferByTransferIdNotFoundException;
 use Spryker\Zed\AppPayment\Business\Message\MessageBuilder;
 use Spryker\Zed\AppPayment\Business\Payment\AppConfig\AppConfigLoader;
 use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
@@ -27,6 +28,11 @@ class PaymentTransfer
 {
     use TransactionTrait;
     use LoggerTrait;
+
+    /**
+     * @var array<\Generated\Shared\Transfer\PaymentTransmissionTransfer>
+     */
+    protected array $failedPaymentTransmissionTransfers = [];
 
     /**
      * @param array<\Spryker\Zed\AppPayment\Dependency\Plugin\PaymentsTransmissionsRequestExtenderPluginInterface> $paymentsTransmissionsRequestExpanderPlugins
@@ -43,11 +49,16 @@ class PaymentTransfer
 
     public function transferPayments(PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer): PaymentsTransmissionsResponseTransfer
     {
+        // In case all payment transmissions fail, we do not request the platform tzo do something, and we need to return a response with the failed ones.
+        $paymentsTransmissionsResponseTransfer = new PaymentsTransmissionsResponseTransfer();
+
         try {
             $paymentsTransmissionsRequestTransfer = $this->addAppConfigToRequest($paymentsTransmissionsRequestTransfer);
             $paymentsTransmissionsRequestTransfer = $this->addPaymentsTransmissions($paymentsTransmissionsRequestTransfer);
 
-            $paymentsTransmissionsResponseTransfer = $this->platformPlugin->transferPayments($paymentsTransmissionsRequestTransfer);
+            if ($paymentsTransmissionsRequestTransfer->getPaymentsTransmissions()->count() > 0) {
+                $paymentsTransmissionsResponseTransfer = $this->platformPlugin->transferPayments($paymentsTransmissionsRequestTransfer);
+            }
         } catch (Throwable $throwable) {
             $this->getLogger()->error($throwable->getMessage(), [
                 PaymentsTransmissionsRequestTransfer::TENANT_IDENTIFIER => $paymentsTransmissionsRequestTransfer->getTenantIdentifierOrFail(),
@@ -60,12 +71,19 @@ class PaymentTransfer
             return $paymentsTransmissionsResponseTransfer;
         }
 
-        /** @phpstan-var \Generated\Shared\Transfer\PaymentsTransmissionsResponseTransfer */
-        return $this->getTransactionHandler()->handleTransaction(function () use ($paymentsTransmissionsResponseTransfer) {
+        /** @var \Generated\Shared\Transfer\PaymentsTransmissionsResponseTransfer $paymentsTransmissionsResponseTransfer */
+        $paymentsTransmissionsResponseTransfer = $this->getTransactionHandler()->handleTransaction(function () use ($paymentsTransmissionsResponseTransfer) {
             $this->savePaymentsTransfers($paymentsTransmissionsResponseTransfer);
 
             return $paymentsTransmissionsResponseTransfer;
         });
+
+        // Adding the failed ones to the response to give the Tenant the chance to see why the transfer failed
+        foreach ($this->failedPaymentTransmissionTransfers as $failedPaymentTransmissionTransfer) {
+            $paymentsTransmissionsResponseTransfer->addPaymentTransmission($failedPaymentTransmissionTransfer);
+        }
+
+        return $paymentsTransmissionsResponseTransfer;
     }
 
     protected function addAppConfigToRequest(PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer): PaymentsTransmissionsRequestTransfer
@@ -105,9 +123,19 @@ class PaymentTransfer
                 ->setPayment($paymentTransfer)
                 ->setOrderItems(new ArrayObject($orderItems));
 
-            $previousPaymentTransmissionTransfer = $this->appPaymentRepository->findPaymentTransmissionByTransactionId($paymentTransfer->getTransactionIdOrFail());
+            if ($paymentsTransmissionsRequestTransfer->getTransferId() !== null) {
+                $previousPaymentTransmissionTransfer = $this->appPaymentRepository->findPaymentTransmissionByTransferId($paymentsTransmissionsRequestTransfer->getTransferId());
 
-            if ($previousPaymentTransmissionTransfer instanceof PaymentTransmissionTransfer) {
+                if (!($previousPaymentTransmissionTransfer instanceof PaymentTransmissionTransfer)) {
+                    $paymentTransmissionTransfer
+                        ->setIsSuccessful(false)
+                        ->setMessageOrFail(MessageBuilder::paymentTransferByTransferIdNotFound($paymentsTransmissionsRequestTransfer->getTransferIdOrFail()));
+
+                    $this->failedPaymentTransmissionTransfers[] = $paymentTransmissionTransfer;
+
+                    continue;
+                }
+
                 $paymentTransmissionTransfer->setTransferId($previousPaymentTransmissionTransfer->getTransferIdOrFail());
             }
 

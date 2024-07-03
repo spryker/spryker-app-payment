@@ -47,5 +47,5 @@ interface AppPaymentRepositoryInterface
         array $refundStatuses
     ): array;
 
-    public function findPaymentTransmissionByTransactionId(string $getTransactionIdOrFail): ?PaymentTransmissionTransfer;
+    public function findPaymentTransmissionByTransferId(string $transferId): ?PaymentTransmissionTransfer;
 }
