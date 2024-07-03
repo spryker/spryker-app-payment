@@ -17,6 +17,7 @@
     </transfer>
 
     <transfer name="OrderItem" strict="true">
+        <property name="transferId" type="string" description="The ID returned from the Platform implementation"/>
         <property name="merchantReference" type="string"/>
         <property name="orderReference" type="string"/>
         <property name="itemReference" type="string" description="UUID of the sales_order_item"/>

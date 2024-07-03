@@ -193,9 +193,6 @@ components:
 
         TransfersRequest:
             properties:
-                transferId:
-                    type: string
-                    description: 'ID of a previous made transfer, passed to make a reverse transfer.'
                 orderItems:
                     type: array
                     items:
@@ -231,6 +228,9 @@ components:
                     description: 'Message in case of failure to know the issue on the Tenant side.'
         OrderItem:
             properties:
+                transferId:
+                    type: string
+                    description: 'ID of a previous made transfer, passed to make a reverse transfer.'
                 merchantReference:
                     type: string
                     description: 'UUID of the merchant.'
