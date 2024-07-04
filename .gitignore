@@ -46,7 +46,7 @@ src/Generated/
 /src/Orm/Propel/generated-conf/
 
 # propel migrations
-/src/Orm/Propel/Migration_mysql/
+/src/Orm/Propel/Migration_SQLite/
 tests/_data/app_payment_db
 
 # tools
