@@ -1,4 +1,4 @@
-# AppPayment Module
+# AppPayment Package
 [![Latest Stable Version](https://poser.pugx.org/spryker/app-payment/v/stable.svg)](https://packagist.org/packages/spryker/app-payment)
 [![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D%208.1-8892BF.svg)](https://php.net/)
 
@@ -69,3 +69,46 @@ This plugin provides the routes for the AppPaymentBackendApi module.
 
 ### MessageBrokerAws
 - \Spryker\Zed\AppPayment\Communication\Plugin\MessageBrokerAws\ConsumerIdHttpChannelMessageReceiverRequestExpanderPlugin
+
+### Configure the MessageBroker
+
+Add this to your project configuration:
+
+```
+$config[MessageBrokerConstants::MESSAGE_TO_CHANNEL_MAP] =
+$config[MessageBrokerAwsConstants::MESSAGE_TO_CHANNEL_MAP] = [
+    PaymentAuthorizedTransfer::class => 'payment-events',
+    PaymentAuthorizationFailedTransfer::class => 'payment-events',
+    PaymentCapturedTransfer::class => 'payment-events',
+    PaymentCaptureFailedTransfer::class => 'payment-events',
+    PaymentRefundedTransfer::class => 'payment-events',
+    PaymentRefundFailedTransfer::class => 'payment-events',
+    PaymentCanceledTransfer::class => 'payment-events',
+    PaymentCancellationFailedTransfer::class => 'payment-events',
+    CancelPaymentTransfer::class => 'payment-commands',
+    CapturePaymentTransfer::class => 'payment-commands',
+    RefundPaymentTransfer::class => 'payment-commands',
+    AddPaymentMethodTransfer::class => 'payment-method-commands',
+    DeletePaymentMethodTransfer::class => 'payment-method-commands',
+    PaymentCreatedTransfer::class => 'payment-events',
+    // App event
+    AppConfigUpdatedTransfer::class => 'app-events',
+];
+
+$config[MessageBrokerConstants::CHANNEL_TO_TRANSPORT_MAP] = [
+    'app-events' => MessageBrokerAwsConfig::HTTP_TRANSPORT,
+    'payment-events' => MessageBrokerAwsConfig::HTTP_TRANSPORT,
+    'payment-method-commands' => MessageBrokerAwsConfig::HTTP_TRANSPORT,
+    'payment-commands' => MessageBrokerAwsConfig::SQS_TRANSPORT,
+];
+
+$config[MessageBrokerAwsConstants::CHANNEL_TO_SENDER_TRANSPORT_MAP] = [
+    'app-events' => MessageBrokerAwsConfig::HTTP_TRANSPORT,
+    'payment-events' => MessageBrokerAwsConfig::HTTP_TRANSPORT,
+    'payment-method-commands' => MessageBrokerAwsConfig::HTTP_TRANSPORT,
+];
+
+$config[MessageBrokerAwsConstants::CHANNEL_TO_RECEIVER_TRANSPORT_MAP] = [
+    'payment-commands' => MessageBrokerAwsConfig::SQS_TRANSPORT,
+];
+```

@@ -10,7 +10,7 @@ namespace SprykerTest\Glue\Testify\Helper;
 use Codeception\Stub;
 use Codeception\Util\HttpCode;
 use Spryker\Glue\AppKernel\AppKernelDependencyProvider;
-use Spryker\Glue\AppKernel\Plugin\RouteProvider\AppRouteProviderPlugin;
+use Spryker\Glue\AppKernel\Plugin\RouteProvider\AppKernelRouteProviderPlugin;
 use Spryker\Glue\AppPaymentBackendApi\Plugin\AppKernel\PaymentConfigurationValidatorPlugin;
 use Spryker\Glue\AppPaymentBackendApi\Plugin\GlueApplication\AppPaymentBackendApiRouteProviderPlugin;
 use Spryker\Glue\AppWebhookBackendApi\Plugin\GlueApplication\AppWebhookBackendApiRouteProviderPlugin;
@@ -91,7 +91,7 @@ class PaymentGlueBackendApiHelper extends SprykerGlueBackendApiHelper
         $this->getDependencyProviderHelper()->setDependency(GlueBackendApiApplicationDependencyProvider::PLUGINS_ROUTE_PROVIDER, [
             new AppPaymentBackendApiRouteProviderPlugin(),
             new AppWebhookBackendApiRouteProviderPlugin(),
-            new AppRouteProviderPlugin(),
+            new AppKernelRouteProviderPlugin(),
         ], GlueBackendApiApplicationFactory::class);
 
         $this->getDependencyProviderHelper()->setDependency(SprykerAppKernelDependencyProvider::PLUGIN_CONFIGURATION_AFTER_DELETE_PLUGINS, [
