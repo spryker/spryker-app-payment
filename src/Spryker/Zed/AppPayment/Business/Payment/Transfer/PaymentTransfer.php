@@ -71,14 +71,19 @@ class PaymentTransfer
         }
 
         /** @var \Generated\Shared\Transfer\PaymentsTransmissionsResponseTransfer $paymentsTransmissionsResponseTransfer */
-        $paymentsTransmissionsResponseTransfer = $this->getTransactionHandler()->handleTransaction(function () use ($paymentsTransmissionsResponseTransfer) {
+        $paymentsTransmissionsResponseTransfer = $this->getTransactionHandler()->handleTransaction(function () use ($paymentsTransmissionsRequestTransfer, $paymentsTransmissionsResponseTransfer) {
+            if ($paymentsTransmissionsRequestTransfer->getPaymentsTransmissions()->count() === 0) {
+                // If there are no payments to transfer, we do not need to save anything. In such case, we most likely filtered out all orderItems that were passed.
+                return $paymentsTransmissionsResponseTransfer;
+            }
+
             $this->savePaymentsTransfers($paymentsTransmissionsResponseTransfer);
 
             return $paymentsTransmissionsResponseTransfer;
         });
 
-        // Adding the failed ones to the response to give the Tenant the chance to see why the transfer failed
-        foreach ($this->failedPaymentTransmissionTransfers as $failedPaymentTransmissionTransfer) {
+        // Adding the failed ones to the response to give the Tenant the chance to see why the transfer failed.
+        foreach ($paymentsTransmissionsRequestTransfer->getFailedPaymentsTransmissions() as $failedPaymentTransmissionTransfer) {
             $paymentsTransmissionsResponseTransfer->addPaymentTransmission($failedPaymentTransmissionTransfer);
         }
 
@@ -92,54 +97,16 @@ class PaymentTransfer
         );
     }
 
+    /**
+     * In case of a transfer reversal:
+     * - The OrderItems contain a transferId of the previously made transfer that was sent to the Tenant.
+     * - Foreach transferId we need to group the items.
+     */
     protected function addPaymentsTransmissions(
         PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer
     ): PaymentsTransmissionsRequestTransfer {
-        $orders = [];
-
-        foreach ($paymentsTransmissionsRequestTransfer->getOrderItems() as $orderItemTransfer) {
-            if (!isset($orders[$orderItemTransfer->getOrderReference()])) {
-                $orders[$orderItemTransfer->getOrderReference()] = [];
-            }
-
-            $orders[$orderItemTransfer->getOrderReference()][$orderItemTransfer->getItemReference()] = $orderItemTransfer;
-        }
-
-        $paymentTransferCollection = $this->appPaymentRepository->getPaymentsByTenantIdentifierAndOrderReferences(
-            $paymentsTransmissionsRequestTransfer->getTenantIdentifierOrFail(),
-            array_keys($orders),
-        );
-
-        // For each Order === Payment add a PaymentTransmission
-        foreach ($orders as $orderReference => $orderItems) {
-            $paymentTransfer = $this->getPaymentByTenantIdentifierAndOrderReferenceFromCollection($paymentsTransmissionsRequestTransfer->getTenantIdentifierOrFail(), $orderReference, $paymentTransferCollection);
-
-            $paymentTransmissionTransfer = new PaymentTransmissionTransfer();
-            $paymentTransmissionTransfer
-                ->setOrderReference($orderReference)
-                ->setTenantIdentifier($paymentTransfer->getTenantIdentifierOrFail())
-                ->setTransactionId($paymentTransfer->getTransactionIdOrFail())
-                ->setPayment($paymentTransfer)
-                ->setOrderItems(new ArrayObject($orderItems));
-
-            if ($paymentsTransmissionsRequestTransfer->getTransferId() !== null) {
-                $previousPaymentTransmissionTransfer = $this->appPaymentRepository->findPaymentTransmissionByTransferId($paymentsTransmissionsRequestTransfer->getTransferId());
-
-                if (!($previousPaymentTransmissionTransfer instanceof PaymentTransmissionTransfer)) {
-                    $paymentTransmissionTransfer
-                        ->setIsSuccessful(false)
-                        ->setMessageOrFail(MessageBuilder::paymentTransferByTransferIdNotFound($paymentsTransmissionsRequestTransfer->getTransferIdOrFail()));
-
-                    $this->failedPaymentTransmissionTransfers[] = $paymentTransmissionTransfer;
-
-                    continue;
-                }
-
-                $paymentTransmissionTransfer->setTransferId($previousPaymentTransmissionTransfer->getTransferIdOrFail());
-            }
-
-            $paymentsTransmissionsRequestTransfer->addPaymentTransmission($paymentTransmissionTransfer);
-        }
+        $paymentsTransmissionsRequestTransfer = $this->addPaymentTransmissionsForOrderItemsGroupedByOrderReference($paymentsTransmissionsRequestTransfer);
+        $paymentsTransmissionsRequestTransfer = $this->addPaymentTransmissionsForOrderItemsGroupedByTransferId($paymentsTransmissionsRequestTransfer);
 
         // Apply group plugin from other modules to split the payment transmissions
         foreach ($this->paymentsTransmissionsRequestExpanderPlugins as $paymentsTransmissionsRequestExpanderPlugin) {
@@ -147,6 +114,170 @@ class PaymentTransfer
         }
 
         return $this->recalculatePaymentsTransmissions($paymentsTransmissionsRequestTransfer);
+    }
+
+    protected function addPaymentTransmissionsForOrderItemsGroupedByOrderReference(
+        PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer
+    ): PaymentsTransmissionsRequestTransfer {
+        $orderItemsGroupedByOrderReference = $this->getOrderItemsGroupedByOrderReference($paymentsTransmissionsRequestTransfer);
+
+        if ($orderItemsGroupedByOrderReference === []) {
+            return $paymentsTransmissionsRequestTransfer;
+        }
+
+        // Collect all payments for the given Tenant and OrderReferences.
+        $paymentTransferCollection = $this->appPaymentRepository->getPaymentsByTenantIdentifierAndOrderReferences(
+            $paymentsTransmissionsRequestTransfer->getTenantIdentifierOrFail(),
+            array_keys($orderItemsGroupedByOrderReference),
+        );
+
+        foreach ($orderItemsGroupedByOrderReference as $orderReference => $orderItems) {
+            $paymentTransfer = $this->getPaymentByTenantIdentifierAndOrderReferenceFromCollection($paymentsTransmissionsRequestTransfer->getTenantIdentifierOrFail(), $orderReference, $paymentTransferCollection);
+            $paymentTransmissionTransfer = $this->createPaymentTransmissionTransfer($paymentTransfer, $orderReference, $orderItems);
+
+            $paymentsTransmissionsRequestTransfer->addPaymentTransmission($paymentTransmissionTransfer);
+        }
+
+        return $paymentsTransmissionsRequestTransfer;
+    }
+
+    protected function addPaymentTransmissionsForOrderItemsGroupedByTransferId(
+        PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer
+    ): PaymentsTransmissionsRequestTransfer {
+        $orderItemsGroupedByTransferId = $this->getOrderItemsGroupedByTransferIdAndOrderReference($paymentsTransmissionsRequestTransfer);
+
+        if ($orderItemsGroupedByTransferId === []) {
+            return $paymentsTransmissionsRequestTransfer;
+        }
+
+        $orderReferences = $this->getOrderReferencesFromOrderItemsGroupedByTransferId($orderItemsGroupedByTransferId);
+
+        // Collect all payments for the given Tenant and OrderReferences.
+        $paymentTransferCollection = $this->appPaymentRepository->getPaymentsByTenantIdentifierAndOrderReferences(
+            $paymentsTransmissionsRequestTransfer->getTenantIdentifierOrFail(),
+            $orderReferences,
+        );
+
+        // Collect all previous PaymentTransmissions for the given TransferIds
+        $previousPaymentTransmissionTransfers = $this->appPaymentRepository->findPaymentTransmissionsByTransferIds(
+            array_keys($orderItemsGroupedByTransferId),
+        );
+
+        foreach ($orderItemsGroupedByTransferId as $transferId => $orders) {
+            foreach ($orders as $orderReference => $orderItems) {
+                $paymentTransfer = $this->getPaymentByTenantIdentifierAndOrderReferenceFromCollection(
+                    $paymentsTransmissionsRequestTransfer->getTenantIdentifierOrFail(),
+                    $orderReference,
+                    $paymentTransferCollection,
+                );
+
+                $paymentTransmissionTransfer = $this->createPaymentTransmissionTransfer($paymentTransfer, $orderReference, $orderItems);
+                $paymentTransmissionTransfer->setTransferId($transferId);
+
+                if (!isset($previousPaymentTransmissionTransfers[$transferId])) {
+                    $paymentTransmissionTransfer
+                        ->setIsSuccessful(false)
+                        ->setMessage(MessageBuilder::paymentTransferByTransferIdNotFound($transferId));
+
+                    $paymentsTransmissionsRequestTransfer->addFailedPaymentTransmission($paymentTransmissionTransfer);
+
+                    continue;
+                }
+
+                $paymentsTransmissionsRequestTransfer->addPaymentTransmission($paymentTransmissionTransfer);
+            }
+        }
+
+        return $paymentsTransmissionsRequestTransfer;
+    }
+
+    /**
+     * @param array<string, string> $orderItems
+     */
+    protected function createPaymentTransmissionTransfer(
+        GeneratedPaymentTransfer $generatedPaymentTransfer,
+        string $orderReference,
+        array $orderItems
+    ): PaymentTransmissionTransfer {
+        $paymentTransmissionTransfer = new PaymentTransmissionTransfer();
+        $paymentTransmissionTransfer
+            ->setOrderReference($orderReference)
+            ->setTenantIdentifier($generatedPaymentTransfer->getTenantIdentifierOrFail())
+            ->setTransactionId($generatedPaymentTransfer->getTransactionIdOrFail())
+            ->setPayment($generatedPaymentTransfer)
+            ->setOrderItems(new ArrayObject($orderItems));
+
+        return $paymentTransmissionTransfer;
+    }
+
+    /**
+     * Group orderItems by their transferId and inside of this by their orderReference. They were transferred together in the payout process.
+     *
+     * @return array<string, array>
+     */
+    protected function getOrderItemsGroupedByTransferIdAndOrderReference(PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer): array
+    {
+        $ordersGroupedByTransferIdAndOrderReference = [];
+
+        foreach ($paymentsTransmissionsRequestTransfer->getOrderItems() as $orderItemTransfer) {
+            if ($orderItemTransfer->getTransferId() === null) {
+                continue;
+            }
+
+            if (!isset($ordersGroupedByTransferIdAndOrderReference[$orderItemTransfer->getTransferId()])) {
+                $ordersGroupedByTransferIdAndOrderReference[$orderItemTransfer->getTransferId()] = [];
+            }
+
+            if (!isset($ordersGroupedByTransferIdAndOrderReference[$orderItemTransfer->getTransferId()][$orderItemTransfer->getOrderReference()])) {
+                $ordersGroupedByTransferIdAndOrderReference[$orderItemTransfer->getTransferId()][$orderItemTransfer->getOrderReference()] = [];
+            }
+
+            $ordersGroupedByTransferIdAndOrderReference[$orderItemTransfer->getTransferId()][$orderItemTransfer->getOrderReference()][] = $orderItemTransfer;
+        }
+
+        return $ordersGroupedByTransferIdAndOrderReference;
+    }
+
+    /**
+     * @param array<string, array> $orderItemsGroupedByTransferId
+     *
+     * @return array<string, string>
+     */
+    protected function getOrderReferencesFromOrderItemsGroupedByTransferId(array $orderItemsGroupedByTransferId): array
+    {
+        $orderReferences = [];
+
+        foreach ($orderItemsGroupedByTransferId as $orderItemsGrouped) {
+            foreach (array_keys($orderItemsGrouped) as $orderReference) {
+                $orderReferences[$orderReference] = $orderReference;
+            }
+        }
+
+        return $orderReferences;
+    }
+
+    /**
+     * Group orderItems by their orderReference. Items with a transferId are ignored as they are grouped into a different stack
+     *
+     * @return array<string, array>
+     */
+    protected function getOrderItemsGroupedByOrderReference(PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer): array
+    {
+        $ordersGroupedByOrderReference = [];
+
+        foreach ($paymentsTransmissionsRequestTransfer->getOrderItems() as $orderItemTransfer) {
+            if ($orderItemTransfer->getTransferId() !== null) {
+                continue;
+            }
+
+            if (!isset($ordersGroupedByOrderReference[$orderItemTransfer->getOrderReference()])) {
+                $ordersGroupedByOrderReference[$orderItemTransfer->getOrderReference()] = [];
+            }
+
+            $ordersGroupedByOrderReference[$orderItemTransfer->getOrderReference()][$orderItemTransfer->getItemReference()] = $orderItemTransfer;
+        }
+
+        return $ordersGroupedByOrderReference;
     }
 
     protected function savePaymentsTransfers(
@@ -195,17 +326,17 @@ class PaymentTransfer
     protected function recalculatePaymentsTransmissions(
         PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer
     ): PaymentsTransmissionsRequestTransfer {
-        foreach ($paymentsTransmissionsRequestTransfer->getPaymentsTransmissions() as $paymentsTransmission) {
+        foreach ($paymentsTransmissionsRequestTransfer->getPaymentsTransmissions() as $paymentsTransmissionTransfer) {
             $totalAmount = 0;
             $itemReferences = [];
 
-            foreach ($paymentsTransmission->getOrderItems() as $orderItemTransfer) {
+            foreach ($paymentsTransmissionTransfer->getOrderItems() as $orderItemTransfer) {
                 $totalAmount += $orderItemTransfer->getAmount();
                 $itemReferences[] = $orderItemTransfer->getItemReference();
             }
 
-            $paymentsTransmission->setAmount($totalAmount);
-            $paymentsTransmission->setItemReferences($itemReferences);
+            $paymentsTransmissionTransfer->setAmount($totalAmount);
+            $paymentsTransmissionTransfer->setItemReferences($itemReferences);
         }
 
         return $paymentsTransmissionsRequestTransfer;

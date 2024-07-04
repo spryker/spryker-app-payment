@@ -11,7 +11,6 @@ use Codeception\Stub;
 use Codeception\Test\Unit;
 use Exception;
 use Generated\Shared\Transfer\AppConfigTransfer;
-use Generated\Shared\Transfer\MerchantTransfer;
 use Generated\Shared\Transfer\OrderItemTransfer;
 use Generated\Shared\Transfer\PaymentsTransmissionsRequestTransfer;
 use Generated\Shared\Transfer\PaymentsTransmissionsResponseTransfer;
@@ -51,17 +50,7 @@ class PaymentsTransfersApiTest extends Unit
         $orderReference = Uuid::uuid4()->toString();
         $merchantReference = Uuid::uuid4()->toString();
 
-        $this->tester->haveAppConfigForTenant($tenantIdentifier);
-        $this->tester->haveMerchantPersisted([
-            MerchantTransfer::MERCHANT_REFERENCE => $merchantReference,
-            MerchantTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
-        ]);
-
-        $this->tester->havePayment([
-            PaymentTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
-            PaymentTransfer::TRANSACTION_ID => $transactionId,
-            PaymentTransfer::ORDER_REFERENCE => $orderReference,
-        ]);
+        $this->tester->haveTransferDefaults($tenantIdentifier, $merchantReference, $transactionId, $orderReference);
 
         $paymentsTransmissionsResponseTransfer = new PaymentsTransmissionsResponseTransfer();
 
@@ -147,17 +136,7 @@ class PaymentsTransfersApiTest extends Unit
         $orderReference = Uuid::uuid4()->toString();
         $merchantReference = Uuid::uuid4()->toString();
 
-        $this->tester->haveAppConfigForTenant($tenantIdentifier);
-        $this->tester->haveMerchantPersisted([
-            MerchantTransfer::MERCHANT_REFERENCE => $merchantReference,
-            MerchantTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
-        ]);
-
-        $this->tester->havePayment([
-            PaymentTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
-            PaymentTransfer::TRANSACTION_ID => $transactionId,
-            PaymentTransfer::ORDER_REFERENCE => $orderReference,
-        ]);
+        $this->tester->haveTransferDefaults($tenantIdentifier, $merchantReference, $transactionId, $orderReference);
 
         $this->tester->havePaymentTransmissionPersisted([PaymentTransmissionTransfer::TRANSFER_ID => $transferId]);
 
@@ -235,6 +214,65 @@ class PaymentsTransfersApiTest extends Unit
         $this->assertSame($expectedPaymentTransmissionTransfer->getTransferId(), $response['transfers'][0]['transferId']);
     }
 
+    public function testGivenPaymentsTransfersPostRequestForReverseTransferWithTwoItemsEachWasTransferredSeparatelyWhenRequestIsValidThenAHttpResponseCode200IsReturnedAndTwoReverseTransfersArePersisted(): void
+    {
+        // Arrange
+        $transactionId = Uuid::uuid4()->toString();
+        $transferId1 = Uuid::uuid4()->toString();
+        $transferId2 = Uuid::uuid4()->toString();
+        $reverseTransferId1 = Uuid::uuid4()->toString();
+        $reverseTransferId2 = Uuid::uuid4()->toString();
+        $tenantIdentifier = Uuid::uuid4()->toString();
+        $orderReference = Uuid::uuid4()->toString();
+        $merchantReference = Uuid::uuid4()->toString();
+
+        $this->tester->haveTransferDefaults($tenantIdentifier, $merchantReference, $transactionId, $orderReference);
+
+        $this->tester->havePaymentTransmissionPersisted([PaymentTransmissionTransfer::TRANSFER_ID => $transferId1]);
+        $this->tester->havePaymentTransmissionPersisted([PaymentTransmissionTransfer::TRANSFER_ID => $transferId2]);
+
+        $paymentsTransmissionsResponseTransfer = new PaymentsTransmissionsResponseTransfer();
+
+        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+            'transferPayments' => function (PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer) use ($paymentsTransmissionsResponseTransfer, $reverseTransferId1, $reverseTransferId2) {
+                $paymentsTransmissionsResponseTransfer->setIsSuccessful(true);
+
+                // Ensure that the AppConfig is always passed to the platform plugin.
+                $this->assertInstanceOf(AppConfigTransfer::class, $paymentsTransmissionsRequestTransfer->getAppConfig());
+
+                // Add transferId to each PaymentTransmissionTransfer.
+                $paymentTransmissionTransfers = $paymentsTransmissionsRequestTransfer->getPaymentsTransmissions();
+                $paymentTransmissionTransfers[0]->setTransferId($reverseTransferId1)->setIsSuccessful(true);
+                $paymentTransmissionTransfers[1]->setTransferId($reverseTransferId2)->setIsSuccessful(true);
+
+                $paymentsTransmissionsResponseTransfer->setPaymentsTransmissions($paymentTransmissionTransfers);
+
+                return $paymentsTransmissionsResponseTransfer;
+            },
+        ]);
+
+        $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
+
+        $requestOrderItems = $this->tester->haveOrderItemsForReverseTransfer($orderReference, $merchantReference, $merchantReference, $transferId1, $transferId2);
+
+        // Act
+        $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
+        $this->tester->addHeader('content-type', 'application/json');
+
+        $response = $this->tester->sendPost(
+            $this->tester->buildPaymentsTransfersUrl(),
+            ['orderItems' => $requestOrderItems],
+        );
+
+        $response = json_decode($response->getContent(), true);
+
+        // Assert
+        $this->tester->seeResponseCodeIs(Response::HTTP_OK);
+
+        $this->assertSame($reverseTransferId1, $response['transfers'][0]['transferId']);
+        $this->assertSame($reverseTransferId2, $response['transfers'][1]['transferId']);
+    }
+
     public function testGivenPaymentsTransfersPostRequestForReverseTransferWhenNoPreviousTransactionExistsThenAHttpResponseCode200IsReturnedWithAFailureResponseMessage(): void
     {
         // Arrange
@@ -244,40 +282,8 @@ class PaymentsTransfersApiTest extends Unit
         $orderReference = Uuid::uuid4()->toString();
         $merchantReference = Uuid::uuid4()->toString();
 
-        $this->tester->haveAppConfigForTenant($tenantIdentifier);
-        $this->tester->haveMerchantPersisted([
-            MerchantTransfer::MERCHANT_REFERENCE => $merchantReference,
-            MerchantTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
-        ]);
-
-        $this->tester->havePayment([
-            PaymentTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
-            PaymentTransfer::TRANSACTION_ID => $transactionId,
-            PaymentTransfer::ORDER_REFERENCE => $orderReference,
-        ]);
-
-        $paymentsTransmissionsResponseTransfer = new PaymentsTransmissionsResponseTransfer();
-
-        $orderItems = [
-            $this->tester->haveOrderItem([
-                OrderItemTransfer::MERCHANT_REFERENCE => $merchantReference,
-                OrderItemTransfer::ORDER_REFERENCE => $orderReference,
-                OrderItemTransfer::ITEM_REFERENCE => Uuid::uuid4()->toString(),
-                OrderItemTransfer::AMOUNT => -90,
-            ]),
-            $this->tester->haveOrderItem([
-                OrderItemTransfer::MERCHANT_REFERENCE => $merchantReference,
-                OrderItemTransfer::ORDER_REFERENCE => $orderReference,
-                OrderItemTransfer::ITEM_REFERENCE => $transferId,
-                OrderItemTransfer::AMOUNT => -90,
-            ]),
-        ];
-
-        $requestOrderItems = [];
-
-        foreach ($orderItems as $orderItemTransfer) {
-            $requestOrderItems[] = $orderItemTransfer->toArray();
-        }
+        $this->tester->haveTransferDefaults($tenantIdentifier, $merchantReference, $transactionId, $orderReference);
+        $requestOrderItems = $this->tester->haveOrderItemsForReverseTransfer($orderReference, $merchantReference, $merchantReference, $transferId, $transferId);
 
         // Act
         $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
@@ -319,24 +325,7 @@ class PaymentsTransfersApiTest extends Unit
 
         $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
 
-        $orderItems = [
-            $this->tester->haveOrderItem([
-                OrderItemTransfer::ORDER_REFERENCE => $orderReference,
-                OrderItemTransfer::ITEM_REFERENCE => Uuid::uuid4()->toString(),
-                OrderItemTransfer::AMOUNT => 90,
-            ]),
-            $this->tester->haveOrderItem([
-                OrderItemTransfer::ORDER_REFERENCE => $orderReference,
-                OrderItemTransfer::ITEM_REFERENCE => Uuid::uuid4()->toString(),
-                OrderItemTransfer::AMOUNT => 90,
-            ]),
-        ];
-
-        $requestOrderItems = [];
-
-        foreach ($orderItems as $orderItemTransfer) {
-            $requestOrderItems[] = $orderItemTransfer->toArray();
-        }
+        $requestOrderItems = $this->tester->haveOrderItemsForTransfer($orderReference);
 
         // Act
         $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
@@ -375,24 +364,7 @@ class PaymentsTransfersApiTest extends Unit
 
         $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
 
-        $orderItems = [
-            $this->tester->haveOrderItem([
-                OrderItemTransfer::ORDER_REFERENCE => $orderReference,
-                OrderItemTransfer::ITEM_REFERENCE => Uuid::uuid4()->toString(),
-                OrderItemTransfer::AMOUNT => 90,
-            ]),
-            $this->tester->haveOrderItem([
-                OrderItemTransfer::ORDER_REFERENCE => $orderReference,
-                OrderItemTransfer::ITEM_REFERENCE => Uuid::uuid4()->toString(),
-                OrderItemTransfer::AMOUNT => 90,
-            ]),
-        ];
-
-        $requestOrderItems = [];
-
-        foreach ($orderItems as $orderItemTransfer) {
-            $requestOrderItems[] = $orderItemTransfer->toArray();
-        }
+        $requestOrderItems = $this->tester->haveOrderItemsForTransfer($orderReference);
 
         // Act
         $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
@@ -421,24 +393,7 @@ class PaymentsTransfersApiTest extends Unit
             PaymentTransfer::ORDER_REFERENCE => $orderReference,
         ]);
 
-        $orderItems = [
-            $this->tester->haveOrderItem([
-                OrderItemTransfer::ORDER_REFERENCE => $orderReference,
-                OrderItemTransfer::ITEM_REFERENCE => Uuid::uuid4()->toString(),
-                OrderItemTransfer::AMOUNT => 90,
-            ]),
-            $this->tester->haveOrderItem([
-                OrderItemTransfer::ORDER_REFERENCE => $orderReference,
-                OrderItemTransfer::ITEM_REFERENCE => Uuid::uuid4()->toString(),
-                OrderItemTransfer::AMOUNT => 90,
-            ]),
-        ];
-
-        $requestOrderItems = [];
-
-        foreach ($orderItems as $orderItemTransfer) {
-            $requestOrderItems[] = $orderItemTransfer->toArray();
-        }
+        $requestOrderItems = $this->tester->haveOrderItemsForTransfer($orderReference);
 
         // Act
         $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);

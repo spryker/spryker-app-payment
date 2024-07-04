@@ -11,7 +11,6 @@ use Generated\Shared\Transfer\PaymentRefundTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 use Orm\Zed\AppPayment\Persistence\SpyPayment;
-use Orm\Zed\AppPayment\Persistence\SpyPaymentTransfer;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTenantIdentifierAndOrderReferenceNotFoundException;
 use Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTransactionIdNotFoundException;
@@ -110,14 +109,22 @@ class AppPaymentRepository extends AbstractRepository implements AppPaymentRepos
         return $this->getFactory()->createPaymentMapper()->mapPaymentEntityToPaymentTransfer($spyPayment, new PaymentTransfer());
     }
 
-    public function findPaymentTransmissionByTransferId(string $transferId): ?PaymentTransmissionTransfer
+    /**
+     * @param array<string> $transferIds
+     *
+     * @return array<\Generated\Shared\Transfer\PaymentTransmissionTransfer>
+     */
+    public function findPaymentTransmissionsByTransferIds(array $transferIds): array
     {
-        $paymentTransferEntity = $this->getFactory()->createPaymentTransferQuery()->findOneByTransferId($transferId);
+        $collection = $this->getFactory()->createPaymentTransferQuery()->filterByTransferId_In($transferIds)->find();
 
-        if (!($paymentTransferEntity instanceof SpyPaymentTransfer)) {
-            return null;
+        $paymentTransmissionTransfers = [];
+
+        foreach ($collection as $paymentTransferEntity) {
+            $paymentTransmissionTransfers[$paymentTransferEntity->getTransferId()] = $this->getFactory()->createPaymentMapper()
+                ->mapPaymentTransmissionEntityToPaymentTransmissionTransfer($paymentTransferEntity, new PaymentTransmissionTransfer());
         }
 
-        return $this->getFactory()->createPaymentMapper()->mapPaymentTransmissionEntityToPaymentTransmissionTransfer($paymentTransferEntity, new PaymentTransmissionTransfer());
+        return $paymentTransmissionTransfers;
     }
 }

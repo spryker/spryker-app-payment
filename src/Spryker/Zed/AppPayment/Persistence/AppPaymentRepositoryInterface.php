@@ -9,7 +9,6 @@ namespace Spryker\Zed\AppPayment\Persistence;
 
 use Generated\Shared\Transfer\PaymentRefundTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
-use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 
 interface AppPaymentRepositoryInterface
 {
@@ -47,5 +46,10 @@ interface AppPaymentRepositoryInterface
         array $refundStatuses
     ): array;
 
-    public function findPaymentTransmissionByTransferId(string $transferId): ?PaymentTransmissionTransfer;
+    /**
+     * @param array<string> $transferIds
+     *
+     * @return array<\Generated\Shared\Transfer\PaymentTransmissionTransfer>
+     */
+    public function findPaymentTransmissionsByTransferIds(array $transferIds): array;
 }

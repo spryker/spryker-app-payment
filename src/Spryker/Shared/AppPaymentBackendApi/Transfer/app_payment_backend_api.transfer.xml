@@ -25,7 +25,6 @@
     </transfer>
 
     <transfer name="PaymentsTransmissionsResponse" strict="true">
-        <property name="isSuccessful" type="bool"/>
         <property name="message" type="string"/>
         <property name="paymentsTransmissions" type="PaymentTransmission[]" singular="paymentTransmission"/>
     </transfer>
