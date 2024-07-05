@@ -16,11 +16,7 @@ class AppPaymentConfig extends AbstractBundleConfig
 {
     /**
      * @api
-     *
-     * @var string
      */
-    public const HEADER_TENANT_IDENTIFIER = 'x-tenant-identifier';
-
     public function getAppIdentifier(): string
     {
         return $this->getStringValue(AppPaymentConstants::APP_IDENTIFIER);
@@ -28,7 +24,7 @@ class AppPaymentConfig extends AbstractBundleConfig
 
     public function getPaymentProviderName(): string
     {
-        // When extracting into a standalone package we should throw an exception here when this method is not overriden on project level
+        // When extracting into a standalone package we should throw an exception here when this method is not overridden on project level
         return 'You need to configure the PaymentProviderName omn the project level';
     }
 

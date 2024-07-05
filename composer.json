@@ -5,7 +5,7 @@
     "license": "proprietary",
     "require": {
         "php": ">=8.1",
-        "spryker/app-webhook": "dev-feature/extracted-app-webhook",
+        "spryker/app-webhook": "dev-main",
         "spryker/glue-application-extension": "^1.0.0",
         "spryker/kernel": "^3.30.0",
         "spryker/log": "^3.0.0",
@@ -28,9 +28,9 @@
         "phpstan/phpdoc-parser": "1.25.0",
         "phpstan/phpstan": "1.10.66",
         "rector/rector": "^0.19.0",
-        "spryker-sdk/async-api": "dev-feature/resolve-remote-references as 0.3.1",
-        "spryker/app-kernel": "dev-feature/extract-payment-template",
         "spryker/app-merchant": "dev-feature/acp-2626/master-stripe-marketplace-payment-flow-marketplace-oms-workflow-transfers-to-merchants",
+        "spryker-sdk/async-api": "dev-master as 0.3.1",
+        "spryker/app-kernel": "dev-master",
         "spryker/code-sniffer": "*",
         "spryker/container": "*",
         "spryker/development": "^3.34.0",
@@ -84,8 +84,6 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-feature/acp-2626/master-stripe-marketplace-payment-flow-marketplace-oms-workflow-transfers-to-merchants": "1.0.x-dev",
-            "dev-feature/app-payment-extraction": "1.0.x-dev",
             "dev-main": "1.0.x-dev"
         }
     },

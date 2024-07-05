@@ -93,7 +93,6 @@ paths:
                             schema:
                                 type: string
 
-
 components:
     schemas:
         InitializePaymentResponse:
@@ -251,6 +250,7 @@ components:
                 - orderReference
                 - amount
                 - itemReference
+
     parameters:
         tenantIdentifier:
             name: X-Tenant-Identifier
