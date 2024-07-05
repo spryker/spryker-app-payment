@@ -10,10 +10,14 @@ namespace Spryker\Glue\AppPaymentBackendApi\Mapper\Payment;
 use Generated\Shared\Transfer\GlueRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
 use GuzzleHttp\RequestOptions;
-use Spryker\Zed\AppPayment\AppPaymentConfig;
 
 class GlueRequestPaymentMapper implements GlueRequestPaymentMapperInterface
 {
+ /**
+  * @var string
+  */
+    public const HEADER_TENANT_IDENTIFIER = 'x-tenant-identifier';
+
     public function mapGlueRequestTransferToInitializePaymentRequestTransfer(
         GlueRequestTransfer $glueRequestTransfer
     ): InitializePaymentRequestTransfer {
@@ -21,7 +25,7 @@ class GlueRequestPaymentMapper implements GlueRequestPaymentMapperInterface
 
         $initializePaymentRequestTransfer = new InitializePaymentRequestTransfer();
         $initializePaymentRequestTransfer->fromArray($glueRequestTransfer->getAttributes()[RequestOptions::FORM_PARAMS] ?? $glueRequestTransfer->getAttributes(), true);
-        $initializePaymentRequestTransfer->setTenantIdentifier($metaData[AppPaymentConfig::HEADER_TENANT_IDENTIFIER][0] ?? ($metaData['x-store-reference'][0] ?? ''));
+        $initializePaymentRequestTransfer->setTenantIdentifier($metaData[static::HEADER_TENANT_IDENTIFIER][0] ?? ($metaData['x-store-reference'][0] ?? ''));
 
         return $initializePaymentRequestTransfer;
     }

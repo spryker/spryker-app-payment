@@ -15,9 +15,9 @@ use Generated\Shared\Transfer\ConfigurationValidationErrorTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 use Orm\Zed\AppKernel\Persistence\SpyAppConfigQuery;
 use Ramsey\Uuid\Uuid;
+use Spryker\Glue\AppPaymentBackendApi\Mapper\Payment\GlueRequestPaymentMapper;
 use Spryker\Shared\AppPayment\AppPaymentConstants;
 use Spryker\Zed\AppKernel\AppKernelDependencyProvider;
-use Spryker\Zed\AppPayment\AppPaymentConfig;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Communication\Plugin\AppKernel\DeleteTenantPaymentsConfigurationAfterDeletePlugin;
 use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
@@ -74,7 +74,7 @@ class AppConfigTest extends Unit
         $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
 
         $this->tester->setHeaders([
-            AppPaymentConfig::HEADER_TENANT_IDENTIFIER => $tenantIdentifier,
+            GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER => $tenantIdentifier,
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
         ]);
@@ -108,7 +108,7 @@ class AppConfigTest extends Unit
         $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
 
         $this->tester->setHeaders([
-            AppPaymentConfig::HEADER_TENANT_IDENTIFIER => $tenantIdentifier,
+            GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER => $tenantIdentifier,
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
             'Accept-Language' => 'en-US, en;q=0.9,*;q=0.5',
@@ -137,7 +137,7 @@ class AppConfigTest extends Unit
         $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
 
         $this->tester->setHeaders([
-            AppPaymentConfig::HEADER_TENANT_IDENTIFIER => $tenantIdentifier,
+            GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER => $tenantIdentifier,
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
             'Accept-Language' => 'en-US, en;q=0.9,*;q=0.5',
@@ -171,7 +171,7 @@ class AppConfigTest extends Unit
         $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
 
         $this->tester->setHeaders([
-            AppPaymentConfig::HEADER_TENANT_IDENTIFIER => $tenantIdentifier,
+            GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER => $tenantIdentifier,
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
             'Accept-Language' => 'en-US, en;q=0.9,*;q=0.5',
@@ -199,7 +199,7 @@ class AppConfigTest extends Unit
         $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
 
         $this->tester->setHeaders([
-            AppPaymentConfig::HEADER_TENANT_IDENTIFIER => $tenantIdentifier,
+            GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER => $tenantIdentifier,
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
             'Accept-Language' => 'en-US, en;q=0.9,*;q=0.5',
@@ -231,7 +231,7 @@ class AppConfigTest extends Unit
         $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
 
         $this->tester->setHeaders([
-            AppPaymentConfig::HEADER_TENANT_IDENTIFIER => $tenantIdentifier,
+            GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER => $tenantIdentifier,
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
             'Accept-Language' => 'en-US, en;q=0.9,*;q=0.5',
@@ -258,7 +258,7 @@ class AppConfigTest extends Unit
         $this->tester->setConfig(AppPaymentConstants::IS_TENANT_PAYMENTS_DELETION_AFTER_DISCONNECTION_ENABLED, true);
 
         $this->tester->setHeaders([
-            AppPaymentConfig::HEADER_TENANT_IDENTIFIER => $tenantIdentifier,
+            GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER => $tenantIdentifier,
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
             'Accept-Language' => 'en-US, en;q=0.9,*;q=0.5',
@@ -285,7 +285,7 @@ class AppConfigTest extends Unit
         $this->tester->setConfig(AppPaymentConstants::IS_TENANT_PAYMENTS_DELETION_AFTER_DISCONNECTION_ENABLED, false);
 
         $this->tester->setHeaders([
-            AppPaymentConfig::HEADER_TENANT_IDENTIFIER => $tenantIdentifier,
+            GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER => $tenantIdentifier,
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
             'Accept-Language' => 'en-US, en;q=0.9,*;q=0.5',
@@ -317,7 +317,7 @@ class AppConfigTest extends Unit
         $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
 
         $this->tester->setHeaders([
-            AppPaymentConfig::HEADER_TENANT_IDENTIFIER => $tenantIdentifier,
+            GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER => $tenantIdentifier,
             'Accept-Language' => 'en-US, en;q=0.9,*;q=0.5',
         ]);
 
