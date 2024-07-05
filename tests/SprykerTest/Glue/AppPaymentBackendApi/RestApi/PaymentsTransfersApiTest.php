@@ -20,6 +20,7 @@ use Ramsey\Uuid\Uuid;
 use Spryker\Glue\AppPaymentBackendApi\Mapper\Payment\GlueRequestPaymentMapper;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Business\Message\MessageBuilder;
+use Spryker\Zed\AppPayment\Dependency\Plugin\PaymentsTransmissionsRequestExtenderPluginInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
 use SprykerTest\Glue\AppPaymentBackendApi\AppPaymentBackendApiTester;
 use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
@@ -72,6 +73,15 @@ class PaymentsTransfersApiTest extends Unit
         ]);
 
         $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
+        $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGINS_PAYMENTS_TRANSMISSIONS_REQUEST_EXPANDER, [
+            new class implements PaymentsTransmissionsRequestExtenderPluginInterface {
+                public function extendPaymentsTransmissionsRequest(
+                    PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer
+                ): PaymentsTransmissionsRequestTransfer {
+                    return $paymentsTransmissionsRequestTransfer;
+                }
+            },
+        ]);
 
         $orderItems = [
             $this->tester->haveOrderItem([
@@ -376,6 +386,56 @@ class PaymentsTransfersApiTest extends Unit
         // Assert
         $this->tester->seeResponseCodeIs(Response::HTTP_BAD_REQUEST);
         $this->tester->seeResponseContainsErrorMessage('There was an error in the PlatformPlugin implementation');
+    }
+
+    public function testWhenThePlatformPluginReturnsAFailedTransmissionInTheCollectionThenTheTransmissionIsNotPersistedAndAResponseWithTheFailureMessageIsSent(): void
+    {
+        // Arrange
+        $transactionId = Uuid::uuid4()->toString();
+        $tenantIdentifier = Uuid::uuid4()->toString();
+        $orderReference = Uuid::uuid4()->toString();
+
+        $this->tester->haveAppConfigForTenant($tenantIdentifier);
+
+        $this->tester->havePayment([
+            PaymentTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
+            PaymentTransfer::TRANSACTION_ID => $transactionId,
+            PaymentTransfer::ORDER_REFERENCE => $orderReference,
+        ]);
+
+        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+            'transferPayments' => function () {
+                $paymentTransmissionResponseTransfer = (new PaymentsTransmissionsResponseTransfer())
+                    ->setIsSuccessful(true);
+
+                $paymentTransmissionTransfer = new PaymentTransmissionTransfer();
+                $paymentTransmissionTransfer->setIsSuccessful(false);
+                $paymentTransmissionTransfer->setMessage('Transmission failed');
+
+                $paymentTransmissionResponseTransfer->addPaymentTransmission($paymentTransmissionTransfer);
+
+                return $paymentTransmissionResponseTransfer;
+            },
+        ]);
+
+        $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
+
+        $requestOrderItems = $this->tester->haveOrderItemsForTransfer($orderReference);
+
+        // Act
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
+        $this->tester->addHeader('content-type', 'application/json');
+
+        $response = $this->tester->sendPost(
+            $this->tester->buildPaymentsTransfersUrl(),
+            ['orderItems' => $requestOrderItems],
+        );
+
+        // Assert
+        $this->tester->seeResponseCodeIs(Response::HTTP_OK);
+
+        $transfers = json_decode($response->getContent(), true)['transfers'];
+        $this->assertSame('Transmission failed', $transfers[0]['failureMessage']);
     }
 
     public function testWhenThereIsNoPaymentFoundForTheTenantTheAFailedResponseIsReturnedWithTheExceptionMessageForwardedInTheResponse(): void

@@ -11,7 +11,6 @@ namespace SprykerTest\Glue\AppPaymentBackendApi;
 
 use Codeception\Actor;
 use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
-use Generated\Shared\Transfer\MerchantTransfer;
 use Generated\Shared\Transfer\OrderItemTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 use Ramsey\Uuid\Uuid;
@@ -49,10 +48,6 @@ class AppPaymentBackendApiTester extends Actor
     public function haveTransferDefaults(string $tenantIdentifier, string $merchantReference, string $transactionId, string $orderReference): void
     {
         $this->haveAppConfigForTenant($tenantIdentifier);
-        $this->haveMerchantPersisted([
-            MerchantTransfer::MERCHANT_REFERENCE => $merchantReference,
-            MerchantTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
-        ]);
 
         $this->havePayment([
             PaymentTransfer::TENANT_IDENTIFIER => $tenantIdentifier,

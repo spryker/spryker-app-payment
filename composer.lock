@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "72e49c9ff865e9ee27e98d322708b937",
+    "content-hash": "fa57d5f44afb873dc155d1b0ca54f267",
     "packages": [
         {
             "name": "brick/math",
@@ -14899,90 +14899,6 @@
             "time": "2024-06-24T09:04:58+00:00"
         },
         {
-            "name": "spryker/app-merchant",
-            "version": "dev-feature/acp-2626/master-stripe-marketplace-payment-flow-marketplace-oms-workflow-transfers-to-merchants",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/spryker/app-merchant.git",
-                "reference": "9879cde488d9a64ab4401ccff5d47c7ec286718b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/spryker/app-merchant/zipball/9879cde488d9a64ab4401ccff5d47c7ec286718b",
-                "reference": "9879cde488d9a64ab4401ccff5d47c7ec286718b",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=8.1",
-                "spryker/app-payment": "dev-feature/acp-2626/master-stripe-marketplace-payment-flow-marketplace-oms-workflow-transfers-to-merchants as dev-main",
-                "spryker/app-webhook": "dev-main",
-                "spryker/glue-application-extension": "^1.0.0",
-                "spryker/kernel": "^3.30.0",
-                "spryker/log": "^3.0.0",
-                "spryker/message-broker": "^1.11.0",
-                "spryker/transfer": "^3.33.0"
-            },
-            "require-dev": {
-                "codeception/codeception": "^5.0",
-                "codeception/module-asserts": "^3.0.0",
-                "codeception/module-cli": "^2.0.0",
-                "codeception/module-filesystem": "^3.0.0",
-                "codeception/module-phpbrowser": "^3.0.0",
-                "codeception/module-rest": "^3.0.0",
-                "codeception/module-webdriver": "^3.0.0",
-                "codeception/phpunit-wrapper": "^9.0.0",
-                "galbar/jsonpath": "^3.0",
-                "infection/codeception-adapter": "^0.4.3",
-                "infection/infection": "^0.29.6",
-                "phpstan/phpdoc-parser": "1.25.0",
-                "phpstan/phpstan": "1.10.66",
-                "rector/rector": "^0.19.0",
-                "spryker-sdk/async-api": "dev-master as 0.3.1",
-                "spryker/app-kernel": "dev-master",
-                "spryker/code-sniffer": "*",
-                "spryker/container": "*",
-                "spryker/development": "^3.34.0",
-                "spryker/event-dispatcher": "^1.6",
-                "spryker/glue-backend-api-application": "*",
-                "spryker/glue-json-api-convention": "^1.3",
-                "spryker/http": "^1.11",
-                "spryker/message-broker-aws": "*",
-                "spryker/propel": "*",
-                "spryker/router": "^1.19",
-                "spryker/testify": "*",
-                "spryker/testify-async-api": "*",
-                "spryker/translator": "^1.13"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Orm\\": "src/Orm/",
-                    "Spryker\\": "src/Spryker/",
-                    "SprykerTest\\Zed\\Testify\\Helper\\": "tests/SprykerTest/Zed/Testify/_support/Helper/",
-                    "SprykerTest\\Glue\\Testify\\Helper\\": "tests/SprykerTest/Glue/Testify/_support/Helper/",
-                    "SprykerTest\\Zed\\AppMerchant\\Helper\\": "tests/SprykerTest/Zed/AppMerchant/_support/Helper/",
-                    "SprykerTest\\Shared\\AppMerchant\\Helper\\": "tests/SprykerTest/Shared/AppMerchant/_support/Helper/",
-                    "SprykerTest\\AsyncApi\\AppMerchant\\Helper\\": "tests/SprykerTest/AsyncApi/AppMerchant/_support/Helper/",
-                    "SprykerTest\\Glue\\AppMerchantBackendApi\\Helper\\": "tests/SprykerTest/Glue/AppMerchantBackendApi/_support/Helper/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "proprietary"
-            ],
-            "description": "AppMerchant module",
-            "support": {
-                "issues": "https://github.com/spryker/app-merchant/issues",
-                "source": "https://github.com/spryker/app-merchant/tree/feature/acp-2626/master-stripe-marketplace-payment-flow-marketplace-oms-workflow-transfers-to-merchants"
-            },
-            "time": "2024-07-05T07:11:09+00:00"
-        },
-        {
             "name": "spryker/application",
             "version": "3.35.1",
             "source": {
@@ -18488,7 +18404,6 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "spryker/app-webhook": 20,
-        "spryker/app-merchant": 20,
         "spryker-sdk/async-api": 20,
         "spryker/app-kernel": 20
     },

@@ -311,11 +311,11 @@ class PaymentTransfer
                 continue;
             }
 
-            // @codeCoverageIgnoreEnd
-
             if ($paymentTransfer->getOrderReferenceOrFail() !== $orderReference) {
                 continue;
             }
+
+            // @codeCoverageIgnoreEnd
 
             return $paymentTransfer;
         }
