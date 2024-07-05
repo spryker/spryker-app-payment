@@ -36,18 +36,11 @@ src/Generated/
 /tests/SprykerTest/*/*/_output/*
 /tests/SprykerTest/*/*/_support/_generated/*
 
-# propel classes
-/src/Orm/Zed/*/Persistence/Base
-/src/Orm/Zed/*/Persistence/Map
-
-# propel config
-/src/Orm/Propel/Schema
-/src/Orm/Propel/Sql
-/src/Orm/Propel/generated-conf/
-
-# propel migrations
-/src/Orm/Propel/Migration_SQLite/
+# Propel
+/src/Orm/Propel/
+/src/Orm/Zed/
 tests/_data/app_payment_db
 
 # tools
 .phpstorm.meta.php
+composer.lock
