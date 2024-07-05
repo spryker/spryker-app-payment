@@ -1,0 +1,44 @@
+namespace: SprykerTest\Glue\AppPaymentBackendApi
+
+paths:
+    tests: .
+    data: ../../../_data
+    support: _support
+    output: ../../../_output
+
+coverage:
+    enabled: true
+    remote: false
+    show_uncovered: true
+    whitelist:
+        include:
+            - '../../../../src/Spryker/*/AppPaymentBackendApi/*'
+            - '../../../../src/Spryker/*/AppPayment/*'
+suites:
+    RestApi:
+        actor: AppPaymentBackendApiTester
+        modules:
+            enabled:
+                - Asserts
+                - \SprykerTest\Glue\AppPaymentBackendApi\Helper\AppPaymentBackendApiHelper
+                - \SprykerTest\Glue\AppPaymentBackendApi\Helper\WebhookApiHelper
+                - \SprykerTest\Shared\AppPayment\Helper\AppPaymentHelper
+                - \SprykerTest\Shared\Testify\Helper\Environment
+                -
+                    \SprykerTest\Shared\Testify\Helper\LocatorHelper:
+                        projectNamespaces:
+                            - Pyz
+                - \SprykerTest\Shared\Propel\Helper\ConnectionHelper
+                - \SprykerTest\Shared\Testify\Helper\ConfigHelper
+                - \SprykerTest\Glue\Testify\Helper\DependencyProviderHelper
+                - \SprykerTest\Shared\Testify\Helper\DependencyHelper
+                - \SprykerTest\Glue\Testify\Helper\PaymentGlueBackendApiHelper
+                - \SprykerTest\Glue\Testify\Helper\JsonPath
+                - \SprykerTest\Zed\AppPayment\Helper\AppPaymentHelper
+                - \SprykerTest\Shared\AppPayment\Helper\AppPaymentRefundHelper
+                - \SprykerTest\Zed\Testify\Helper\Business\BusinessHelper
+                - \SprykerTest\Shared\AppKernel\Helper\AppConfigHelper
+                - \SprykerTest\Zed\Testify\Helper\Business\DependencyProviderHelper
+                - \SprykerTest\Zed\MessageBroker\Helper\InMemoryMessageBrokerHelper
+                - \SprykerTest\Shared\Propel\Helper\ConnectionHelper
+                - \SprykerTest\Shared\Testify\Helper\DataCleanupHelper

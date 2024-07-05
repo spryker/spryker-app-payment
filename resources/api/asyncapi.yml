@@ -1,0 +1,236 @@
+asyncapi: 2.6.0
+info:
+    title: Payment API
+    version: 0.1.0
+channels:
+    payment-events:
+        subscribe:
+            message:
+                oneOf:
+                    - $ref: '#/components/messages/PaymentAuthorized'
+                    - $ref: '#/components/messages/PaymentAuthorizationFailed'
+                    - $ref: '#/components/messages/PaymentCaptured'
+                    - $ref: '#/components/messages/PaymentCaptureFailed'
+                    - $ref: '#/components/messages/PaymentRefunded'
+                    - $ref: '#/components/messages/PaymentRefundFailed'
+                    - $ref: '#/components/messages/PaymentCanceled'
+                    - $ref: '#/components/messages/PaymentCancellationFailed'
+                    - $ref: '#/components/messages/PaymentCreated'
+
+    payment-commands:
+        publish:
+            message:
+                oneOf:
+                    - $ref: '#/components/messages/CancelPayment'
+                    - $ref: '#/components/messages/CapturePayment'
+                    - $ref: '#/components/messages/RefundPayment'
+
+    payment-method-commands:
+        subscribe:
+            message:
+                oneOf:
+                    - $ref: '#/components/messages/AddPaymentMethod'
+                    - $ref: '#/components/messages/DeletePaymentMethod'
+components:
+    messages:
+        AddPaymentMethod:
+            name: AddPaymentMethod
+            x-spryker:
+                module: Payment
+            summary: 'Informs about a new Payment method.'
+            payload:
+                $ref: '#/components/schemas/PaymentMethodPayload'
+            headers:
+                $ref: '#/components/schemas/message-broker/components/schemas/headers'
+        DeletePaymentMethod:
+            name: DeletePaymentMethod
+            x-spryker:
+                module: Payment
+            summary: 'Instruct to delete a Payment method.'
+            payload:
+                $ref: '#/components/schemas/PaymentMethodPayload'
+            headers:
+                $ref: '#/components/schemas/message-broker/components/schemas/headers'
+        CancelPayment:
+            name: CancelPayment
+            x-spryker:
+                module: Payment
+            summary: 'Request to cancel a payment.'
+            payload:
+                $ref: '#/components/schemas/sales-payment/schemas/PaymentPayload'
+            headers:
+                $ref: '#/components/schemas/message-broker/components/schemas/headers'
+        CapturePayment:
+            name: CapturePayment
+            x-spryker:
+                module: Payment
+            summary: 'Request to capture a payment.'
+            payload:
+                $ref: '#/components/schemas/sales-payment/schemas/PaymentPayload'
+            headers:
+                $ref: '#/components/schemas/message-broker/components/schemas/headers'
+        RefundPayment:
+            name: RefundPayment
+            x-spryker:
+                module: Payment
+            summary: 'Request to refund a payment.'
+            payload:
+                $ref: '#/components/schemas/PaymentRefundPayload'
+            headers:
+                $ref: '#/components/schemas/message-broker/components/schemas/headers'
+
+        PaymentAuthorized:
+            name: PaymentAuthorized
+            x-spryker:
+                module: Payment
+            summary: 'Informs about payment authorization.'
+            payload:
+                $ref: '#/components/schemas/PaymentPayload'
+            headers:
+                $ref: '#/components/schemas/message-broker/components/schemas/headers'
+        PaymentAuthorizationFailed:
+            name: PaymentAuthorizationFailed
+            x-spryker:
+                module: Payment
+            summary: 'Informs about payment authorization failure.'
+            payload:
+                $ref: '#/components/schemas/PaymentPayload'
+            headers:
+                $ref: '#/components/schemas/message-broker/components/schemas/headers'
+        PaymentCaptured:
+            name: PaymentCaptured
+            x-spryker:
+                module: Payment
+            summary: 'Informs about a captured payment.'
+            payload:
+                $ref: '#/components/schemas/PaymentPayload'
+            headers:
+                $ref: '#/components/schemas/message-broker/components/schemas/headers'
+        PaymentCaptureFailed:
+            name: PaymentCaptureFailed
+            x-spryker:
+                module: Payment
+            summary: 'Informs about a captured payment failure.'
+            payload:
+                $ref: '#/components/schemas/PaymentPayload'
+            headers:
+                $ref: '#/components/schemas/message-broker/components/schemas/headers'
+        PaymentRefunded:
+            name: PaymentRefunded
+            x-spryker:
+                module: Payment
+            summary: 'Requests a payment refund.'
+            payload:
+                $ref: '#/components/schemas/PaymentPayload'
+            headers:
+                $ref: '#/components/schemas/message-broker/components/schemas/headers'
+        PaymentRefundFailed:
+            name: PaymentRefundFailed
+            x-spryker:
+                module: Payment
+            summary: 'Informs about a refund payment failure.'
+            payload:
+                $ref: '#/components/schemas/PaymentPayload'
+            headers:
+                $ref: '#/components/schemas/message-broker/components/schemas/headers'
+        PaymentCanceled:
+            name: PaymentCanceled
+            x-spryker:
+                module: Payment
+            summary: 'Informs about a canceled payment.'
+            payload:
+                $ref: '#/components/schemas/PaymentPayload'
+            headers:
+                $ref: '#/components/schemas/message-broker/components/schemas/headers'
+        PaymentCancellationFailed:
+            name: PaymentCancellationFailed
+            x-spryker:
+                module: Payment
+            summary: 'Informs about a cancel payment failure.'
+            payload:
+                $ref: '#/components/schemas/PaymentPayload'
+            headers:
+                $ref: '#/components/schemas/message-broker/components/schemas/headers'
+        PaymentCreated:
+            name: PaymentCreated
+            x-spryker:
+                module: Payment
+            summary: 'Informs about a new Payment was created for an order.'
+            payload:
+                $ref: '#/components/schemas/PaymentCreatedPayload'
+            headers:
+                $ref: '#/components/schemas/message-broker/components/schemas/headers'
+
+    schemas:
+        PaymentMethodPayload:
+            type: object
+            properties:
+                name:
+                    type: string
+                providerName:
+                    type: string
+                paymentAuthorizationEndpoint:
+                    type: string
+            required:
+                - name
+                - providerName
+                - paymentAuthorizationEndpoint
+        PaymentPayload:
+            type: object
+            properties:
+                orderReference:
+                    type: string
+                orderItemIds:
+                    type: array
+                amount:
+                    type: integer
+                currencyIsoCode:
+                    type: string
+            required:
+                - orderReference
+                - orderItemIds
+        PaymentRefundPayload:
+            type: object
+            properties:
+                orderReference:
+                    type: string
+                orderItems:
+                    type: array
+                    $ref: '#/components/schemas/OrderItem'
+                amount:
+                    type: integer
+                currencyIsoCode:
+                    type: string
+            required:
+                - orderReference
+                - orderItems
+                - amount
+        PaymentCreatedPayload:
+            type: object
+            properties:
+                entityReference:
+                    description: 'The entity reference of the payment. It can be anything on the SCOS side like a sales order or subscription reference'
+                    type: string
+                paymentReference:
+                    type: string
+                details:
+                    type: string
+            required:
+                - entityReference
+                - paymentReference
+        OrderItem:
+            type: object
+            properties:
+                orderItemId:
+                    type: integer
+                sku:
+                    type: string
+            required:
+                - orderItemId
+                - sku
+        payment:
+            $ref: 'https://raw.githubusercontent.com/spryker/payment/5.15.1/resources/api/asyncapi/payment.yml#/components'
+        sales-payment:
+            $ref: 'https://raw.githubusercontent.com/spryker/sales-payment/1.3.2/resources/api/asyncapi.yml#/components'
+        message-broker:
+            $ref: 'https://raw.githubusercontent.com/spryker/message-broker/1.6.0/resources/api/template.yml'

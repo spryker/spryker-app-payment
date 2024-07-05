@@ -1,0 +1,170 @@
+openapi: 3.0.0
+info:
+    version: 1.0.0
+    contact:
+        name: Spryker
+        url: 'https://spryker.com/'
+        email: support@spryker.com
+    title: 'Spryker Payment App API'
+    license:
+        name: Proprietary
+
+servers:
+    -   url: 'http://api.payment.spryker.local'
+        description: 'Local glue endpoint'
+    -   url: 'https://api.payment-testing.acp.demo-spryker.com/'
+        description: 'Testing glue endpoint'
+    -   url: 'https://api.payment-staging.acp.demo-spryker.com/'
+        description: 'Staging glue endpoint'
+    -   url: 'https://api.payment.acp.spryker.com/'
+        description: 'Production glue endpoint'
+
+paths:
+    '/private/initialize-payment':
+        post:
+            x-spryker:
+                module: PaymentBackendApi
+                controller: InitializePaymentResourceController
+            summary: 'Receives webhooks initialized by a third party provider.'
+            parameters:
+                - $ref: '#/components/parameters/tenantIdentifier'
+            requestBody:
+                description: 'Provides order data.'
+                required: true
+                content:
+                    # SCOS tenants are NOT sending this as JSON, but as form data!
+                    application/x-www-form-urlencoded:
+                        schema:
+                            $ref: '#/components/schemas/InitializePaymentRequest'
+                        encoding:
+                            orderData:
+                                # Arrays of objects (as url-encoded form data) is not officially supported by the
+                                # OpenAPI spec, as there are different standards for how this is serialized.
+                                # The current format will incorrectly appear as a JSON form field in swagger, while
+                                # postman will generate working examples with it.
+                                # See this discussion on the OpenAPI specification on the limitations of deepObject
+                                # https://github.com/OAI/OpenAPI-Specification/issues/1706
+                                style: deepObject
+                                explode: true
+            responses:
+                200:
+                    description: 'Expected response to a valid request.'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/InitializePaymentResponse'
+                400:
+                    description: 'Bad request.'
+                default:
+                    description: 'Expected response to a bad request.'
+                    content:
+                        text/plain:
+                            schema:
+                                type: string
+
+components:
+    schemas:
+        InitializePaymentResponse:
+            properties:
+                isSuccessful:
+                    type: boolean
+                redirectUrl:
+                    type: string
+                    description: 'URL for payment authorization'
+                message:
+                    type: string
+                    nullable: true
+
+        InitializePaymentRequest:
+            type: object
+            required:
+                - orderData
+                - redirectSuccessUrl
+                - redirectCancelUrl
+                - checkoutSummaryPageUrl
+            properties:
+                orderData:
+                    description: 'Order data.'
+                    type: object
+                    required:
+                        - orderReference
+                        - localeName
+                        - countryCode
+                        - customerFirstName
+                        - customerLastName
+                        - currencyCode
+                        - grandTotal
+                        - paymentMethod
+                        - items
+                    properties:
+                        orderReference:
+                            type: string
+                            example: 'DE--123456'
+                        storeName:
+                            type: string
+                            example: 'DE'
+                        localeName:
+                            type: string
+                            enum:
+                                - en_US
+                                - de_DE
+                        countryCode:
+                            type: string
+                            example: 'DE'
+                        customerFirstName:
+                            type: string
+                            example: 'John'
+                        customerLastName:
+                            type: string
+                            example: 'McClane'
+                        currencyCode:
+                            type: string
+                            example: 'EUR'
+                        grandTotal:
+                            type: integer
+                            example: 10000
+                            description: 'Total in lowest denominator (cents)'
+                        paymentMethod:
+                            type: string
+                            enum:
+                                - 'Credit Card'
+                                - 'PayPal'
+                        items:
+                            type: array
+                            items:
+                                $ref: '#/components/schemas/QuoteItem'
+                            minItems: 1
+                redirectSuccessUrl:
+                    description: 'Provides redirect success URL.'
+                    type: string
+                    example: 'https://example.com/success'
+                redirectCancelUrl:
+                    description: 'Provides redirect cancel URL.'
+                    type: string
+                    example: 'https://example.com/cancel'
+                checkoutSummaryPageUrl:
+                    description: 'Provides checkout summary page URL.'
+                    type: string
+                    example: 'https://example.com/summary'
+
+        QuoteItem:
+            type: object
+            required:
+                - idSalesOrderItem
+            properties:
+                idSalesOrderItem:
+                    type: integer
+                    example: 210
+                name:
+                    type: string
+                    example: "Oryx Figurine"
+
+    parameters:
+        tenantIdentifier:
+            name: X-Tenant-Identifier
+            in: header
+            required: true
+            description: 'Reference of the Tenant.'
+            schema:
+                type: string
+            example: dev-DE

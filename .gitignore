@@ -1,0 +1,46 @@
+# IDEs
+.idea/
+.project/
+.vscode/
+nbproject/
+/.buildpath
+/.settings
+*.sublime-*
+*.AppleDouble
+*.AppleDB
+*.AppleDesktop
+Temporary Items
+.apdisk
+GPATH
+GRTAGS
+GTAGS
+
+# OS
+.DS_Store
+
+# Y&Z
+!/config/Shared/config_local.dist.php
+/config/Shared/console_env_local.php
+
+src/Generated/
+/vendor/
+
+# logs
+/tests/_log/*
+!/tests/_log/.gitkeep
+/tests/_output/*
+!/tests/_output/.gitkeep
+/tests/_support/_generated/*
+!/tests/_support/_generated/.gitkeep
+
+/tests/SprykerTest/*/*/_output/*
+/tests/SprykerTest/*/*/_support/_generated/*
+
+# Propel
+/src/Orm/Propel/
+/src/Orm/Zed/
+tests/_data/app_payment_db
+
+# tools
+.phpstorm.meta.php
+composer.lock

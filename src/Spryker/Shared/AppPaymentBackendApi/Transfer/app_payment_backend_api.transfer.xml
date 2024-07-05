@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<transfers xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="spryker:transfer-01 http://static.spryker.com/transfer-01.xsd">
+
+    <transfer name="InitializePaymentRequest" strict="true">
+    </transfer>
+
+    <transfer name="InitializePaymentResponse" strict="true">
+    </transfer>
+
+    <transfer name="WebhookRequest" strict="true">
+        <property name="transactionId" type="string"/>
+        <property name="content" type="string"/>
+        <property name="mode" type="string"/>
+    </transfer>
+
+    <transfer name="WebhookResponse" strict="true">
+    </transfer>
+
+</transfers>

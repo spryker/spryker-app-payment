@@ -1,0 +1,21 @@
+{
+    "$schema": "vendor/infection/infection/resources/schema.json",
+    "source": {
+        "directories": [
+            "src/Spryker/*/AppPayment",
+            "src/Spryker/*/AppPaymentBackendApi",
+        ]
+    },
+    "testFramework":"codeception",
+    "logs": {
+        "text": "tests/_output/mutation/infection.log",
+        "html": "tests/_output/mutation/infection.html",
+        "summary": "tests/_output/mutation/summary.log",
+        "json": "tests/_output/mutation/infection-log.json",
+        "perMutator": "tests/_output/mutation/per-mutator.md"
+    },
+    "mutators": {
+        "@default": true,
+        "@function_signature": false
+    }
+}
