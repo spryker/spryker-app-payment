@@ -16,7 +16,7 @@ use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
 use Generated\Shared\Transfer\QuoteTransfer;
 use GuzzleHttp\RequestOptions;
 use Ramsey\Uuid\Uuid;
-use Spryker\Zed\AppPayment\AppPaymentConfig;
+use Spryker\Glue\AppPaymentBackendApi\Mapper\Payment\GlueRequestPaymentMapper;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
 use SprykerTest\Glue\AppPaymentBackendApi\AppPaymentBackendApiTester;
@@ -64,7 +64,7 @@ class InitializePaymentApiTest extends Unit
         $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
 
         // Act
-        $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $initializePaymentRequestTransfer->getTenantIdentifier());
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $initializePaymentRequestTransfer->getTenantIdentifier());
         $this->tester->addHeader('Content-Type', 'application/json');
 
         $response = $this->tester->sendPost($this->tester->buildPaymentUrl(), [RequestOptions::FORM_PARAMS => $initializePaymentRequestTransfer->toArray()]);
@@ -106,7 +106,7 @@ class InitializePaymentApiTest extends Unit
         $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
 
         // Act
-        $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $initializePaymentRequestTransfer->getTenantIdentifier());
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $initializePaymentRequestTransfer->getTenantIdentifier());
         $this->tester->addHeader('Content-Type', 'application/json');
 
         $response = $this->tester->sendPost($this->tester->buildPaymentUrl(), [RequestOptions::FORM_PARAMS => $initializePaymentRequestTransfer->toArray()]);
@@ -135,7 +135,7 @@ class InitializePaymentApiTest extends Unit
         $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
 
         // Act
-        $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $initializePaymentRequestTransfer->getTenantIdentifier());
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $initializePaymentRequestTransfer->getTenantIdentifier());
         $this->tester->addHeader('Content-Type', 'application/json');
 
         $this->tester->sendPost($url, [RequestOptions::FORM_PARAMS => $initializePaymentRequestTransfer->toArray()]);
@@ -161,7 +161,7 @@ class InitializePaymentApiTest extends Unit
         $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
 
         // Act
-        $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $initializePaymentRequestTransfer->getTenantIdentifier());
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $initializePaymentRequestTransfer->getTenantIdentifier());
         $this->tester->addHeader('Content-Type', 'application/json');
 
         $this->tester->sendPost($this->tester->buildPaymentUrl(), [RequestOptions::FORM_PARAMS => $initializePaymentRequestTransfer->toArray()]);
@@ -186,7 +186,7 @@ class InitializePaymentApiTest extends Unit
         $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
 
         // Act
-        $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $initializePaymentRequestTransfer->getTenantIdentifier());
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $initializePaymentRequestTransfer->getTenantIdentifier());
         $this->tester->addHeader('Content-Type', 'application/json');
 
         $response = $this->tester->sendPost($url, [RequestOptions::FORM_PARAMS => $initializePaymentRequestTransfer->toArray()]);

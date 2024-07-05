@@ -83,8 +83,8 @@ class PaymentTransfer
         });
 
         // Adding the failed ones to the response to give the Tenant the chance to see why the transfer failed.
-        foreach ($paymentsTransmissionsRequestTransfer->getFailedPaymentsTransmissions() as $failedPaymentTransmissionTransfer) {
-            $paymentsTransmissionsResponseTransfer->addPaymentTransmission($failedPaymentTransmissionTransfer);
+        foreach ($paymentsTransmissionsRequestTransfer->getFailedPaymentsTransmissions() as $failedPaymentsTransmission) {
+            $paymentsTransmissionsResponseTransfer->addPaymentTransmission($failedPaymentsTransmission);
         }
 
         return $paymentsTransmissionsResponseTransfer;

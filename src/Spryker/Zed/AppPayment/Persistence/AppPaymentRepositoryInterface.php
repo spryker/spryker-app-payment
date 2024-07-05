@@ -46,7 +46,6 @@ interface AppPaymentRepositoryInterface
         array $refundStatuses
     ): array;
 
-
     /**
      * @param array<string> $transferIds
      *

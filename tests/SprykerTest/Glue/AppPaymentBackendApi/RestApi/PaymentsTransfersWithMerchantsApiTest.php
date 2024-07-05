@@ -20,8 +20,8 @@ use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentQuery;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentTransferQuery;
 use Ramsey\Uuid\Uuid;
+use Spryker\Glue\AppPaymentBackendApi\Mapper\Payment\GlueRequestPaymentMapper;
 use Spryker\Zed\AppMerchant\Communication\Plugin\AppPayment\MerchantsPaymentsTransmissionsRequestExtenderPlugin;
-use Spryker\Zed\AppPayment\AppPaymentConfig;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
 use SprykerTest\Glue\AppPaymentBackendApi\AppPaymentBackendApiTester;
@@ -132,7 +132,7 @@ class PaymentsTransfersWithMerchantsApiTest extends Unit
         ]);
 
         // Act
-        $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
         $this->tester->addHeader('Content-Type', 'application/json');
 
         $orderItemsRequestData = array_map(function (OrderItemTransfer $orderItem): array {
@@ -258,7 +258,7 @@ class PaymentsTransfersWithMerchantsApiTest extends Unit
         ]);
 
         // Act
-        $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
         $this->tester->addHeader('Content-Type', 'application/json');
 
         $orderItemsRequestData = array_map(function (OrderItemTransfer $orderItem): array {

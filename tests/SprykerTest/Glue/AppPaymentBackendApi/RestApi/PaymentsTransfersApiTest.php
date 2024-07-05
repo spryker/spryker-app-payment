@@ -17,7 +17,7 @@ use Generated\Shared\Transfer\PaymentsTransmissionsResponseTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 use Ramsey\Uuid\Uuid;
-use Spryker\Zed\AppPayment\AppPaymentConfig;
+use Spryker\Glue\AppPaymentBackendApi\Mapper\Payment\GlueRequestPaymentMapper;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Business\Message\MessageBuilder;
 use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
@@ -95,7 +95,7 @@ class PaymentsTransfersApiTest extends Unit
         }
 
         // Act
-        $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
         $this->tester->addHeader('content-type', 'application/json');
 
         $response = $this->tester->sendPost(
@@ -183,7 +183,7 @@ class PaymentsTransfersApiTest extends Unit
         }
 
         // Act
-        $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
         $this->tester->addHeader('content-type', 'application/json');
 
         $response = $this->tester->sendPost(
@@ -256,7 +256,7 @@ class PaymentsTransfersApiTest extends Unit
         $requestOrderItems = $this->tester->haveOrderItemsForReverseTransfer($orderReference, $merchantReference, $merchantReference, $transferId1, $transferId2);
 
         // Act
-        $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
         $this->tester->addHeader('content-type', 'application/json');
 
         $response = $this->tester->sendPost(
@@ -286,7 +286,7 @@ class PaymentsTransfersApiTest extends Unit
         $requestOrderItems = $this->tester->haveOrderItemsForReverseTransfer($orderReference, $merchantReference, $merchantReference, $transferId, $transferId);
 
         // Act
-        $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
         $this->tester->addHeader('content-type', 'application/json');
 
         $response = $this->tester->sendPost(
@@ -328,7 +328,7 @@ class PaymentsTransfersApiTest extends Unit
         $requestOrderItems = $this->tester->haveOrderItemsForTransfer($orderReference);
 
         // Act
-        $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
         $this->tester->sendPost(
             $this->tester->buildPaymentsTransfersUrl(),
             ['orderItems' => $requestOrderItems],
@@ -367,7 +367,7 @@ class PaymentsTransfersApiTest extends Unit
         $requestOrderItems = $this->tester->haveOrderItemsForTransfer($orderReference);
 
         // Act
-        $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
         $this->tester->sendPost(
             $this->tester->buildPaymentsTransfersUrl(),
             ['orderItems' => $requestOrderItems],
@@ -396,7 +396,7 @@ class PaymentsTransfersApiTest extends Unit
         $requestOrderItems = $this->tester->haveOrderItemsForTransfer($orderReference);
 
         // Act
-        $this->tester->addHeader(AppPaymentConfig::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
         $this->tester->sendPost(
             $this->tester->buildPaymentsTransfersUrl(),
             ['orderItems' => $requestOrderItems],

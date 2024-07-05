@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b01da6b1c5ad49bdfd31e4326d51a77b",
+    "content-hash": "72e49c9ff865e9ee27e98d322708b937",
     "packages": [
         {
             "name": "brick/math",
@@ -1646,16 +1646,16 @@
         },
         {
             "name": "spryker/app-webhook",
-            "version": "dev-feature/extracted-app-webhook",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker/app-webhook.git",
-                "reference": "cd903f76d4778a7bae81ba52a67f16c89116a7cc"
+                "reference": "4c8b5866e8fb754737940971475aa58d29e38d23"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spryker/app-webhook/zipball/cd903f76d4778a7bae81ba52a67f16c89116a7cc",
-                "reference": "cd903f76d4778a7bae81ba52a67f16c89116a7cc",
+                "url": "https://api.github.com/repos/spryker/app-webhook/zipball/4c8b5866e8fb754737940971475aa58d29e38d23",
+                "reference": "4c8b5866e8fb754737940971475aa58d29e38d23",
                 "shasum": ""
             },
             "require": {
@@ -1679,7 +1679,7 @@
                 "phpstan/phpdoc-parser": "1.25.0",
                 "phpstan/phpstan": "1.10.66",
                 "rector/rector": "^0.19.0",
-                "spryker/app-kernel": "dev-feature/extract-payment-template",
+                "spryker/app-kernel": "dev-master",
                 "spryker/code-sniffer": "*",
                 "spryker/development": "^3.34.0",
                 "spryker/glue-application": "^1.64",
@@ -1688,6 +1688,7 @@
                 "spryker/testify": "*",
                 "spryker/testify-async-api": "^0.1.4"
             },
+            "default-branch": true,
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -1708,9 +1709,9 @@
             "description": "AppWebhook module",
             "support": {
                 "issues": "https://github.com/spryker/app-webhook/issues",
-                "source": "https://github.com/spryker/app-webhook/tree/feature/extracted-app-webhook"
+                "source": "https://github.com/spryker/app-webhook/tree/main"
             },
-            "time": "2024-07-04T12:42:06+00:00"
+            "time": "2024-07-05T05:33:59+00:00"
         },
         {
             "name": "spryker/application-extension",
@@ -14729,16 +14730,16 @@
         },
         {
             "name": "spryker-sdk/async-api",
-            "version": "dev-feature/resolve-remote-references",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker-sdk/async-api.git",
-                "reference": "700901692e5af35994ca8cfff7cf27d877ec5240"
+                "reference": "629f20a2f192d0a90e1a48339488827a6c04ef98"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spryker-sdk/async-api/zipball/700901692e5af35994ca8cfff7cf27d877ec5240",
-                "reference": "700901692e5af35994ca8cfff7cf27d877ec5240",
+                "url": "https://api.github.com/repos/spryker-sdk/async-api/zipball/629f20a2f192d0a90e1a48339488827a6c04ef98",
+                "reference": "629f20a2f192d0a90e1a48339488827a6c04ef98",
                 "shasum": ""
             },
             "require": {
@@ -14758,6 +14759,7 @@
                 "spryker/code-sniffer": "^0.17.20",
                 "symfony/var-dumper": "^6.0.0"
             },
+            "default-branch": true,
             "bin": [
                 "bin/asyncapi"
             ],
@@ -14780,22 +14782,22 @@
             "description": "SDK for AsyncAPI.",
             "support": {
                 "issues": "https://github.com/spryker-sdk/async-api/issues",
-                "source": "https://github.com/spryker-sdk/async-api/tree/feature/resolve-remote-references"
+                "source": "https://github.com/spryker-sdk/async-api/tree/master"
             },
-            "time": "2024-01-12T07:30:12+00:00"
+            "time": "2024-07-05T05:50:00+00:00"
         },
         {
             "name": "spryker/app-kernel",
-            "version": "dev-feature/extract-payment-template",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker/app-kernel.git",
-                "reference": "d5882ef31305d138da35005be6b549ad21c598a5"
+                "reference": "6ddc2d3a7ed43b56708edca1e08884dd7424c469"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spryker/app-kernel/zipball/d5882ef31305d138da35005be6b549ad21c598a5",
-                "reference": "d5882ef31305d138da35005be6b549ad21c598a5",
+                "url": "https://api.github.com/repos/spryker/app-kernel/zipball/6ddc2d3a7ed43b56708edca1e08884dd7424c469",
+                "reference": "6ddc2d3a7ed43b56708edca1e08884dd7424c469",
                 "shasum": ""
             },
             "require": {
@@ -14827,6 +14829,7 @@
                 "spryker/testify": "*",
                 "spryker/testify-async-api": "^0.1.4"
             },
+            "default-branch": true,
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -14849,9 +14852,9 @@
             "description": "AppKernel module",
             "support": {
                 "issues": "https://github.com/spryker/app-kernel/issues",
-                "source": "https://github.com/spryker/app-kernel/tree/feature/extract-payment-template"
+                "source": "https://github.com/spryker/app-kernel/tree/master"
             },
-            "time": "2024-07-03T04:44:13+00:00"
+            "time": "2024-07-05T04:49:15+00:00"
         },
         {
             "name": "spryker/app-kernel-extension",
@@ -14901,18 +14904,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/spryker/app-merchant.git",
-                "reference": "8202a9775e3e73dfcc4be679aedcd4fee56fa47e"
+                "reference": "9879cde488d9a64ab4401ccff5d47c7ec286718b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spryker/app-merchant/zipball/8202a9775e3e73dfcc4be679aedcd4fee56fa47e",
-                "reference": "8202a9775e3e73dfcc4be679aedcd4fee56fa47e",
+                "url": "https://api.github.com/repos/spryker/app-merchant/zipball/9879cde488d9a64ab4401ccff5d47c7ec286718b",
+                "reference": "9879cde488d9a64ab4401ccff5d47c7ec286718b",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.1",
-                "spryker/app-payment": "dev-feature/acp-2626/master-stripe-marketplace-payment-flow-marketplace-oms-workflow-transfers-to-merchants",
-                "spryker/app-webhook": "dev-feature/extracted-app-webhook as dev-main",
+                "spryker/app-payment": "dev-feature/acp-2626/master-stripe-marketplace-payment-flow-marketplace-oms-workflow-transfers-to-merchants as dev-main",
+                "spryker/app-webhook": "dev-main",
                 "spryker/glue-application-extension": "^1.0.0",
                 "spryker/kernel": "^3.30.0",
                 "spryker/log": "^3.0.0",
@@ -14934,8 +14937,8 @@
                 "phpstan/phpdoc-parser": "1.25.0",
                 "phpstan/phpstan": "1.10.66",
                 "rector/rector": "^0.19.0",
-                "spryker-sdk/async-api": "dev-feature/resolve-remote-references as 0.3.1",
-                "spryker/app-kernel": "dev-feature/extract-payment-template",
+                "spryker-sdk/async-api": "dev-master as 0.3.1",
+                "spryker/app-kernel": "dev-master",
                 "spryker/code-sniffer": "*",
                 "spryker/container": "*",
                 "spryker/development": "^3.34.0",
@@ -14977,7 +14980,7 @@
                 "issues": "https://github.com/spryker/app-merchant/issues",
                 "source": "https://github.com/spryker/app-merchant/tree/feature/acp-2626/master-stripe-marketplace-payment-flow-marketplace-oms-workflow-transfers-to-merchants"
             },
-            "time": "2024-07-04T13:26:33+00:00"
+            "time": "2024-07-05T07:11:09+00:00"
         },
         {
             "name": "spryker/application",
@@ -18477,7 +18480,7 @@
     "aliases": [
         {
             "package": "spryker-sdk/async-api",
-            "version": "dev-feature/resolve-remote-references",
+            "version": "9999999-dev",
             "alias": "0.3.1",
             "alias_normalized": "0.3.1.0"
         }
@@ -18485,9 +18488,9 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "spryker/app-webhook": 20,
+        "spryker/app-merchant": 20,
         "spryker-sdk/async-api": 20,
-        "spryker/app-kernel": 20,
-        "spryker/app-merchant": 20
+        "spryker/app-kernel": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
