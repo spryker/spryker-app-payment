@@ -63,9 +63,9 @@ class PaymentsTransfersApiTest extends Unit
                 $this->assertInstanceOf(AppConfigTransfer::class, $paymentTransmissionsRequestTransfer->getAppConfig());
 
                 // Add transferId to each PaymentTransmissionTransfer.
-                foreach ($paymentTransmissionsRequestTransfer->getPaymentTransmissions() as $paymentsTransmission) {
-                    $paymentsTransmission->setTransferId($transferId)->setIsSuccessful(true);
-                    $paymentTransmissionsResponseTransfer->addPaymentTransmission($paymentsTransmission);
+                foreach ($paymentTransmissionsRequestTransfer->getPaymentTransmissions() as $paymentTransmission) {
+                    $paymentTransmission->setTransferId($transferId)->setIsSuccessful(true);
+                    $paymentTransmissionsResponseTransfer->addPaymentTransmission($paymentTransmission);
                 }
 
                 return $paymentTransmissionsResponseTransfer;
@@ -160,9 +160,9 @@ class PaymentsTransfersApiTest extends Unit
                 $this->assertInstanceOf(AppConfigTransfer::class, $paymentTransmissionsRequestTransfer->getAppConfig());
 
                 // Add transferId to each PaymentTransmissionTransfer.
-                foreach ($paymentTransmissionsRequestTransfer->getPaymentTransmissions() as $paymentsTransmission) {
-                    $paymentsTransmission->setTransferId($reverseTransferId)->setIsSuccessful(true);
-                    $paymentTransmissionsResponseTransfer->addPaymentTransmission($paymentsTransmission);
+                foreach ($paymentTransmissionsRequestTransfer->getPaymentTransmissions() as $paymentTransmission) {
+                    $paymentTransmission->setTransferId($reverseTransferId)->setIsSuccessful(true);
+                    $paymentTransmissionsResponseTransfer->addPaymentTransmission($paymentTransmission);
                 }
 
                 return $paymentTransmissionsResponseTransfer;

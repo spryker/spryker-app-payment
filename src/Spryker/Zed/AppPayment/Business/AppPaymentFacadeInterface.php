@@ -169,7 +169,7 @@ interface AppPaymentFacadeInterface
      * Specification:
      * - Transfers payments.
      * - Loads the `AppConfigTransfer` and adds it to the PaymentTransmissionsRequestTransfer.
-     * - Applies PaymentsTransmissionExpanderPluginInterfaces.
+     * - Applies PaymentTransmissionExpanderPluginInterfaces.
      * - Returns a PaymentTransmissionsResponseTransfer.
      *
      * @api
