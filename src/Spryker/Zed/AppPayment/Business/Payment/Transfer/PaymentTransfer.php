@@ -8,9 +8,9 @@
 namespace Spryker\Zed\AppPayment\Business\Payment\Transfer;
 
 use ArrayObject;
-use Generated\Shared\Transfer\PaymentsTransmissionsRequestTransfer;
-use Generated\Shared\Transfer\PaymentsTransmissionsResponseTransfer;
 use Generated\Shared\Transfer\PaymentTransfer as GeneratedPaymentTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionsRequestTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionsResponseTransfer;
 use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 use Spryker\Shared\Log\LoggerTrait;
 use Spryker\Zed\AppPayment\AppPaymentConfig;
@@ -34,7 +34,7 @@ class PaymentTransfer
     protected array $failedPaymentTransmissionTransfers = [];
 
     /**
-     * @param array<\Spryker\Zed\AppPayment\Dependency\Plugin\PaymentsTransmissionsRequestExtenderPluginInterface> $paymentsTransmissionsRequestExpanderPlugins
+     * @param array<\Spryker\Zed\AppPayment\Dependency\Plugin\PaymentTransmissionsRequestExtenderPluginInterface> $paymentTransmissionsRequestExpanderPlugins
      */
     public function __construct(
         protected PlatformPluginInterface $platformPlugin,
@@ -42,58 +42,58 @@ class PaymentTransfer
         protected AppPaymentRepositoryInterface $appPaymentRepository,
         protected AppPaymentConfig $appPaymentConfig,
         protected AppConfigLoader $appConfigLoader,
-        protected array $paymentsTransmissionsRequestExpanderPlugins
+        protected array $paymentTransmissionsRequestExpanderPlugins
     ) {
     }
 
-    public function transferPayments(PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer): PaymentsTransmissionsResponseTransfer
+    public function transferPayments(PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer): PaymentTransmissionsResponseTransfer
     {
-        // In case all payment transmissions fail, we do not request the platform tzo do something, and we need to return a response with the failed ones.
-        $paymentsTransmissionsResponseTransfer = new PaymentsTransmissionsResponseTransfer();
+        // In case all payment transmissions fail, we do not request the platform to do something, and we need to return a response with the failed ones.
+        $paymentTransmissionsResponseTransfer = new PaymentTransmissionsResponseTransfer();
 
         try {
-            $paymentsTransmissionsRequestTransfer = $this->addAppConfigToRequest($paymentsTransmissionsRequestTransfer);
-            $paymentsTransmissionsRequestTransfer = $this->addPaymentsTransmissions($paymentsTransmissionsRequestTransfer);
+            $paymentTransmissionsRequestTransfer = $this->addAppConfigToRequest($paymentTransmissionsRequestTransfer);
+            $paymentTransmissionsRequestTransfer = $this->addPaymentTransmissions($paymentTransmissionsRequestTransfer);
 
-            if ($paymentsTransmissionsRequestTransfer->getPaymentsTransmissions()->count() > 0) {
-                $paymentsTransmissionsResponseTransfer = $this->platformPlugin->transferPayments($paymentsTransmissionsRequestTransfer);
+            if ($paymentTransmissionsRequestTransfer->getPaymentTransmissions()->count() > 0) {
+                $paymentTransmissionsResponseTransfer = $this->platformPlugin->transferPayments($paymentTransmissionsRequestTransfer);
             }
         } catch (Throwable $throwable) {
             $this->getLogger()->error($throwable->getMessage(), [
-                PaymentsTransmissionsRequestTransfer::TENANT_IDENTIFIER => $paymentsTransmissionsRequestTransfer->getTenantIdentifierOrFail(),
+                PaymentTransmissionsRequestTransfer::TENANT_IDENTIFIER => $paymentTransmissionsRequestTransfer->getTenantIdentifierOrFail(),
             ]);
-            $paymentsTransmissionsResponseTransfer = new PaymentsTransmissionsResponseTransfer();
-            $paymentsTransmissionsResponseTransfer
+            $paymentTransmissionsResponseTransfer = new PaymentTransmissionsResponseTransfer();
+            $paymentTransmissionsResponseTransfer
                 ->setIsSuccessful(false)
                 ->setMessage($throwable->getMessage());
 
-            return $paymentsTransmissionsResponseTransfer;
+            return $paymentTransmissionsResponseTransfer;
         }
 
-        /** @var \Generated\Shared\Transfer\PaymentsTransmissionsResponseTransfer $paymentsTransmissionsResponseTransfer */
-        $paymentsTransmissionsResponseTransfer = $this->getTransactionHandler()->handleTransaction(function () use ($paymentsTransmissionsRequestTransfer, $paymentsTransmissionsResponseTransfer) {
-            if ($paymentsTransmissionsRequestTransfer->getPaymentsTransmissions()->count() === 0) {
+        /** @var \Generated\Shared\Transfer\PaymentTransmissionsResponseTransfer $paymentTransmissionsResponseTransfer */
+        $paymentTransmissionsResponseTransfer = $this->getTransactionHandler()->handleTransaction(function () use ($paymentTransmissionsRequestTransfer, $paymentTransmissionsResponseTransfer) {
+            if ($paymentTransmissionsRequestTransfer->getPaymentTransmissions()->count() === 0) {
                 // If there are no payments to transfer, we do not need to save anything. In such case, we most likely filtered out all orderItems that were passed.
-                return $paymentsTransmissionsResponseTransfer;
+                return $paymentTransmissionsResponseTransfer;
             }
 
-            $this->savePaymentsTransfers($paymentsTransmissionsResponseTransfer);
+            $this->savePaymentsTransfers($paymentTransmissionsResponseTransfer);
 
-            return $paymentsTransmissionsResponseTransfer;
+            return $paymentTransmissionsResponseTransfer;
         });
 
         // Adding the failed ones to the response to give the Tenant the chance to see why the transfer failed.
-        foreach ($paymentsTransmissionsRequestTransfer->getFailedPaymentsTransmissions() as $failedPaymentsTransmission) {
-            $paymentsTransmissionsResponseTransfer->addPaymentTransmission($failedPaymentsTransmission);
+        foreach ($paymentTransmissionsRequestTransfer->getFailedPaymentTransmissions() as $failedPaymentTransmission) {
+            $paymentTransmissionsResponseTransfer->addPaymentTransmission($failedPaymentTransmission);
         }
 
-        return $paymentsTransmissionsResponseTransfer;
+        return $paymentTransmissionsResponseTransfer;
     }
 
-    protected function addAppConfigToRequest(PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer): PaymentsTransmissionsRequestTransfer
+    protected function addAppConfigToRequest(PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer): PaymentTransmissionsRequestTransfer
     {
-        return $paymentsTransmissionsRequestTransfer->setAppConfigOrFail(
-            $this->appConfigLoader->loadAppConfig($paymentsTransmissionsRequestTransfer->getTenantIdentifierOrFail()),
+        return $paymentTransmissionsRequestTransfer->setAppConfigOrFail(
+            $this->appConfigLoader->loadAppConfig($paymentTransmissionsRequestTransfer->getTenantIdentifierOrFail()),
         );
     }
 
@@ -102,59 +102,59 @@ class PaymentTransfer
      * - The OrderItems contain a transferId of the previously made transfer that was sent to the Tenant.
      * - Foreach transferId we need to group the items.
      */
-    protected function addPaymentsTransmissions(
-        PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer
-    ): PaymentsTransmissionsRequestTransfer {
-        $paymentsTransmissionsRequestTransfer = $this->addPaymentTransmissionsForOrderItemsGroupedByOrderReference($paymentsTransmissionsRequestTransfer);
-        $paymentsTransmissionsRequestTransfer = $this->addPaymentTransmissionsForOrderItemsGroupedByTransferId($paymentsTransmissionsRequestTransfer);
+    protected function addPaymentTransmissions(
+        PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer
+    ): PaymentTransmissionsRequestTransfer {
+        $paymentTransmissionsRequestTransfer = $this->addPaymentTransmissionsForOrderItemsGroupedByOrderReference($paymentTransmissionsRequestTransfer);
+        $paymentTransmissionsRequestTransfer = $this->addPaymentTransmissionsForOrderItemsGroupedByTransferId($paymentTransmissionsRequestTransfer);
 
         // Apply group plugin from other modules to split the payment transmissions
-        foreach ($this->paymentsTransmissionsRequestExpanderPlugins as $paymentsTransmissionsRequestExpanderPlugin) {
-            $paymentsTransmissionsRequestTransfer = $paymentsTransmissionsRequestExpanderPlugin->extendPaymentsTransmissionsRequest($paymentsTransmissionsRequestTransfer);
+        foreach ($this->paymentTransmissionsRequestExpanderPlugins as $paymentTransmissionsRequestExpanderPlugin) {
+            $paymentTransmissionsRequestTransfer = $paymentTransmissionsRequestExpanderPlugin->extendPaymentTransmissionsRequest($paymentTransmissionsRequestTransfer);
         }
 
-        return $this->recalculatePaymentsTransmissions($paymentsTransmissionsRequestTransfer);
+        return $this->recalculatePaymentTransmissions($paymentTransmissionsRequestTransfer);
     }
 
     protected function addPaymentTransmissionsForOrderItemsGroupedByOrderReference(
-        PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer
-    ): PaymentsTransmissionsRequestTransfer {
-        $orderItemsGroupedByOrderReference = $this->getOrderItemsGroupedByOrderReference($paymentsTransmissionsRequestTransfer);
+        PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer
+    ): PaymentTransmissionsRequestTransfer {
+        $orderItemsGroupedByOrderReference = $this->getOrderItemsGroupedByOrderReference($paymentTransmissionsRequestTransfer);
 
         if ($orderItemsGroupedByOrderReference === []) {
-            return $paymentsTransmissionsRequestTransfer;
+            return $paymentTransmissionsRequestTransfer;
         }
 
         // Collect all payments for the given Tenant and OrderReferences.
         $paymentTransferCollection = $this->appPaymentRepository->getPaymentsByTenantIdentifierAndOrderReferences(
-            $paymentsTransmissionsRequestTransfer->getTenantIdentifierOrFail(),
+            $paymentTransmissionsRequestTransfer->getTenantIdentifierOrFail(),
             array_keys($orderItemsGroupedByOrderReference),
         );
 
         foreach ($orderItemsGroupedByOrderReference as $orderReference => $orderItems) {
-            $paymentTransfer = $this->getPaymentByTenantIdentifierAndOrderReferenceFromCollection($paymentsTransmissionsRequestTransfer->getTenantIdentifierOrFail(), $orderReference, $paymentTransferCollection);
+            $paymentTransfer = $this->getPaymentByTenantIdentifierAndOrderReferenceFromCollection($paymentTransmissionsRequestTransfer->getTenantIdentifierOrFail(), $orderReference, $paymentTransferCollection);
             $paymentTransmissionTransfer = $this->createPaymentTransmissionTransfer($paymentTransfer, $orderReference, $orderItems);
 
-            $paymentsTransmissionsRequestTransfer->addPaymentTransmission($paymentTransmissionTransfer);
+            $paymentTransmissionsRequestTransfer->addPaymentTransmission($paymentTransmissionTransfer);
         }
 
-        return $paymentsTransmissionsRequestTransfer;
+        return $paymentTransmissionsRequestTransfer;
     }
 
     protected function addPaymentTransmissionsForOrderItemsGroupedByTransferId(
-        PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer
-    ): PaymentsTransmissionsRequestTransfer {
-        $orderItemsGroupedByTransferId = $this->getOrderItemsGroupedByTransferIdAndOrderReference($paymentsTransmissionsRequestTransfer);
+        PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer
+    ): PaymentTransmissionsRequestTransfer {
+        $orderItemsGroupedByTransferId = $this->getOrderItemsGroupedByTransferIdAndOrderReference($paymentTransmissionsRequestTransfer);
 
         if ($orderItemsGroupedByTransferId === []) {
-            return $paymentsTransmissionsRequestTransfer;
+            return $paymentTransmissionsRequestTransfer;
         }
 
         $orderReferences = $this->getOrderReferencesFromOrderItemsGroupedByTransferId($orderItemsGroupedByTransferId);
 
         // Collect all payments for the given Tenant and OrderReferences.
         $paymentTransferCollection = $this->appPaymentRepository->getPaymentsByTenantIdentifierAndOrderReferences(
-            $paymentsTransmissionsRequestTransfer->getTenantIdentifierOrFail(),
+            $paymentTransmissionsRequestTransfer->getTenantIdentifierOrFail(),
             $orderReferences,
         );
 
@@ -166,7 +166,7 @@ class PaymentTransfer
         foreach ($orderItemsGroupedByTransferId as $transferId => $orders) {
             foreach ($orders as $orderReference => $orderItems) {
                 $paymentTransfer = $this->getPaymentByTenantIdentifierAndOrderReferenceFromCollection(
-                    $paymentsTransmissionsRequestTransfer->getTenantIdentifierOrFail(),
+                    $paymentTransmissionsRequestTransfer->getTenantIdentifierOrFail(),
                     $orderReference,
                     $paymentTransferCollection,
                 );
@@ -179,16 +179,16 @@ class PaymentTransfer
                         ->setIsSuccessful(false)
                         ->setMessage(MessageBuilder::paymentTransferByTransferIdNotFound($transferId));
 
-                    $paymentsTransmissionsRequestTransfer->addFailedPaymentTransmission($paymentTransmissionTransfer);
+                    $paymentTransmissionsRequestTransfer->addFailedPaymentTransmission($paymentTransmissionTransfer);
 
                     continue;
                 }
 
-                $paymentsTransmissionsRequestTransfer->addPaymentTransmission($paymentTransmissionTransfer);
+                $paymentTransmissionsRequestTransfer->addPaymentTransmission($paymentTransmissionTransfer);
             }
         }
 
-        return $paymentsTransmissionsRequestTransfer;
+        return $paymentTransmissionsRequestTransfer;
     }
 
     /**
@@ -215,11 +215,11 @@ class PaymentTransfer
      *
      * @return array<string, array>
      */
-    protected function getOrderItemsGroupedByTransferIdAndOrderReference(PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer): array
+    protected function getOrderItemsGroupedByTransferIdAndOrderReference(PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer): array
     {
         $ordersGroupedByTransferIdAndOrderReference = [];
 
-        foreach ($paymentsTransmissionsRequestTransfer->getOrderItems() as $orderItemTransfer) {
+        foreach ($paymentTransmissionsRequestTransfer->getOrderItems() as $orderItemTransfer) {
             if ($orderItemTransfer->getTransferId() === null) {
                 continue;
             }
@@ -261,11 +261,11 @@ class PaymentTransfer
      *
      * @return array<string, array>
      */
-    protected function getOrderItemsGroupedByOrderReference(PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer): array
+    protected function getOrderItemsGroupedByOrderReference(PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer): array
     {
         $ordersGroupedByOrderReference = [];
 
-        foreach ($paymentsTransmissionsRequestTransfer->getOrderItems() as $orderItemTransfer) {
+        foreach ($paymentTransmissionsRequestTransfer->getOrderItems() as $orderItemTransfer) {
             if ($orderItemTransfer->getTransferId() !== null) {
                 continue;
             }
@@ -281,17 +281,17 @@ class PaymentTransfer
     }
 
     protected function savePaymentsTransfers(
-        PaymentsTransmissionsResponseTransfer $paymentsTransmissionsResponseTransfer
-    ): PaymentsTransmissionsResponseTransfer {
-        foreach ($paymentsTransmissionsResponseTransfer->getPaymentsTransmissions() as $paymentsTransmissionTransfer) {
-            if (!$paymentsTransmissionTransfer->getIsSuccessful()) {
+        PaymentTransmissionsResponseTransfer $paymentTransmissionsResponseTransfer
+    ): PaymentTransmissionsResponseTransfer {
+        foreach ($paymentTransmissionsResponseTransfer->getPaymentTransmissions() as $paymentTransmission) {
+            if (!$paymentTransmission->getIsSuccessful()) {
                 continue;
             }
 
-            $this->appPaymentEntityManager->savePaymentTransfer($paymentsTransmissionTransfer);
+            $this->appPaymentEntityManager->savePaymentTransfer($paymentTransmission);
         }
 
-        return $paymentsTransmissionsResponseTransfer;
+        return $paymentTransmissionsResponseTransfer;
     }
 
     /**
@@ -323,22 +323,22 @@ class PaymentTransfer
         throw new PaymentByTenantIdentifierAndOrderReferenceNotFoundException(MessageBuilder::paymentByTenantIdentifierAndOrderReferenceNotFound($tenantIdentifier, $orderReference));
     }
 
-    protected function recalculatePaymentsTransmissions(
-        PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer
-    ): PaymentsTransmissionsRequestTransfer {
-        foreach ($paymentsTransmissionsRequestTransfer->getPaymentsTransmissions() as $paymentsTransmissionTransfer) {
+    protected function recalculatePaymentTransmissions(
+        PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer
+    ): PaymentTransmissionsRequestTransfer {
+        foreach ($paymentTransmissionsRequestTransfer->getPaymentTransmissions() as $paymentTransmission) {
             $totalAmount = 0;
             $itemReferences = [];
 
-            foreach ($paymentsTransmissionTransfer->getOrderItems() as $orderItemTransfer) {
+            foreach ($paymentTransmission->getOrderItems() as $orderItemTransfer) {
                 $totalAmount += $orderItemTransfer->getAmount();
                 $itemReferences[] = $orderItemTransfer->getItemReference();
             }
 
-            $paymentsTransmissionTransfer->setAmount($totalAmount);
-            $paymentsTransmissionTransfer->setItemReferences($itemReferences);
+            $paymentTransmission->setAmount($totalAmount);
+            $paymentTransmission->setItemReferences($itemReferences);
         }
 
-        return $paymentsTransmissionsRequestTransfer;
+        return $paymentTransmissionsRequestTransfer;
     }
 }

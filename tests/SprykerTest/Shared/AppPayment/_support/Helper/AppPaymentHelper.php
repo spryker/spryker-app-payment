@@ -13,9 +13,9 @@ use Generated\Shared\DataBuilder\CapturePaymentRequestBuilder;
 use Generated\Shared\DataBuilder\InitializePaymentRequestBuilder;
 use Generated\Shared\DataBuilder\OrderItemBuilder;
 use Generated\Shared\DataBuilder\PaymentBuilder;
-use Generated\Shared\DataBuilder\PaymentsTransmissionsRequestBuilder;
-use Generated\Shared\DataBuilder\PaymentsTransmissionsResponseBuilder;
 use Generated\Shared\DataBuilder\PaymentTransmissionBuilder;
+use Generated\Shared\DataBuilder\PaymentTransmissionsRequestBuilder;
+use Generated\Shared\DataBuilder\PaymentTransmissionsResponseBuilder;
 use Generated\Shared\DataBuilder\QuoteBuilder;
 use Generated\Shared\Transfer\CancelPaymentRequestTransfer;
 use Generated\Shared\Transfer\CapturePaymentRequestTransfer;
@@ -23,9 +23,9 @@ use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
 use Generated\Shared\Transfer\OrderItemTransfer;
 use Generated\Shared\Transfer\PaymentPageRequestTransfer;
 use Generated\Shared\Transfer\PaymentStatusRequestTransfer;
-use Generated\Shared\Transfer\PaymentsTransmissionsRequestTransfer;
-use Generated\Shared\Transfer\PaymentsTransmissionsResponseTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionsRequestTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionsResponseTransfer;
 use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentQuery;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentTransfer;
@@ -241,30 +241,30 @@ class AppPaymentHelper extends Module
 
     // Transfer related code
 
-    public function havePaymentsTransmissionsRequestTransfer(array $seed = [], array $paymentsTransmissionsSeed = []): PaymentsTransmissionsRequestTransfer
+    public function havePaymentTransmissionsRequestTransfer(array $seed = [], array $paymentTransmissionsSeed = []): PaymentTransmissionsRequestTransfer
     {
-        $paymentsTransmissionsRequestTransferBuilder = new PaymentsTransmissionsRequestBuilder($seed);
+        $paymentTransmissionsRequestTransferBuilder = new PaymentTransmissionsRequestBuilder($seed);
 
-        foreach ($paymentsTransmissionsSeed as $paymentTransmissionSeed) {
+        foreach ($paymentTransmissionsSeed as $paymentTransmissionSeed) {
             $paymentTransmissionBuilder = new PaymentTransmissionBuilder($paymentTransmissionSeed);
-            $paymentsTransmissionsRequestTransferBuilder->withPaymentTransmission($paymentTransmissionBuilder);
+            $paymentTransmissionsRequestTransferBuilder->withPaymentTransmission($paymentTransmissionBuilder);
         }
 
-        return $paymentsTransmissionsRequestTransferBuilder->build();
+        return $paymentTransmissionsRequestTransferBuilder->build();
     }
 
     // Transfer related code
 
-    public function havePaymentsTransmissionsResponseTransfer(array $seed = [], array $paymentsTransmissionsSeed = []): PaymentsTransmissionsResponseTransfer
+    public function havePaymentTransmissionsResponseTransfer(array $seed = [], array $paymentTransmissionsSeed = []): PaymentTransmissionsResponseTransfer
     {
-        $paymentsTransmissionsResponseTransferBuilder = new PaymentsTransmissionsResponseBuilder($seed);
+        $paymentTransmissionsResponseTransferBuilder = new PaymentTransmissionsResponseBuilder($seed);
 
-        foreach ($paymentsTransmissionsSeed as $paymentTransmissionSeed) {
+        foreach ($paymentTransmissionsSeed as $paymentTransmissionSeed) {
             $paymentTransmissionBuilder = new PaymentTransmissionBuilder($paymentTransmissionSeed);
-            $paymentsTransmissionsResponseTransferBuilder->withPaymentTransmission($paymentTransmissionBuilder);
+            $paymentTransmissionsResponseTransferBuilder->withPaymentTransmission($paymentTransmissionBuilder);
         }
 
-        return $paymentsTransmissionsResponseTransferBuilder->build();
+        return $paymentTransmissionsResponseTransferBuilder->build();
     }
 
     public function assertPaymentTransferEqualsPaymentTransmission(

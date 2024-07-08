@@ -19,8 +19,8 @@ use Generated\Shared\Transfer\PaymentPageRequestTransfer;
 use Generated\Shared\Transfer\PaymentPageResponseTransfer;
 use Generated\Shared\Transfer\PaymentStatusRequestTransfer;
 use Generated\Shared\Transfer\PaymentStatusResponseTransfer;
-use Generated\Shared\Transfer\PaymentsTransmissionsRequestTransfer;
-use Generated\Shared\Transfer\PaymentsTransmissionsResponseTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionsRequestTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionsResponseTransfer;
 use Generated\Shared\Transfer\RefundPaymentRequestTransfer;
 use Generated\Shared\Transfer\RefundPaymentResponseTransfer;
 use Generated\Shared\Transfer\WebhookRequestTransfer;
@@ -139,9 +139,9 @@ class AppPaymentDependencyProvider extends AbstractBundleDependencyProvider
                 return (new PaymentPageResponseTransfer())->setIsSuccessful(true);
             }
 
-            public function transferPayments(PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer): PaymentsTransmissionsResponseTransfer
+            public function transferPayments(PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer): PaymentTransmissionsResponseTransfer
             {
-                return (new PaymentsTransmissionsResponseTransfer())->setIsSuccessful(true);
+                return (new PaymentTransmissionsResponseTransfer())->setIsSuccessful(true);
             }
         };
         // @codeCoverageIgnoreEnd
@@ -184,7 +184,7 @@ class AppPaymentDependencyProvider extends AbstractBundleDependencyProvider
     }
 
     /**
-     * @return array<\Spryker\Zed\AppPayment\Dependency\Plugin\PaymentsTransmissionsRequestExtenderPluginInterface>
+     * @return array<\Spryker\Zed\AppPayment\Dependency\Plugin\PaymentTransmissionsRequestExtenderPluginInterface>
      */
     protected function getPaymentsTransmissionRequestExtenderPlugins(): array
     {

@@ -11,8 +11,8 @@ use Generated\Shared\Transfer\GlueRequestTransfer;
 use Generated\Shared\Transfer\GlueRequestValidationTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
-use Generated\Shared\Transfer\PaymentsTransmissionsRequestTransfer;
-use Generated\Shared\Transfer\PaymentsTransmissionsResponseTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionsRequestTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionsResponseTransfer;
 
 interface AppPaymentBackendApiToAppPaymentFacadeInterface
 {
@@ -20,5 +20,5 @@ interface AppPaymentBackendApiToAppPaymentFacadeInterface
 
     public function validatePaymentConfiguration(GlueRequestTransfer $glueRequestTransfer): GlueRequestValidationTransfer;
 
-    public function transferPayments(PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer): PaymentsTransmissionsResponseTransfer;
+    public function transferPayments(PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer): PaymentTransmissionsResponseTransfer;
 }

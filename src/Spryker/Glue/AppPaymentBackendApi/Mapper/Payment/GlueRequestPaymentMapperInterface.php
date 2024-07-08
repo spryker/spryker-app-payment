@@ -9,7 +9,7 @@ namespace Spryker\Glue\AppPaymentBackendApi\Mapper\Payment;
 
 use Generated\Shared\Transfer\GlueRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
-use Generated\Shared\Transfer\PaymentsTransmissionsRequestTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionsRequestTransfer;
 
 interface GlueRequestPaymentMapperInterface
 {
@@ -17,7 +17,7 @@ interface GlueRequestPaymentMapperInterface
         GlueRequestTransfer $glueRequestTransfer
     ): InitializePaymentRequestTransfer;
 
-    public function mapGlueRequestTransferToPaymentsTransmissionsRequestTransfer(
+    public function mapGlueRequestTransferToPaymentTransmissionsRequestTransfer(
         GlueRequestTransfer $glueRequestTransfer
-    ): PaymentsTransmissionsRequestTransfer;
+    ): PaymentTransmissionsRequestTransfer;
 }

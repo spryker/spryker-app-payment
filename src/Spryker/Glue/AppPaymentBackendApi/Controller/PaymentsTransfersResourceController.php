@@ -18,9 +18,9 @@ class PaymentsTransfersResourceController extends AbstractController
 {
     public function postAction(GlueRequestTransfer $glueRequestTransfer): GlueResponseTransfer
     {
-        $paymentsTransmissionsRequestTransfer = $this->getFactory()->createGlueRequestPaymentMapper()->mapGlueRequestTransferToPaymentsTransmissionsRequestTransfer($glueRequestTransfer);
-        $paymentsTransmissionsResponseTransfer = $this->getFactory()->getAppPaymentFacade()->transferPayments($paymentsTransmissionsRequestTransfer);
+        $paymentTransmissionsRequestTransfer = $this->getFactory()->createGlueRequestPaymentMapper()->mapGlueRequestTransferToPaymentTransmissionsRequestTransfer($glueRequestTransfer);
+        $paymentTransmissionsResponseTransfer = $this->getFactory()->getAppPaymentFacade()->transferPayments($paymentTransmissionsRequestTransfer);
 
-        return $this->getFactory()->createGlueResponsePaymentMapper()->mapPaymentsTransmissionsResponseTransferToSingleResourceGlueResponseTransfer($paymentsTransmissionsResponseTransfer);
+        return $this->getFactory()->createGlueResponsePaymentMapper()->mapPaymentTransmissionsResponseTransferToSingleResourceGlueResponseTransfer($paymentTransmissionsResponseTransfer);
     }
 }

@@ -9,7 +9,7 @@ namespace Spryker\Glue\AppPaymentBackendApi\Mapper\Payment;
 
 use Generated\Shared\Transfer\GlueRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
-use Generated\Shared\Transfer\PaymentsTransmissionsRequestTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionsRequestTransfer;
 use GuzzleHttp\RequestOptions;
 
 class GlueRequestPaymentMapper implements GlueRequestPaymentMapperInterface
@@ -31,18 +31,18 @@ class GlueRequestPaymentMapper implements GlueRequestPaymentMapperInterface
         return $initializePaymentRequestTransfer;
     }
 
-    public function mapGlueRequestTransferToPaymentsTransmissionsRequestTransfer(
+    public function mapGlueRequestTransferToPaymentTransmissionsRequestTransfer(
         GlueRequestTransfer $glueRequestTransfer
-    ): PaymentsTransmissionsRequestTransfer {
+    ): PaymentTransmissionsRequestTransfer {
         $metaData = $glueRequestTransfer->getMeta();
 
         /** @phpstan-var array<string, mixed> */
         $requestData = json_decode((string)$glueRequestTransfer->getContent(), true);
 
-        $paymentsTransmissionsRequestTransfer = new PaymentsTransmissionsRequestTransfer();
-        $paymentsTransmissionsRequestTransfer->fromArray($requestData, true);
-        $paymentsTransmissionsRequestTransfer->setTenantIdentifier($metaData[static::HEADER_TENANT_IDENTIFIER][0] ?? ($metaData['x-store-reference'][0] ?? ''));
+        $paymentTransmissionsRequestTransfer = new PaymentTransmissionsRequestTransfer();
+        $paymentTransmissionsRequestTransfer->fromArray($requestData, true);
+        $paymentTransmissionsRequestTransfer->setTenantIdentifier($metaData[static::HEADER_TENANT_IDENTIFIER][0] ?? ($metaData['x-store-reference'][0] ?? ''));
 
-        return $paymentsTransmissionsRequestTransfer;
+        return $paymentTransmissionsRequestTransfer;
     }
 }

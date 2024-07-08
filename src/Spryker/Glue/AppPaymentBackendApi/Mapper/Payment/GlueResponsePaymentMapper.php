@@ -12,7 +12,7 @@ use Generated\Shared\Transfer\GlueErrorTransfer;
 use Generated\Shared\Transfer\GlueResourceTransfer;
 use Generated\Shared\Transfer\GlueResponseTransfer;
 use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
-use Generated\Shared\Transfer\PaymentsTransmissionsResponseTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionsResponseTransfer;
 use Symfony\Component\HttpFoundation\Response;
 
 class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
@@ -25,15 +25,15 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
         return $this->addInitializePaymentResponseTransferToGlueResponse($initializePaymentResponseTransfer, $glueResponseTransfer);
     }
 
-    public function mapPaymentsTransmissionsResponseTransferToSingleResourceGlueResponseTransfer(
-        PaymentsTransmissionsResponseTransfer $paymentsTransmissionsResponseTransfer
+    public function mapPaymentTransmissionsResponseTransferToSingleResourceGlueResponseTransfer(
+        PaymentTransmissionsResponseTransfer $paymentTransmissionsResponseTransfer
     ): GlueResponseTransfer {
         $glueResponseTransfer = new GlueResponseTransfer();
 
-        if ($paymentsTransmissionsResponseTransfer->getIsSuccessful() === false) {
+        if ($paymentTransmissionsResponseTransfer->getIsSuccessful() === false) {
             $glueResponseTransfer->setHttpStatus(Response::HTTP_BAD_REQUEST);
             $glueResponseTransfer->addError((new GlueErrorTransfer())->setMessage(
-                $paymentsTransmissionsResponseTransfer->getMessageOrFail(),
+                $paymentTransmissionsResponseTransfer->getMessageOrFail(),
             ));
 
             return $glueResponseTransfer;
@@ -44,7 +44,7 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
 
         $glueResponseTransfer->setHttpStatus(Response::HTTP_OK);
         $glueResponseTransfer->addResource($glueResourceTransfer);
-        $glueResponseTransfer->setContent($this->generateTransfersResponseContent($paymentsTransmissionsResponseTransfer));
+        $glueResponseTransfer->setContent($this->generateTransfersResponseContent($paymentTransmissionsResponseTransfer));
 
         return $glueResponseTransfer;
     }
@@ -63,21 +63,21 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
         return $glueResponseTransfer;
     }
 
-    protected function generateTransfersResponseContent(PaymentsTransmissionsResponseTransfer $paymentsTransmissionsResponseTransfer): string
+    protected function generateTransfersResponseContent(PaymentTransmissionsResponseTransfer $paymentTransmissionsResponseTransfer): string
     {
         $responseContent = [
             'transfers' => [],
         ];
 
-        foreach ($paymentsTransmissionsResponseTransfer->getPaymentsTransmissions() as $paymentsTransmission) {
+        foreach ($paymentTransmissionsResponseTransfer->getPaymentTransmissions() as $paymentTransmission) {
             $responseContent['transfers'][] = [
-                'isSuccessful' => $paymentsTransmission->getIsSuccessful(),
-                'failureMessage' => $paymentsTransmission->getMessage(),
-                'merchantReference' => $paymentsTransmission->getMerchantReference(),
-                'orderReference' => $paymentsTransmission->getOrderReference(),
-                'orderItems' => $this->formatOrderItemsForTransferResponse($paymentsTransmission->getOrderItems()),
-                'amount' => $paymentsTransmission->getAmount(),
-                'transferId' => $paymentsTransmission->getTransferId(), // Return the transfer identifier as transaction id to be known on the Tenant side. May be empty in case oif a failure
+                'isSuccessful' => $paymentTransmission->getIsSuccessful(),
+                'failureMessage' => $paymentTransmission->getMessage(),
+                'merchantReference' => $paymentTransmission->getMerchantReference(),
+                'orderReference' => $paymentTransmission->getOrderReference(),
+                'orderItems' => $this->formatOrderItemsForTransferResponse($paymentTransmission->getOrderItems()),
+                'amount' => $paymentTransmission->getAmount(),
+                'transferId' => $paymentTransmission->getTransferId(), // Return the transfer identifier as transaction id to be known on the Tenant side. May be empty in case oif a failure
             ];
         }
 

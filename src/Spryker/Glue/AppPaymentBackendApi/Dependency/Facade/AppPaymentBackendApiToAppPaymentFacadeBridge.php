@@ -11,8 +11,8 @@ use Generated\Shared\Transfer\GlueRequestTransfer;
 use Generated\Shared\Transfer\GlueRequestValidationTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
-use Generated\Shared\Transfer\PaymentsTransmissionsRequestTransfer;
-use Generated\Shared\Transfer\PaymentsTransmissionsResponseTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionsRequestTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionsResponseTransfer;
 
 class AppPaymentBackendApiToAppPaymentFacadeBridge implements AppPaymentBackendApiToAppPaymentFacadeInterface
 {
@@ -39,8 +39,8 @@ class AppPaymentBackendApiToAppPaymentFacadeBridge implements AppPaymentBackendA
         return $this->appPaymentFacade->validatePaymentConfiguration($glueRequestTransfer);
     }
 
-    public function transferPayments(PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer): PaymentsTransmissionsResponseTransfer
+    public function transferPayments(PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer): PaymentTransmissionsResponseTransfer
     {
-        return $this->appPaymentFacade->transferPayments($paymentsTransmissionsRequestTransfer);
+        return $this->appPaymentFacade->transferPayments($paymentTransmissionsRequestTransfer);
     }
 }

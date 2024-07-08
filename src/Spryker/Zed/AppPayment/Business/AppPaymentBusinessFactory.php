@@ -77,7 +77,7 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
             $this->getRepository(),
             $this->getConfig(),
             $this->createAppConfigLoader(),
-            $this->getPaymentsTransmissionsRequestExtenderPlugins(),
+            $this->getPaymentTransmissionsRequestExtenderPlugins(),
         );
     }
 
@@ -139,11 +139,11 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
     }
 
     /**
-     * @return array<\Spryker\Zed\AppPayment\Dependency\Plugin\PaymentsTransmissionsRequestExtenderPluginInterface>
+     * @return array<\Spryker\Zed\AppPayment\Dependency\Plugin\PaymentTransmissionsRequestExtenderPluginInterface>
      */
-    protected function getPaymentsTransmissionsRequestExtenderPlugins(): array
+    protected function getPaymentTransmissionsRequestExtenderPlugins(): array
     {
-        /** @phpstan-var array<\Spryker\Zed\AppPayment\Dependency\Plugin\PaymentsTransmissionsRequestExtenderPluginInterface> */
+        /** @phpstan-var array<\Spryker\Zed\AppPayment\Dependency\Plugin\PaymentTransmissionsRequestExtenderPluginInterface> */
         return $this->getProvidedDependency(AppPaymentDependencyProvider::PLUGINS_PAYMENTS_TRANSMISSIONS_REQUEST_EXPANDER);
     }
 

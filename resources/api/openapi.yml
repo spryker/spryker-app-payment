@@ -232,10 +232,10 @@ components:
                     description: 'ID of a previous made transfer, passed to make a reverse transfer.'
                 merchantReference:
                     type: string
-                    description: 'UUID of the merchant.'
+                    description: 'ID of the merchant.'
                 orderReference:
                     type: string
-                    description: 'UUID of the sales order.'
+                    description: 'ID of the sales order.'
                 itemReference:
                     type: string
                     description: 'UUID of the sales order item.'

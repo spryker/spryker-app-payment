@@ -12,15 +12,15 @@ use Codeception\Test\Unit;
 use Exception;
 use Generated\Shared\Transfer\AppConfigTransfer;
 use Generated\Shared\Transfer\OrderItemTransfer;
-use Generated\Shared\Transfer\PaymentsTransmissionsRequestTransfer;
-use Generated\Shared\Transfer\PaymentsTransmissionsResponseTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionsRequestTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionsResponseTransfer;
 use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 use Ramsey\Uuid\Uuid;
 use Spryker\Glue\AppPaymentBackendApi\Mapper\Payment\GlueRequestPaymentMapper;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Business\Message\MessageBuilder;
-use Spryker\Zed\AppPayment\Dependency\Plugin\PaymentsTransmissionsRequestExtenderPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\PaymentTransmissionsRequestExtenderPluginInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
 use SprykerTest\Glue\AppPaymentBackendApi\AppPaymentBackendApiTester;
 use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
@@ -53,32 +53,32 @@ class PaymentsTransfersApiTest extends Unit
 
         $this->tester->haveTransferDefaults($tenantIdentifier, $merchantReference, $transactionId, $orderReference);
 
-        $paymentsTransmissionsResponseTransfer = new PaymentsTransmissionsResponseTransfer();
+        $paymentTransmissionsResponseTransfer = new PaymentTransmissionsResponseTransfer();
 
         $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
-            'transferPayments' => function (PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer) use ($paymentsTransmissionsResponseTransfer, $transferId) {
-                $paymentsTransmissionsResponseTransfer->setIsSuccessful(true);
+            'transferPayments' => function (PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer) use ($paymentTransmissionsResponseTransfer, $transferId) {
+                $paymentTransmissionsResponseTransfer->setIsSuccessful(true);
 
                 // Ensure that the AppConfig is always passed to the platform plugin.
-                $this->assertInstanceOf(AppConfigTransfer::class, $paymentsTransmissionsRequestTransfer->getAppConfig());
+                $this->assertInstanceOf(AppConfigTransfer::class, $paymentTransmissionsRequestTransfer->getAppConfig());
 
                 // Add transferId to each PaymentTransmissionTransfer.
-                foreach ($paymentsTransmissionsRequestTransfer->getPaymentsTransmissions() as $paymentsTransmission) {
+                foreach ($paymentTransmissionsRequestTransfer->getPaymentTransmissions() as $paymentsTransmission) {
                     $paymentsTransmission->setTransferId($transferId)->setIsSuccessful(true);
-                    $paymentsTransmissionsResponseTransfer->addPaymentTransmission($paymentsTransmission);
+                    $paymentTransmissionsResponseTransfer->addPaymentTransmission($paymentsTransmission);
                 }
 
-                return $paymentsTransmissionsResponseTransfer;
+                return $paymentTransmissionsResponseTransfer;
             },
         ]);
 
         $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
         $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGINS_PAYMENTS_TRANSMISSIONS_REQUEST_EXPANDER, [
-            new class implements PaymentsTransmissionsRequestExtenderPluginInterface {
-                public function extendPaymentsTransmissionsRequest(
-                    PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer
-                ): PaymentsTransmissionsRequestTransfer {
-                    return $paymentsTransmissionsRequestTransfer;
+            new class implements PaymentTransmissionsRequestExtenderPluginInterface {
+                public function extendPaymentTransmissionsRequest(
+                    PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer
+                ): PaymentTransmissionsRequestTransfer {
+                    return $paymentTransmissionsRequestTransfer;
                 }
             },
         ]);
@@ -128,8 +128,8 @@ class PaymentsTransfersApiTest extends Unit
             ->setItemReferences([$orderItems[0]->getItemReferenceOrFail(), $orderItems[1]->getItemReferenceOrFail()])
             ->setAmount('180');
 
-        $this->assertCount(1, $paymentsTransmissionsResponseTransfer->getPaymentsTransmissions());
-        $paymentTransmissionTransfer = $paymentsTransmissionsResponseTransfer->getPaymentsTransmissions()[0];
+        $this->assertCount(1, $paymentTransmissionsResponseTransfer->getPaymentTransmissions());
+        $paymentTransmissionTransfer = $paymentTransmissionsResponseTransfer->getPaymentTransmissions()[0];
 
         $this->tester->assertPaymentTransferEqualsPaymentTransmission($paymentTransmissionTransfer->getTransferIdOrFail(), $expectedPaymentTransmissionTransfer);
 
@@ -150,22 +150,22 @@ class PaymentsTransfersApiTest extends Unit
 
         $this->tester->havePaymentTransmissionPersisted([PaymentTransmissionTransfer::TRANSFER_ID => $transferId]);
 
-        $paymentsTransmissionsResponseTransfer = new PaymentsTransmissionsResponseTransfer();
+        $paymentTransmissionsResponseTransfer = new PaymentTransmissionsResponseTransfer();
 
         $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
-            'transferPayments' => function (PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer) use ($paymentsTransmissionsResponseTransfer, $reverseTransferId) {
-                $paymentsTransmissionsResponseTransfer->setIsSuccessful(true);
+            'transferPayments' => function (PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer) use ($paymentTransmissionsResponseTransfer, $reverseTransferId) {
+                $paymentTransmissionsResponseTransfer->setIsSuccessful(true);
 
                 // Ensure that the AppConfig is always passed to the platform plugin.
-                $this->assertInstanceOf(AppConfigTransfer::class, $paymentsTransmissionsRequestTransfer->getAppConfig());
+                $this->assertInstanceOf(AppConfigTransfer::class, $paymentTransmissionsRequestTransfer->getAppConfig());
 
                 // Add transferId to each PaymentTransmissionTransfer.
-                foreach ($paymentsTransmissionsRequestTransfer->getPaymentsTransmissions() as $paymentsTransmission) {
+                foreach ($paymentTransmissionsRequestTransfer->getPaymentTransmissions() as $paymentsTransmission) {
                     $paymentsTransmission->setTransferId($reverseTransferId)->setIsSuccessful(true);
-                    $paymentsTransmissionsResponseTransfer->addPaymentTransmission($paymentsTransmission);
+                    $paymentTransmissionsResponseTransfer->addPaymentTransmission($paymentsTransmission);
                 }
 
-                return $paymentsTransmissionsResponseTransfer;
+                return $paymentTransmissionsResponseTransfer;
             },
         ]);
 
@@ -216,8 +216,8 @@ class PaymentsTransfersApiTest extends Unit
             ->setItemReferences([$orderItems[0]->getItemReferenceOrFail(), $orderItems[1]->getItemReferenceOrFail()])
             ->setAmount('-180');
 
-        $this->assertCount(1, $paymentsTransmissionsResponseTransfer->getPaymentsTransmissions());
-        $paymentTransmissionTransfer = $paymentsTransmissionsResponseTransfer->getPaymentsTransmissions()[0];
+        $this->assertCount(1, $paymentTransmissionsResponseTransfer->getPaymentTransmissions());
+        $paymentTransmissionTransfer = $paymentTransmissionsResponseTransfer->getPaymentTransmissions()[0];
 
         $this->tester->assertPaymentTransferEqualsPaymentTransmission($paymentTransmissionTransfer->getTransferIdOrFail(), $expectedPaymentTransmissionTransfer);
 
@@ -241,23 +241,23 @@ class PaymentsTransfersApiTest extends Unit
         $this->tester->havePaymentTransmissionPersisted([PaymentTransmissionTransfer::TRANSFER_ID => $transferId1]);
         $this->tester->havePaymentTransmissionPersisted([PaymentTransmissionTransfer::TRANSFER_ID => $transferId2]);
 
-        $paymentsTransmissionsResponseTransfer = new PaymentsTransmissionsResponseTransfer();
+        $paymentTransmissionsResponseTransfer = new PaymentTransmissionsResponseTransfer();
 
         $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
-            'transferPayments' => function (PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer) use ($paymentsTransmissionsResponseTransfer, $reverseTransferId1, $reverseTransferId2) {
-                $paymentsTransmissionsResponseTransfer->setIsSuccessful(true);
+            'transferPayments' => function (PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer) use ($paymentTransmissionsResponseTransfer, $reverseTransferId1, $reverseTransferId2) {
+                $paymentTransmissionsResponseTransfer->setIsSuccessful(true);
 
                 // Ensure that the AppConfig is always passed to the platform plugin.
-                $this->assertInstanceOf(AppConfigTransfer::class, $paymentsTransmissionsRequestTransfer->getAppConfig());
+                $this->assertInstanceOf(AppConfigTransfer::class, $paymentTransmissionsRequestTransfer->getAppConfig());
 
                 // Add transferId to each PaymentTransmissionTransfer.
-                $paymentTransmissionTransfers = $paymentsTransmissionsRequestTransfer->getPaymentsTransmissions();
+                $paymentTransmissionTransfers = $paymentTransmissionsRequestTransfer->getPaymentTransmissions();
                 $paymentTransmissionTransfers[0]->setTransferId($reverseTransferId1)->setIsSuccessful(true);
                 $paymentTransmissionTransfers[1]->setTransferId($reverseTransferId2)->setIsSuccessful(true);
 
-                $paymentsTransmissionsResponseTransfer->setPaymentsTransmissions($paymentTransmissionTransfers);
+                $paymentTransmissionsResponseTransfer->setPaymentTransmissions($paymentTransmissionTransfers);
 
-                return $paymentsTransmissionsResponseTransfer;
+                return $paymentTransmissionsResponseTransfer;
             },
         ]);
 
@@ -366,7 +366,7 @@ class PaymentsTransfersApiTest extends Unit
 
         $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
             'transferPayments' => function () {
-                return (new PaymentsTransmissionsResponseTransfer())
+                return (new PaymentTransmissionsResponseTransfer())
                     ->setIsSuccessful(false)
                     ->setMessage('There was an error in the PlatformPlugin implementation');
             },
@@ -405,7 +405,7 @@ class PaymentsTransfersApiTest extends Unit
 
         $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
             'transferPayments' => function () {
-                $paymentTransmissionResponseTransfer = (new PaymentsTransmissionsResponseTransfer())
+                $paymentTransmissionResponseTransfer = (new PaymentTransmissionsResponseTransfer())
                     ->setIsSuccessful(true);
 
                 $paymentTransmissionTransfer = new PaymentTransmissionTransfer();

@@ -13,8 +13,8 @@ use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
 use Generated\Shared\Transfer\PaymentPageRequestTransfer;
 use Generated\Shared\Transfer\PaymentPageResponseTransfer;
-use Generated\Shared\Transfer\PaymentsTransmissionsRequestTransfer;
-use Generated\Shared\Transfer\PaymentsTransmissionsResponseTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionsRequestTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionsResponseTransfer;
 use Spryker\Zed\AppPayment\Business\Payment\Initialize\PaymentInitializer;
 use Spryker\Zed\AppPayment\Business\Payment\Page\PaymentPage;
 use Spryker\Zed\AppPayment\Business\Payment\Transfer\PaymentTransfer;
@@ -49,8 +49,8 @@ class Payment
         return $this->paymentPage->getPaymentPage($paymentPageRequestTransfer);
     }
 
-    public function transferPayments(PaymentsTransmissionsRequestTransfer $paymentsTransmissionsRequestTransfer): PaymentsTransmissionsResponseTransfer
+    public function transferPayments(PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer): PaymentTransmissionsResponseTransfer
     {
-        return $this->paymentTransfer->transferPayments($paymentsTransmissionsRequestTransfer);
+        return $this->paymentTransfer->transferPayments($paymentTransmissionsRequestTransfer);
     }
 }
