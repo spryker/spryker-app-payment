@@ -155,7 +155,7 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
 
     public function createMessageSender(): MessageSender
     {
-        return new MessageSender($this->getMessageBrokerFacade(), $this->getConfig(), $this->getAppKernelFacade());
+        return new MessageSender($this->getMessageBrokerFacade(), $this->getConfig());
     }
 
     public function createAppConfigLoader(): AppConfigLoader
