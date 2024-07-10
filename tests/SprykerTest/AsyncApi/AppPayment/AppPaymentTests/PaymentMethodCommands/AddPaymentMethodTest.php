@@ -60,15 +60,33 @@ class AddPaymentMethodTest extends Unit
         $this->tester->assertMessageWasEmittedOnChannel($addPaymentMethodTransfer, 'payment-method-commands');
     }
 
-    public function testAddPaymentMethodMessageIsNotSendWhenAppConfigStateIsConnected(): void
+    public function testAddPaymentMethodMessageIsSendWhenAppConfigIsConnected(): void
     {
         // Arrange
+        $addPaymentMethodTransfer = $this->tester->haveAddPaymentMethodTransfer();
+
         $appConfigTransfer = new AppConfigTransfer();
         $appConfigTransfer
             ->setConfig(['business_model' => 'foo', 'my' => 'app', 'configuration' => 'data', 'mode' => 'test'])
             ->setTenantIdentifier(Uuid::uuid4()->toString())
             ->setIsActive(true)
             ->setStatus(AppKernelConfig::APP_STATUS_CONNECTED);
+
+        $appKernelFacade = new AppKernelFacade();
+        $appKernelFacade->saveConfig($appConfigTransfer);
+
+        // Assert
+        $this->tester->assertMessageWasEmittedOnChannel($addPaymentMethodTransfer, 'payment-method-commands');
+    }
+
+    public function testAddPaymentMethodMessageIsNotSendWhenAppConfigStateIsDisconnected(): void
+    {
+        // Arrange
+        $appConfigTransfer = new AppConfigTransfer();
+        $appConfigTransfer
+            ->setConfig(['business_model' => 'foo', 'my' => 'app', 'configuration' => 'data', 'mode' => 'test'])
+            ->setTenantIdentifier(Uuid::uuid4()->toString())
+            ->setStatus(AppKernelConfig::APP_STATUS_DISCONNECTED);
 
         $appKernelFacade = new AppKernelFacade();
         $appKernelFacade->saveConfig($appConfigTransfer);

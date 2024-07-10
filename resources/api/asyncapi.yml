@@ -171,10 +171,28 @@ components:
                     type: string
                 paymentAuthorizationEndpoint:
                     type: string
+                paymentMethodAppConfiguration:
+                    type: object
+                    properties:
+                        baseUrl:
+                            type: string
+                            example: www.example.com
+                        endpoints:
+                            type: array
+                            properties:
+                                name:
+                                    type: string
+                                    example:
+                                        - authorization
+                                        - transfer
+                                path:
+                                    type: string
+                                    example:
+                                        - /authorization
+                                        - /transfer
             required:
                 - name
                 - providerName
-                - paymentAuthorizationEndpoint
         PaymentPayload:
             type: object
             properties:
