@@ -32,22 +32,20 @@ use Generated\Shared\Transfer\QuoteTransfer;
 use Spryker\Shared\Kernel\Transfer\TransferInterface;
 use Spryker\Zed\AppKernel\AppKernelConfig;
 use Spryker\Zed\AppPayment\AppPaymentConfig;
-use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToAppKernelFacadeInterface;
 use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToMessageBrokerFacadeInterface;
 
 class MessageSender
 {
     public function __construct(
         protected AppPaymentToMessageBrokerFacadeInterface $appPaymentToMessageBrokerFacade,
-        protected AppPaymentConfig $appPaymentConfig,
-        protected AppPaymentToAppKernelFacadeInterface $appPaymentToAppKernelFacade
+        protected AppPaymentConfig $appPaymentConfig
     ) {
     }
 
     public function sendAddPaymentMethodMessage(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
     {
-        // Only send the message when the AppConfig is in state NEW.
-        if ($appConfigTransfer->getStatus() === AppKernelConfig::APP_STATUS_CONNECTED) {
+        // Do not send the message when App is in state "disconnected" or when the app is marked as inactive.
+        if ($appConfigTransfer->getStatus() === AppKernelConfig::APP_STATUS_DISCONNECTED || $appConfigTransfer->getIsActive() === false) {
             return $appConfigTransfer;
         }
 
@@ -81,10 +79,6 @@ class MessageSender
         ));
 
         $this->appPaymentToMessageBrokerFacade->sendMessage($addPaymentMethodTransfer);
-
-        $appConfigTransfer->setStatus(AppKernelConfig::APP_STATUS_CONNECTED);
-
-        $this->appPaymentToAppKernelFacade->saveConfig($appConfigTransfer);
 
         return $appConfigTransfer;
     }
