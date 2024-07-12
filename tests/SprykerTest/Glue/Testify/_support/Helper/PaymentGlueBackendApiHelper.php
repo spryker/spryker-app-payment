@@ -9,9 +9,7 @@ namespace SprykerTest\Glue\Testify\Helper;
 
 use Codeception\Stub;
 use Codeception\Util\HttpCode;
-use Spryker\Glue\AppKernel\AppKernelDependencyProvider;
 use Spryker\Glue\AppKernel\Plugin\RouteProvider\AppKernelRouteProviderPlugin;
-use Spryker\Glue\AppPaymentBackendApi\Plugin\AppKernel\PaymentConfigurationValidatorPlugin;
 use Spryker\Glue\AppPaymentBackendApi\Plugin\GlueApplication\AppPaymentBackendApiRouteProviderPlugin;
 use Spryker\Glue\AppWebhookBackendApi\Plugin\GlueApplication\AppWebhookBackendApiRouteProviderPlugin;
 use Spryker\Glue\GlueApplication\GlueApplicationDependencyProvider;
@@ -96,10 +94,6 @@ class PaymentGlueBackendApiHelper extends SprykerGlueBackendApiHelper
 
         $this->getDependencyProviderHelper()->setDependency(SprykerAppKernelDependencyProvider::PLUGIN_CONFIGURATION_AFTER_DELETE_PLUGINS, [
             new DeleteTenantPaymentsConfigurationAfterDeletePlugin(),
-        ]);
-
-        $this->getDependencyProviderHelper()->setDependency(AppKernelDependencyProvider::PLUGINS_REQUEST_CONFIGURE_VALIDATOR, [
-            new PaymentConfigurationValidatorPlugin(),
         ]);
 
         $this->getDependencyProviderHelper()->setDependency(GlueApplicationDependencyProvider::PLUGINS_RESOURCES_PROVIDER, [

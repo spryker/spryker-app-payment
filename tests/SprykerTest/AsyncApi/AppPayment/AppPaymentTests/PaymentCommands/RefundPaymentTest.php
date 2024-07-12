@@ -22,7 +22,7 @@ use Ramsey\Uuid\Uuid;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Business\Payment\Refund\PaymentRefundStatus;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
-use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use SprykerTest\AsyncApi\AppPayment\AppPaymentAsyncApiTester;
 use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
 
@@ -61,7 +61,7 @@ class RefundPaymentTest extends Unit
             ->setRefundId($refundId)
             ->setStatus(PaymentRefundStatus::SUCCEEDED);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'refundPayment' => function (RefundPaymentRequestTransfer $refundPaymentRequestTransfer) use ($refundPaymentResponseTransfer) {
                 $this->assertInstanceOf(AppConfigTransfer::class, $refundPaymentRequestTransfer->getAppConfig());
                 $this->assertInstanceOf(PaymentTransfer::class, $refundPaymentRequestTransfer->getPayment());
@@ -140,7 +140,7 @@ class RefundPaymentTest extends Unit
             ->setRefundId($newRefundId)
             ->setStatus(PaymentRefundStatus::SUCCEEDED);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'refundPayment' => function (RefundPaymentRequestTransfer $refundPaymentRequestTransfer) use ($refundPaymentResponseTransfer) {
                 $this->assertInstanceOf(AppConfigTransfer::class, $refundPaymentRequestTransfer->getAppConfig());
                 $this->assertInstanceOf(PaymentTransfer::class, $refundPaymentRequestTransfer->getPayment());
@@ -198,7 +198,7 @@ class RefundPaymentTest extends Unit
             ->setRefundId($refundId)
             ->setStatus(PaymentRefundStatus::FAILED);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'refundPayment' => function (RefundPaymentRequestTransfer $refundPaymentRequestTransfer) use ($refundPaymentResponseTransfer) {
                 $this->assertInstanceOf(AppConfigTransfer::class, $refundPaymentRequestTransfer->getAppConfig());
                 $this->assertInstanceOf(PaymentTransfer::class, $refundPaymentRequestTransfer->getPayment());
@@ -233,7 +233,7 @@ class RefundPaymentTest extends Unit
             ->setIsSuccessful(false)
             ->setStatus(PaymentRefundStatus::FAILED);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'refundPayment' => function (RefundPaymentRequestTransfer $refundPaymentRequestTransfer) use ($refundPaymentResponseTransfer) {
                 $this->assertInstanceOf(AppConfigTransfer::class, $refundPaymentRequestTransfer->getAppConfig());
                 $this->assertInstanceOf(PaymentTransfer::class, $refundPaymentRequestTransfer->getPayment());
@@ -302,7 +302,7 @@ class RefundPaymentTest extends Unit
             RefundPaymentTransfer::ORDER_REFERENCE => $paymentTransfer->getOrderReference(),
         ]);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'refundPayment' => function (): void {
                 throw new Exception();
             },

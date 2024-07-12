@@ -16,7 +16,7 @@ use Generated\Shared\Transfer\PaymentTransfer;
 use Ramsey\Uuid\Uuid;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
-use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use SprykerTest\AsyncApi\AppPayment\AppPaymentAsyncApiTester;
 use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
 
@@ -53,7 +53,7 @@ class PaymentCanceledTest extends Unit
             ->setTransactionId($transactionId)
             ->setStatus(PaymentStatus::STATUS_CANCELED);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'cancelPayment' => function (CancelPaymentRequestTransfer $cancelPaymentRequestTransfer) use ($cancelPaymentResponseTransfer) {
                 $this->assertInstanceOf(AppConfigTransfer::class, $cancelPaymentRequestTransfer->getAppConfig());
                 $this->assertInstanceOf(PaymentTransfer::class, $cancelPaymentRequestTransfer->getPayment());

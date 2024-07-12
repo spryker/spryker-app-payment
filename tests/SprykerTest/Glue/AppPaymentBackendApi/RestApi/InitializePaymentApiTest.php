@@ -18,7 +18,7 @@ use GuzzleHttp\RequestOptions;
 use Ramsey\Uuid\Uuid;
 use Spryker\Glue\AppPaymentBackendApi\Mapper\Payment\GlueRequestPaymentMapper;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
-use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use SprykerTest\Glue\AppPaymentBackendApi\AppPaymentBackendApiTester;
 use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
 use Symfony\Component\HttpFoundation\Response;
@@ -52,7 +52,7 @@ class InitializePaymentApiTest extends Unit
             ->setIsSuccessful(true)
             ->setTransactionId($transactionId);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'initializePayment' => function (InitializePaymentRequestTransfer $initializePaymentRequestTransfer) use ($initializePaymentResponseTransfer) {
                 // Ensure that the AppConfig is always passed to the platform plugin.
                 $this->assertInstanceOf(AppConfigTransfer::class, $initializePaymentRequestTransfer->getAppConfig());
@@ -94,7 +94,7 @@ class InitializePaymentApiTest extends Unit
             ->setIsSuccessful(true)
             ->setTransactionId($transactionId);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'initializePayment' => function (InitializePaymentRequestTransfer $initializePaymentRequestTransfer) use ($initializePaymentResponseTransfer) {
                 // Ensure that the AppConfig is always passed to the platform plugin.
                 $this->assertInstanceOf(AppConfigTransfer::class, $initializePaymentRequestTransfer->getAppConfig());
@@ -126,7 +126,7 @@ class InitializePaymentApiTest extends Unit
         $initializePaymentRequestTransfer = $this->tester->haveInitializePaymentRequestTransfer();
         $url = $this->tester->buildPaymentUrl();
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'initializePayment' => static function (): never {
                 throw new Exception();
             },
@@ -154,7 +154,7 @@ class InitializePaymentApiTest extends Unit
         $initializePaymentResponseTransfer
             ->setIsSuccessful(false);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'initializePayment' => $initializePaymentResponseTransfer,
         ]);
 
@@ -177,7 +177,7 @@ class InitializePaymentApiTest extends Unit
         $this->tester->haveAppConfigForTenant($initializePaymentRequestTransfer->getTenantIdentifier());
         $url = $this->tester->buildPaymentUrl();
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'initializePayment' => static function (): never {
                 throw new Exception('An Error occurred in the platform plugin.');
             },

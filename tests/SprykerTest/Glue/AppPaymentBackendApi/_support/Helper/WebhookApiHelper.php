@@ -19,7 +19,7 @@ use Generated\Shared\Transfer\WebhookResponseTransfer;
 use Spryker\Glue\AppWebhookBackendApi\AppWebhookBackendApiDependencyProvider;
 use Spryker\Glue\AppWebhookBackendApi\Plugin\AppWebhookBackendApi\GlueRequestWebhookMapperPluginInterface;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
-use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
 
 class WebhookApiHelper extends Module
@@ -58,7 +58,7 @@ class WebhookApiHelper extends Module
         ?string $paymentStatus = null,
         ?string $paymentRefundStatus = null
     ): void {
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'handleWebhook' => function (WebhookRequestTransfer $webhookRequestTransfer, WebhookResponseTransfer $webhookResponseTransfer) use ($webhookResponseSuccessful, $paymentStatus, $paymentRefundStatus): WebhookResponseTransfer {
                 $webhookResponseTransfer->setIsSuccessful($webhookResponseSuccessful);
 
@@ -85,7 +85,7 @@ class WebhookApiHelper extends Module
 
     public function mockPaymentPlatformThatThrowsAnException(): void
     {
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'handleWebhook' => function (): WebhookResponseTransfer {
                 throw new Exception('PaymentPlatformPluginInterface::handleWebhook() exception.');
             },

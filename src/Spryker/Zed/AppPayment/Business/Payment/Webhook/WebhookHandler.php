@@ -14,7 +14,7 @@ use InvalidArgumentException;
 use Spryker\Shared\Log\LoggerTrait;
 use Spryker\Zed\AppPayment\Business\Message\MessageBuilder;
 use Spryker\Zed\AppPayment\Business\Payment\Webhook\Handler\WebhookHandlerSelector;
-use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\Kernel\Persistence\EntityManager\TransactionTrait;
 use Throwable;
 
@@ -24,7 +24,7 @@ class WebhookHandler
     use LoggerTrait;
 
     public function __construct(
-        protected PlatformPluginInterface $platformPlugin,
+        protected AppPaymentPlatformPluginInterface $appPaymentPlatformPlugin,
         protected WebhookRequestExtender $webhookRequestExtender,
         protected WebhookMessageSender $webhookMessageSender,
         protected WebhookHandlerSelector $webhookHandlerSelector
@@ -36,7 +36,7 @@ class WebhookHandler
         try {
             $webhookRequestTransfer = $this->extendWebhookRequestTransfer($webhookRequestTransfer);
 
-            $webhookResponseTransfer = $this->platformPlugin->handleWebhook($webhookRequestTransfer, $webhookResponseTransfer);
+            $webhookResponseTransfer = $this->appPaymentPlatformPlugin->handleWebhook($webhookRequestTransfer, $webhookResponseTransfer);
         } catch (Throwable $throwable) {
             $this->getLogger()->error($throwable->getMessage(), [
                 PaymentTransfer::TRANSACTION_ID => $webhookRequestTransfer->getPayment() instanceof PaymentTransfer ? $webhookRequestTransfer->getPayment()->getTransactionIdOrFail() : '',

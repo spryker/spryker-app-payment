@@ -17,7 +17,7 @@ use Spryker\Zed\AppPayment\AppPaymentConfig;
 use Spryker\Zed\AppPayment\Business\Exception\PaymentByTenantIdentifierAndOrderReferenceNotFoundException;
 use Spryker\Zed\AppPayment\Business\Message\MessageBuilder;
 use Spryker\Zed\AppPayment\Business\Payment\AppConfig\AppConfigLoader;
-use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentEntityManagerInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface;
 use Spryker\Zed\Kernel\Persistence\EntityManager\TransactionTrait;
@@ -37,7 +37,7 @@ class PaymentTransfer
      * @param array<\Spryker\Zed\AppPayment\Dependency\Plugin\PaymentTransmissionsRequestExtenderPluginInterface> $paymentTransmissionsRequestExpanderPlugins
      */
     public function __construct(
-        protected PlatformPluginInterface $platformPlugin,
+        protected AppPaymentPlatformPluginInterface $appPaymentPlatformPlugin,
         protected AppPaymentEntityManagerInterface $appPaymentEntityManager,
         protected AppPaymentRepositoryInterface $appPaymentRepository,
         protected AppPaymentConfig $appPaymentConfig,
@@ -56,7 +56,7 @@ class PaymentTransfer
             $paymentTransmissionsRequestTransfer = $this->addPaymentTransmissions($paymentTransmissionsRequestTransfer);
 
             if ($paymentTransmissionsRequestTransfer->getPaymentTransmissions()->count() > 0) {
-                $paymentTransmissionsResponseTransfer = $this->platformPlugin->transferPayments($paymentTransmissionsRequestTransfer);
+                $paymentTransmissionsResponseTransfer = $this->appPaymentPlatformPlugin->transferPayments($paymentTransmissionsRequestTransfer);
             }
         } catch (Throwable $throwable) {
             $this->getLogger()->error($throwable->getMessage(), [

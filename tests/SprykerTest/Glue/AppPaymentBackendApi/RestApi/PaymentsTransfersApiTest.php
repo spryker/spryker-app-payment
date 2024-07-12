@@ -20,8 +20,8 @@ use Ramsey\Uuid\Uuid;
 use Spryker\Glue\AppPaymentBackendApi\Mapper\Payment\GlueRequestPaymentMapper;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Business\Message\MessageBuilder;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\PaymentTransmissionsRequestExtenderPluginInterface;
-use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
 use SprykerTest\Glue\AppPaymentBackendApi\AppPaymentBackendApiTester;
 use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
 use Symfony\Component\HttpFoundation\Response;
@@ -55,7 +55,7 @@ class PaymentsTransfersApiTest extends Unit
 
         $paymentTransmissionsResponseTransfer = new PaymentTransmissionsResponseTransfer();
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'transferPayments' => function (PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer) use ($paymentTransmissionsResponseTransfer, $transferId) {
                 $paymentTransmissionsResponseTransfer->setIsSuccessful(true);
 
@@ -152,7 +152,7 @@ class PaymentsTransfersApiTest extends Unit
 
         $paymentTransmissionsResponseTransfer = new PaymentTransmissionsResponseTransfer();
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'transferPayments' => function (PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer) use ($paymentTransmissionsResponseTransfer, $reverseTransferId) {
                 $paymentTransmissionsResponseTransfer->setIsSuccessful(true);
 
@@ -243,7 +243,7 @@ class PaymentsTransfersApiTest extends Unit
 
         $paymentTransmissionsResponseTransfer = new PaymentTransmissionsResponseTransfer();
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'transferPayments' => function (PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer) use ($paymentTransmissionsResponseTransfer, $reverseTransferId1, $reverseTransferId2) {
                 $paymentTransmissionsResponseTransfer->setIsSuccessful(true);
 
@@ -327,7 +327,7 @@ class PaymentsTransfersApiTest extends Unit
             PaymentTransfer::ORDER_REFERENCE => $orderReference,
         ]);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'transferPayments' => function (): void {
                 throw new Exception('There was an error in the PlatformPlugin implementation');
             },
@@ -364,7 +364,7 @@ class PaymentsTransfersApiTest extends Unit
             PaymentTransfer::ORDER_REFERENCE => $orderReference,
         ]);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'transferPayments' => function () {
                 return (new PaymentTransmissionsResponseTransfer())
                     ->setIsSuccessful(false)
@@ -403,7 +403,7 @@ class PaymentsTransfersApiTest extends Unit
             PaymentTransfer::ORDER_REFERENCE => $orderReference,
         ]);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'transferPayments' => function () {
                 $paymentTransmissionResponseTransfer = (new PaymentTransmissionsResponseTransfer())
                     ->setIsSuccessful(true);

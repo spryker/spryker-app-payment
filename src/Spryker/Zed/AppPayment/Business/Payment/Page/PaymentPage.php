@@ -14,8 +14,8 @@ use Spryker\Shared\Log\LoggerTrait;
 use Spryker\Zed\AppPayment\AppPaymentConfig;
 use Spryker\Zed\AppPayment\Business\Message\MessageBuilder;
 use Spryker\Zed\AppPayment\Business\Payment\AppConfig\AppConfigLoader;
-use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPaymentPagePluginInterface;
-use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPaymentPagePluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface;
 use Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTransactionIdNotFoundException;
 use Throwable;
@@ -25,7 +25,7 @@ class PaymentPage
     use LoggerTrait;
 
     public function __construct(
-        protected PlatformPluginInterface $platformPlugin,
+        protected AppPaymentPlatformPluginInterface $appPaymentPlatformPlugin,
         protected AppPaymentRepositoryInterface $appPaymentRepository,
         protected AppConfigLoader $appConfigLoader,
         protected AppPaymentConfig $appPaymentConfig
@@ -41,7 +41,7 @@ class PaymentPage
 
         $requestData = $paymentPageRequestTransfer->getRequestDataOrFail();
 
-        if (!$this->platformPlugin instanceof PlatformPaymentPagePluginInterface) {
+        if (!$this->appPaymentPlatformPlugin instanceof AppPaymentPlatformPaymentPagePluginInterface) {
             return $this->buildErrorPaymentPageResponse(
                 $paymentPageResponseTransfer,
                 MessageBuilder::getPlatformPluginDoesNotProvideRenderingAPaymentPage(),
@@ -95,7 +95,7 @@ class PaymentPage
         $paymentPageRequestTransfer->setRedirectUrl($this->getRedirectUrl($paymentTransfer));
 
         try {
-            return $this->platformPlugin->getPaymentPage($paymentPageRequestTransfer);
+            return $this->appPaymentPlatformPlugin->getPaymentPage($paymentPageRequestTransfer);
         } catch (Throwable $throwable) {
             return $this->buildErrorPaymentPageResponse(
                 $paymentPageResponseTransfer,

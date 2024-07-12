@@ -10,8 +10,6 @@ namespace Spryker\Zed\AppPayment\Business;
 use Generated\Shared\Transfer\AppConfigTransfer;
 use Generated\Shared\Transfer\CancelPaymentTransfer;
 use Generated\Shared\Transfer\CapturePaymentTransfer;
-use Generated\Shared\Transfer\GlueRequestTransfer;
-use Generated\Shared\Transfer\GlueRequestValidationTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
 use Generated\Shared\Transfer\PaymentCollectionDeleteCriteriaTransfer;
@@ -33,16 +31,6 @@ use Spryker\Zed\Kernel\Business\AbstractFacade;
  */
 class AppPaymentFacade extends AbstractFacade implements AppPaymentFacadeInterface
 {
-    /**
-     * @api
-     *
-     * @inheritDoc
-     */
-    public function validatePaymentConfiguration(GlueRequestTransfer $glueRequestTransfer): GlueRequestValidationTransfer
-    {
-        return $this->getFactory()->createPayment()->validateConfiguration($glueRequestTransfer);
-    }
-
     /**
      * @api
      *

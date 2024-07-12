@@ -14,7 +14,7 @@ use Generated\Shared\Transfer\RedirectResponseTransfer;
 use Spryker\Shared\Log\LoggerTrait;
 use Spryker\Zed\AppPayment\AppPaymentConfig;
 use Spryker\Zed\AppPayment\Business\Payment\AppConfig\AppConfigLoader;
-use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface;
 use Throwable;
 
@@ -23,7 +23,7 @@ class Redirect
     use LoggerTrait;
 
     public function __construct(
-        protected PlatformPluginInterface $platformPlugin,
+        protected AppPaymentPlatformPluginInterface $appPaymentPlatformPlugin,
         protected AppPaymentRepositoryInterface $appPaymentRepository,
         protected AppPaymentConfig $appPaymentConfig,
         protected AppConfigLoader $appConfigLoader
@@ -41,7 +41,7 @@ class Redirect
             ->setTransactionId($redirectRequestTransfer->getTransactionIdOrFail());
 
         try {
-            $paymentStatusResponseTransfer = $this->platformPlugin->getPaymentStatus($paymentStatusRequestTransfer);
+            $paymentStatusResponseTransfer = $this->appPaymentPlatformPlugin->getPaymentStatus($paymentStatusRequestTransfer);
 
             if ($paymentStatusResponseTransfer->getIsSuccessful() === true) {
                 return (new RedirectResponseTransfer())->setUrl($paymentTransfer->getRedirectSuccessUrl());

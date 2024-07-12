@@ -17,7 +17,7 @@ use Generated\Shared\Transfer\PaymentTransfer;
 use Ramsey\Uuid\Uuid;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
-use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTenantIdentifierAndOrderReferenceNotFoundException;
 use SprykerTest\AsyncApi\AppPayment\AppPaymentAsyncApiTester;
 use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
@@ -54,7 +54,7 @@ class CapturePaymentTest extends Unit
             ->setTransactionId($transactionId)
             ->setStatus(PaymentStatus::STATUS_CAPTURE_REQUESTED);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'capturePayment' => function (CapturePaymentRequestTransfer $capturePaymentRequestTransfer) use ($capturePaymentResponseTransfer) {
                 $this->assertInstanceOf(AppConfigTransfer::class, $capturePaymentRequestTransfer->getAppConfig());
                 $this->assertInstanceOf(PaymentTransfer::class, $capturePaymentRequestTransfer->getPayment());
@@ -90,7 +90,7 @@ class CapturePaymentTest extends Unit
             ->setTransactionId($transactionId)
             ->setStatus(PaymentStatus::STATUS_CAPTURE_REQUESTED);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'capturePayment' => function (CapturePaymentRequestTransfer $capturePaymentRequestTransfer) use ($capturePaymentResponseTransfer) {
                 $this->assertInstanceOf(AppConfigTransfer::class, $capturePaymentRequestTransfer->getAppConfig());
                 $this->assertInstanceOf(PaymentTransfer::class, $capturePaymentRequestTransfer->getPayment());
@@ -126,7 +126,7 @@ class CapturePaymentTest extends Unit
             ->setTransactionId($transactionId)
             ->setStatus(PaymentStatus::STATUS_CAPTURE_REQUESTED);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'capturePayment' => function (CapturePaymentRequestTransfer $capturePaymentRequestTransfer) use ($capturePaymentResponseTransfer) {
                 $this->assertInstanceOf(AppConfigTransfer::class, $capturePaymentRequestTransfer->getAppConfig());
                 $this->assertInstanceOf(PaymentTransfer::class, $capturePaymentRequestTransfer->getPayment());
@@ -168,7 +168,7 @@ class CapturePaymentTest extends Unit
 
         $capturePaymentTransfer = $this->tester->haveCapturePaymentTransfer(['tenantIdentifier' => $tenantIdentifier, 'orderReference' => $paymentTransfer->getOrderReference()]);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'capturePayment' => static function (): never {
                 throw new Exception();
             },
