@@ -56,6 +56,9 @@ jobs:
                   mkdir -p tests/_data
                   touch tests/_data/app_payment_db
 
+            - name: Validate transfer files
+              run: vendor/bin/console transfer:validate
+
             - name: Setup AppPayment
               run: composer setup
 
