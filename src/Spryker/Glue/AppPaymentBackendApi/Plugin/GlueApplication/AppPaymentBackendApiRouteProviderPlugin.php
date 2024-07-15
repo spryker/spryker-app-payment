@@ -8,6 +8,7 @@
 namespace Spryker\Glue\AppPaymentBackendApi\Plugin\GlueApplication;
 
 use Spryker\Glue\AppPaymentBackendApi\Controller\InitializePaymentResourceController;
+use Spryker\Glue\AppPaymentBackendApi\Controller\PaymentsTransfersResourceController;
 use Spryker\Glue\GlueApplicationExtension\Dependency\Plugin\RouteProviderPluginInterface;
 use Spryker\Glue\Kernel\Backend\AbstractPlugin;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,6 +23,7 @@ class AppPaymentBackendApiRouteProviderPlugin extends AbstractPlugin implements 
     public function addRoutes(RouteCollection $routeCollection): RouteCollection
     {
         $routeCollection->add('postPayment', $this->getPostPaymentRoute());
+        $routeCollection->add('postPaymentsTransfers', $this->getPostPaymentsTransfersRoute());
 
         return $routeCollection;
     }
@@ -32,6 +34,17 @@ class AppPaymentBackendApiRouteProviderPlugin extends AbstractPlugin implements 
             ->setDefaults([
                 '_controller' => [InitializePaymentResourceController::class, 'postAction'],
                 '_resourceName' => 'Payment',
+                '_method' => 'post',
+            ])
+            ->setMethods(Request::METHOD_POST);
+    }
+
+    public function getPostPaymentsTransfersRoute(): Route
+    {
+        return (new Route('/private/payments/transfers'))
+            ->setDefaults([
+                '_controller' => [PaymentsTransfersResourceController::class, 'postAction'],
+                '_resourceName' => 'payments-transfers',
                 '_method' => 'post',
             ])
             ->setMethods(Request::METHOD_POST);

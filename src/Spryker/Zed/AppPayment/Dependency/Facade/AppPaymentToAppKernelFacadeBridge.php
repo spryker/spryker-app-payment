@@ -8,7 +8,6 @@
 namespace Spryker\Zed\AppPayment\Dependency\Facade;
 
 use Generated\Shared\Transfer\AppConfigCriteriaTransfer;
-use Generated\Shared\Transfer\AppConfigResponseTransfer;
 use Generated\Shared\Transfer\AppConfigTransfer;
 use Spryker\Shared\Kernel\Transfer\TransferInterface;
 
@@ -30,10 +29,5 @@ class AppPaymentToAppKernelFacadeBridge implements AppPaymentToAppKernelFacadeIn
     public function getConfig(AppConfigCriteriaTransfer $appConfigCriteriaTransfer, AppConfigTransfer $appConfigTransfer): TransferInterface
     {
         return $this->appKernelFacade->getConfig($appConfigCriteriaTransfer, $appConfigTransfer);
-    }
-
-    public function saveConfig(AppConfigTransfer $appConfigTransfer): AppConfigResponseTransfer
-    {
-        return $this->appKernelFacade->saveConfig($appConfigTransfer);
     }
 }

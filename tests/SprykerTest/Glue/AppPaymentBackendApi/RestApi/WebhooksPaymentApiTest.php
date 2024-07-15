@@ -20,7 +20,7 @@ use Spryker\Zed\AppPayment\Business\Message\MessageBuilder;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
 use Spryker\Zed\AppPayment\Business\Payment\Webhook\WebhookDataType;
 use Spryker\Zed\AppPayment\Communication\Plugin\AppWebhook\PaymentWebhookHandlerPlugin;
-use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\AppWebhook\AppWebhookDependencyProvider;
 use SprykerTest\Glue\AppPaymentBackendApi\AppPaymentBackendApiTester;
 use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
@@ -385,7 +385,7 @@ class WebhooksPaymentApiTest extends Unit
      */
     protected function mockPaymentPlatformPlugin(bool $webhookResponseSuccessful, ?string $paymentStatus = null, ?string $transactionId = null): void
     {
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'handleWebhook' => function (WebhookRequestTransfer $webhookRequestTransfer) use ($webhookResponseSuccessful, $paymentStatus, $transactionId): WebhookResponseTransfer {
                 $webhookResponseTransfer = new WebhookResponseTransfer();
                 $webhookResponseTransfer->setIsSuccessful($webhookResponseSuccessful);

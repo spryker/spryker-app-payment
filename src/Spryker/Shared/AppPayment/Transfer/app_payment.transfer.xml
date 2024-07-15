@@ -114,6 +114,7 @@
     <transfer name="Payment" strict="true">
         <property name="orderReference" type="string"/>
         <property name="transactionId" type="string"/>
+        <property name="transferId" type="string"/>
         <property name="tenantIdentifier" type="string"/>
         <property name="quote" type="Quote"/>
         <property name="status" type="string"/>
@@ -267,7 +268,18 @@
         <property name="name" type="string"/>
         <property name="providerName" type="string"/>
         <property name="paymentAuthorizationEndpoint" type="string"/>
+        <property name="paymentMethodAppConfiguration" type="PaymentMethodAppConfiguration"/>
         <property name="messageAttributes" type="MessageAttributes"/>
+    </transfer>
+
+    <transfer name="PaymentMethodAppConfiguration" strict="true">
+        <property name="baseUrl" type="string"/>
+        <property name="endpoints" type="Endpoint[]" singular="endpoint"/>
+    </transfer>
+
+    <transfer name="Endpoint" strict="true">
+        <property name="name" type="string"/>
+        <property name="path" type="string"/>
     </transfer>
 
     <transfer name="DeletePaymentMethod" strict="true">
@@ -290,6 +302,22 @@
 
     <transfer name="PaymentCollectionDeleteCriteria" strict="true">
         <property name="tenantIdentifier" type="string"/>
+    </transfer>
+
+    <transfer name="PaymentTransmissionsRequest" strict="true">
+        <property name="appConfig" type="AppConfig"/>
+        <property name="tenantIdentifier" type="string"/>
+        <property name="transactionId" type="string"/>
+        <property name="transferId" type="string"/>
+        <property name="orderItems" type="OrderItem[]" singular="orderItem"/>
+        <property name="paymentTransmissions" type="PaymentTransmission[]" singular="paymentTransmission"/>
+        <property name="failedPaymentTransmissions" type="PaymentTransmission[]" singular="failedPaymentTransmission"/>
+    </transfer>
+
+    <transfer name="PaymentTransmissionsResponse" strict="true">
+        <property name="isSuccessful" type="bool"/>
+        <property name="message" type="string"/>
+        <property name="paymentTransmissions" type="PaymentTransmission[]" singular="paymentTransmission"/>
     </transfer>
 
 </transfers>

@@ -14,7 +14,7 @@ use Generated\Shared\Transfer\PaymentStatusRequestTransfer;
 use Generated\Shared\Transfer\PaymentStatusResponseTransfer;
 use Ramsey\Uuid\Uuid;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
-use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
 use SprykerTest\Zed\AppPayment\AppPaymentCommunicationTester;
 
@@ -43,7 +43,7 @@ class RedirectControllerTest extends Unit
         $this->tester->haveAppConfigForTenant($tenantIdentifier);
         $paymentTransfer = $this->tester->havePaymentForTransactionId($transactionId, $tenantIdentifier);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'getPaymentStatus' => function (PaymentStatusRequestTransfer $paymentStatusRequestTransfer) use ($transactionId): PaymentStatusResponseTransfer {
                 // Ensure that required data is passed to the PaymentPlatformPlugin
                 $this->assertNotNull($paymentStatusRequestTransfer->getAppConfig());
@@ -71,7 +71,7 @@ class RedirectControllerTest extends Unit
         $this->tester->haveAppConfigForTenant($tenantIdentifier);
         $paymentTransfer = $this->tester->havePaymentForTransactionId($transactionId, $tenantIdentifier);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'getPaymentStatus' => function (PaymentStatusRequestTransfer $paymentStatusRequestTransfer) use ($transactionId): PaymentStatusResponseTransfer {
                 // Ensure that required data is passed to the PaymentPlatformPlugin
                 $this->assertNotNull($paymentStatusRequestTransfer->getAppConfig());
@@ -100,7 +100,7 @@ class RedirectControllerTest extends Unit
         $this->tester->haveAppConfigForTenant($tenantIdentifier);
         $paymentTransfer = $this->tester->havePaymentForTransactionId($transactionId, $tenantIdentifier);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'getPaymentStatus' => function (PaymentStatusRequestTransfer $paymentStatusRequestTransfer) use ($transactionId): PaymentStatusResponseTransfer {
                 // Ensure that required data is passed to the PaymentPlatformPlugin
                 throw new Exception('Something went wrong');

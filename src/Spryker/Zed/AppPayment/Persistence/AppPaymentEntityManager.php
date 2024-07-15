@@ -10,8 +10,10 @@ namespace Spryker\Zed\AppPayment\Persistence;
 use Generated\Shared\Transfer\PaymentCollectionDeleteCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentRefundTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 use Orm\Zed\AppPayment\Persistence\SpyPayment;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentRefund;
+use Orm\Zed\AppPayment\Persistence\SpyPaymentTransfer;
 use Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTransactionIdNotFoundException;
 use Spryker\Zed\AppPayment\Persistence\Exception\RefundByRefundIdNotFoundException;
 use Spryker\Zed\Kernel\Persistence\AbstractEntityManager;
@@ -41,6 +43,17 @@ class AppPaymentEntityManager extends AbstractEntityManager implements AppPaymen
         $spyPayment->save();
 
         return $this->getFactory()->createPaymentMapper()->mapPaymentEntityToPaymentTransfer($spyPayment, $paymentTransfer);
+    }
+
+    public function savePaymentTransfer(PaymentTransmissionTransfer $paymentTransmissionTransfer): PaymentTransmissionTransfer
+    {
+        $spyPaymentTransfer = $this->getFactory()->createPaymentMapper()
+            ->mapPaymentTransmissionTransferToPaymentTransferEntity($paymentTransmissionTransfer, new SpyPaymentTransfer());
+
+        $spyPaymentTransfer->save();
+
+        return $this->getFactory()->createPaymentMapper()
+            ->mapPaymentTransmissionEntityToPaymentTransmissionTransfer($spyPaymentTransfer, $paymentTransmissionTransfer);
     }
 
     public function createPaymentRefund(PaymentRefundTransfer $paymentRefundTransfer): PaymentRefundTransfer

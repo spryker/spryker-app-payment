@@ -7,8 +7,6 @@
 
 namespace Spryker\Zed\AppPayment\Dependency\Plugin;
 
-use Generated\Shared\Transfer\AppConfigTransfer;
-use Generated\Shared\Transfer\AppConfigValidateResponseTransfer;
 use Generated\Shared\Transfer\CancelPaymentRequestTransfer;
 use Generated\Shared\Transfer\CancelPaymentResponseTransfer;
 use Generated\Shared\Transfer\CapturePaymentRequestTransfer;
@@ -17,24 +15,15 @@ use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
 use Generated\Shared\Transfer\PaymentStatusRequestTransfer;
 use Generated\Shared\Transfer\PaymentStatusResponseTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionsRequestTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionsResponseTransfer;
 use Generated\Shared\Transfer\RefundPaymentRequestTransfer;
 use Generated\Shared\Transfer\RefundPaymentResponseTransfer;
 use Generated\Shared\Transfer\WebhookRequestTransfer;
 use Generated\Shared\Transfer\WebhookResponseTransfer;
 
-interface PlatformPluginInterface
+interface AppPaymentPlatformPluginInterface
 {
-    /**
-     * Specification:
-     * - Receives a `AppConfigTransfer` with the current App/Tenant Configuration in the `AppConfigTransfer::content`.
-     * - Returns a `AppConfigValidateResponseTransfer`.
-     * - Requires `AppConfigValidateResponseTransfer::isSuccessful`to be set.
-     * - Requires `AppConfigValidateResponseTransfer::configurationValidationErrors` when the validation of the configuration has errors.
-     *
-     * @api
-     */
-    public function validateConfiguration(AppConfigTransfer $appConfigTransfer): AppConfigValidateResponseTransfer;
-
     /**
      * Specification:
      * - Receives a `InitializePaymentRequestTransfer` with:
@@ -52,22 +41,6 @@ interface PlatformPluginInterface
      * @api
      */
     public function initializePayment(InitializePaymentRequestTransfer $initializePaymentRequestTransfer): InitializePaymentResponseTransfer;
-
-    /**
-     * Specification:
-     * - Receives a `WebhookRequestTransfer` with:
-     *   - `WebhookRequestTransfer::payment` (PaymentTransfer)
-     *   - `WebhookRequestTransfer::appConfig (AppConfigTransfer)`
-     *   - `WebhookRequestTransfer::content`
-     * - Returns a `WebhookResponseTransfer`.
-     * - Requires `WebhookResponseTransfer::isSuccessful`to be set.
-     * - Requires `WebhookResponseTransfer::message` to be set when the 3rd party provider could not process the request.
-     * - Returns a `WebhookResponseTransfer` with a failed response when the 3rd party provider could not process the request.
-     * - Returns a `WebhookResponseTransfer` with a successful response when the 3rd party provider was able to process the request.
-     *
-     * @api
-     */
-    public function handleWebhook(WebhookRequestTransfer $webhookRequestTransfer, WebhookResponseTransfer $webhookResponseTransfer): WebhookResponseTransfer;
 
     /**
      * Specification:
@@ -110,6 +83,37 @@ interface PlatformPluginInterface
      * @api
      */
     public function refundPayment(RefundPaymentRequestTransfer $refundPaymentRequestTransfer): RefundPaymentResponseTransfer;
+
+    /**
+     * Specification:
+     * - Receives a `WebhookRequestTransfer` with:
+     *   - `WebhookRequestTransfer::payment` (PaymentTransfer)
+     *   - `WebhookRequestTransfer::appConfig (AppConfigTransfer)`
+     *   - `WebhookRequestTransfer::content`
+     * - Returns a `WebhookResponseTransfer`.
+     * - Requires `WebhookResponseTransfer::isSuccessful`to be set.
+     * - Requires `WebhookResponseTransfer::message` to be set when the 3rd party provider could not process the request.
+     * - Returns a `WebhookResponseTransfer` with a failed response when the 3rd party provider could not process the request.
+     * - Returns a `WebhookResponseTransfer` with a successful response when the 3rd party provider was able to process the request.
+     *
+     * @api
+     */
+    public function handleWebhook(WebhookRequestTransfer $webhookRequestTransfer, WebhookResponseTransfer $webhookResponseTransfer): WebhookResponseTransfer;
+
+    /**
+     * Specification:
+     * - Transfers payments.
+     * - Requires `PaymentTransmissionsRequestTransfer::transactionId`to be set.
+     * - Requires `PaymentTransmissionsRequestTransfer::appConfig`to be set.
+     * - Returns a `PaymentTransmissionsResponseTransfer`.
+     * - Requires `PaymentTransmissionsResponseTransfer::isSuccessful`to be set.
+     * - Requires `PaymentTransmissionsResponseTransfer::message` to be set when the 3rd party provider could not process the request.
+     * - Requires `PaymentTransmissionsResponseTransfer::paymentTransmissions` to be set.
+     * - Returns a `PaymentTransmissionsResponseTransfer` with a failed response status and message when the 3rd party provider could not process the request.
+     *
+     * @api
+     */
+    public function transferPayments(PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer): PaymentTransmissionsResponseTransfer;
 
     /**
      * Specification:

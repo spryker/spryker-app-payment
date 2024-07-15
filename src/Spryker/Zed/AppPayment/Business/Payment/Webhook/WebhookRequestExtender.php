@@ -9,13 +9,13 @@ namespace Spryker\Zed\AppPayment\Business\Payment\Webhook;
 
 use Generated\Shared\Transfer\WebhookRequestTransfer;
 use Spryker\Zed\AppPayment\Business\Payment\AppConfig\AppConfigLoader;
-use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface;
 
 class WebhookRequestExtender
 {
     public function __construct(
-        protected PlatformPluginInterface $platformPlugin,
+        protected AppPaymentPlatformPluginInterface $appPaymentPlatformPlugin,
         protected AppConfigLoader $appConfigLoader,
         protected AppPaymentRepositoryInterface $appPaymentRepository
     ) {

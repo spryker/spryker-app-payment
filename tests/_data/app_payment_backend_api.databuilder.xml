@@ -7,4 +7,13 @@
         <property name="message" dataBuilderRule="word()"/>
     </transfer>
 
+    <transfer name="PaymentTransmission" strict="true">
+        <property name="tenantIdentifier" dataBuilderRule="unique()->uuid()"/>
+        <property name="merchantReference" dataBuilderRule="unique()->uuid()"/>
+        <property name="transactionId" dataBuilderRule="unique()->uuid()"/>
+        <property name="orderReference" dataBuilderRule="unique()->uuid()"/>
+        <property name="itemReferences" dataBuilderRule="unique()->uuid()"/>
+        <property name="amount" dataBuilderRule="=100"/>
+    </transfer>
+
 </transfers>

@@ -66,12 +66,13 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "scripts": {
-        "setup": "tests/bin/console app-payment:setup && tests/bin/console transfer:generate && tests/bin/console transfer:databuilder:generate && tests/bin/console dev:ide-auto-completion:zed:generate && tests/bin/console dev:ide-auto-completion:glue:generate && tests/bin/console propel:install",
+        "setup": "tests/bin/console app-payment:setup && tests/bin/console transfer:generate && tests/bin/console transfer:databuilder:generate && tests/bin/console dev:ide-auto-completion:zed:generate && tests/bin/console dev:ide-auto-completion:glue:generate && tests/bin/console propel:install && vendor/bin/codecept build",
         "cs-check": "phpcs -p src/ tests/",
         "cs-fix": "phpcbf -p src/ tests/",
         "stan": "phpstan analyze src/Spryker/",
         "test": "codecept build && codecept run",
         "test-cover": "codecept build && codecept run --coverage-xml",
+        "test-cover-html": "codecept build && codecept run --coverage-html",
         "test-strict": "vendor/bin/infection --threads=max --min-msi=100 --min-covered-msi=100",
         "test-strict-ci": "vendor/bin/infection --threads=max --logger-github=true --min-msi=100 --min-covered-msi=100",
         "rector": "vendor/bin/rector process src/Spryker/ --config rector.php --ansi",
@@ -80,7 +81,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0.x-dev"
+            "dev-main": "1.0.x-dev"
         }
     },
     "config": {

@@ -57,6 +57,7 @@
     </transfer>
 
     <transfer name="OrderItem" strict="true">
+        <property name="itemReference" dataBuilderRule="unique()->uuid()"/>
         <property name="orderItemId" dataBuilderRule="randomDigit()"/>
         <property name="sku" dataBuilderRule="bothify('???###')"/>
     </transfer>

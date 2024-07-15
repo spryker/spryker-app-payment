@@ -10,13 +10,13 @@ namespace Spryker\Zed\AppPayment\Business;
 use Generated\Shared\Transfer\AppConfigTransfer;
 use Generated\Shared\Transfer\CancelPaymentTransfer;
 use Generated\Shared\Transfer\CapturePaymentTransfer;
-use Generated\Shared\Transfer\GlueRequestTransfer;
-use Generated\Shared\Transfer\GlueRequestValidationTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
 use Generated\Shared\Transfer\PaymentCollectionDeleteCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentPageRequestTransfer;
 use Generated\Shared\Transfer\PaymentPageResponseTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionsRequestTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionsResponseTransfer;
 use Generated\Shared\Transfer\RedirectRequestTransfer;
 use Generated\Shared\Transfer\RedirectResponseTransfer;
 use Generated\Shared\Transfer\RefundPaymentTransfer;
@@ -25,22 +25,6 @@ use Generated\Shared\Transfer\WebhookResponseTransfer;
 
 interface AppPaymentFacadeInterface
 {
-    /**
-     * Specification:
-     * - Converts the `GlueRequestTransfer::getContent()` data from a JSON string into a `AppConfigTransfer`.
-     * - Calls `PaymentPlatformPluginInterface::validateConfiguration()` and passes the `AppConfigTransfer`.
-     * - When `PaymentPlatformPluginInterface::validateConfiguration()` throws an exception, the exception is logged.
-     * - When `PaymentPlatformPluginInterface::validateConfiguration()` throws an exception, a `GlueRequestValidationTransfer` with a failed response is returned.
-     * - When `PaymentPlatformPluginInterface::validateConfiguration()` is successful, a `GlueRequestValidationTransfer` with HTTP Status Code 200 (OK) is returned.
-     * - When `PaymentPlatformPluginInterface::validateConfiguration()` is not successful, validation errors from the `AppConfigValidateResponseTransfer` are converted
-     *   to error messages and added to the `GlueRequestValidationTransfer`.
-     * - When `PaymentPlatformPluginInterface::validateConfiguration()` is NOT successful, a `GlueRequestValidationTransfer` with HTTP Status Code 422 (UNPROCESSABLE ENTITY) is returned.
-     * - Requires `GlueRequestTransfer::getContent()`.
-     *
-     * @api
-     */
-    public function validatePaymentConfiguration(GlueRequestTransfer $glueRequestTransfer): GlueRequestValidationTransfer;
-
     /**
      * Specification:
      * - Calls the `PaymentPlatformPluginInterface::initializePayment()` method.
@@ -162,4 +146,15 @@ interface AppPaymentFacadeInterface
     public function deletePaymentCollection(
         PaymentCollectionDeleteCriteriaTransfer $paymentCollectionDeleteCriteriaTransfer
     ): void;
+
+    /**
+     * Specification:
+     * - Transfers payments.
+     * - Loads the `AppConfigTransfer` and adds it to the PaymentTransmissionsRequestTransfer.
+     * - Applies PaymentTransmissionExpanderPluginInterfaces.
+     * - Returns a PaymentTransmissionsResponseTransfer.
+     *
+     * @api
+     */
+    public function transferPayments(PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer): PaymentTransmissionsResponseTransfer;
 }

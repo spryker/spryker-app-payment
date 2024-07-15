@@ -11,6 +11,7 @@ use ArrayObject;
 use Generated\Shared\Transfer\AddPaymentMethodTransfer;
 use Generated\Shared\Transfer\AppConfigTransfer;
 use Generated\Shared\Transfer\DeletePaymentMethodTransfer;
+use Generated\Shared\Transfer\EndpointTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
 use Generated\Shared\Transfer\MessageAttributesTransfer;
@@ -22,6 +23,7 @@ use Generated\Shared\Transfer\PaymentCancellationFailedTransfer;
 use Generated\Shared\Transfer\PaymentCapturedTransfer;
 use Generated\Shared\Transfer\PaymentCaptureFailedTransfer;
 use Generated\Shared\Transfer\PaymentCreatedTransfer;
+use Generated\Shared\Transfer\PaymentMethodAppConfigurationTransfer;
 use Generated\Shared\Transfer\PaymentRefundedTransfer;
 use Generated\Shared\Transfer\PaymentRefundFailedTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
@@ -30,30 +32,46 @@ use Generated\Shared\Transfer\QuoteTransfer;
 use Spryker\Shared\Kernel\Transfer\TransferInterface;
 use Spryker\Zed\AppKernel\AppKernelConfig;
 use Spryker\Zed\AppPayment\AppPaymentConfig;
-use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToAppKernelFacadeInterface;
 use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToMessageBrokerFacadeInterface;
 
 class MessageSender
 {
     public function __construct(
         protected AppPaymentToMessageBrokerFacadeInterface $appPaymentToMessageBrokerFacade,
-        protected AppPaymentConfig $appPaymentConfig,
-        protected AppPaymentToAppKernelFacadeInterface $appPaymentToAppKernelFacade
+        protected AppPaymentConfig $appPaymentConfig
     ) {
     }
 
     public function sendAddPaymentMethodMessage(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
     {
-        // Only send the message when the AppConfig is in state NEW.
-        if ($appConfigTransfer->getStatus() === AppKernelConfig::APP_STATUS_CONNECTED) {
+        // Do not send the message when App is in state "disconnected" or when the app is marked as inactive.
+        if ($appConfigTransfer->getStatus() === AppKernelConfig::APP_STATUS_DISCONNECTED || $appConfigTransfer->getIsActive() === false) {
             return $appConfigTransfer;
         }
+
+        $paymentMethodAppConfigurationTransfer = new PaymentMethodAppConfigurationTransfer();
+        $paymentMethodAppConfigurationTransfer->setBaseUrl($this->appPaymentConfig->getGlueBaseUrl());
+
+        $authorizationEndpointTransfer = new EndpointTransfer();
+        $authorizationEndpointTransfer
+            ->setName('authorization')
+            ->setPath('/private/initialize-payment'); // Defined in app_payment_openapi.yml
+
+        $paymentMethodAppConfigurationTransfer->addEndpoint($authorizationEndpointTransfer);
+
+        $transferEndpointTransfer = new EndpointTransfer();
+        $transferEndpointTransfer
+            ->setName('transfer')
+            ->setPath('/private/payments/transfers'); // Defined in app_payment_openapi.yml
+
+        $paymentMethodAppConfigurationTransfer->addEndpoint($transferEndpointTransfer);
 
         $addPaymentMethodTransfer = new AddPaymentMethodTransfer();
         $addPaymentMethodTransfer
             ->setName($this->appPaymentConfig->getPaymentProviderName())
             ->setPaymentAuthorizationEndpoint(sprintf('%s/private/initialize-payment', $this->appPaymentConfig->getGlueBaseUrl()))
-            ->setProviderName($this->appPaymentConfig->getPaymentProviderName());
+            ->setProviderName($this->appPaymentConfig->getPaymentProviderName())
+            ->setPaymentMethodAppConfiguration($paymentMethodAppConfigurationTransfer);
 
         $addPaymentMethodTransfer->setMessageAttributes($this->getMessageAttributes(
             $appConfigTransfer->getTenantIdentifierOrFail(),
@@ -61,10 +79,6 @@ class MessageSender
         ));
 
         $this->appPaymentToMessageBrokerFacade->sendMessage($addPaymentMethodTransfer);
-
-        $appConfigTransfer->setStatus(AppKernelConfig::APP_STATUS_CONNECTED);
-
-        $this->appPaymentToAppKernelFacade->saveConfig($appConfigTransfer);
 
         return $appConfigTransfer;
     }

@@ -15,7 +15,7 @@ use Generated\Shared\Transfer\RefundPaymentResponseTransfer;
 use Spryker\Shared\Log\LoggerTrait;
 use Spryker\Zed\AppPayment\AppPaymentConfig;
 use Spryker\Zed\AppPayment\Business\Payment\AppConfig\AppConfigLoader;
-use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentEntityManagerInterface;
 use Spryker\Zed\Kernel\Persistence\EntityManager\TransactionTrait;
 use Throwable;
@@ -26,7 +26,7 @@ class PaymentRefunder
     use LoggerTrait;
 
     public function __construct(
-        protected PlatformPluginInterface $platformPlugin,
+        protected AppPaymentPlatformPluginInterface $appPaymentPlatformPlugin,
         protected PaymentRefundValidator $paymentRefundValidator,
         protected AppPaymentEntityManagerInterface $appPaymentEntityManager,
         protected AppPaymentConfig $appPaymentConfig,
@@ -50,7 +50,7 @@ class PaymentRefunder
                     $refundPaymentRequestTransfer->getPaymentOrFail()->getTenantIdentifierOrFail(),
                 ),
             );
-            $refundPaymentResponseTransfer = $this->platformPlugin->refundPayment($refundPaymentRequestTransfer);
+            $refundPaymentResponseTransfer = $this->appPaymentPlatformPlugin->refundPayment($refundPaymentRequestTransfer);
         } catch (Throwable $throwable) {
             $this->getLogger()->error($throwable->getMessage(), [
                 PaymentTransfer::TRANSACTION_ID => $refundPaymentRequestTransfer->getPaymentOrFail()->getTransactionIdOrFail(),

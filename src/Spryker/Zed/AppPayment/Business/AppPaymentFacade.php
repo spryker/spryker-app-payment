@@ -10,13 +10,13 @@ namespace Spryker\Zed\AppPayment\Business;
 use Generated\Shared\Transfer\AppConfigTransfer;
 use Generated\Shared\Transfer\CancelPaymentTransfer;
 use Generated\Shared\Transfer\CapturePaymentTransfer;
-use Generated\Shared\Transfer\GlueRequestTransfer;
-use Generated\Shared\Transfer\GlueRequestValidationTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
 use Generated\Shared\Transfer\PaymentCollectionDeleteCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentPageRequestTransfer;
 use Generated\Shared\Transfer\PaymentPageResponseTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionsRequestTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionsResponseTransfer;
 use Generated\Shared\Transfer\RedirectRequestTransfer;
 use Generated\Shared\Transfer\RedirectResponseTransfer;
 use Generated\Shared\Transfer\RefundPaymentTransfer;
@@ -31,16 +31,6 @@ use Spryker\Zed\Kernel\Business\AbstractFacade;
  */
 class AppPaymentFacade extends AbstractFacade implements AppPaymentFacadeInterface
 {
-    /**
-     * @api
-     *
-     * @inheritDoc
-     */
-    public function validatePaymentConfiguration(GlueRequestTransfer $glueRequestTransfer): GlueRequestValidationTransfer
-    {
-        return $this->getFactory()->createPayment()->validateConfiguration($glueRequestTransfer);
-    }
-
     /**
      * @api
      *
@@ -140,5 +130,10 @@ class AppPaymentFacade extends AbstractFacade implements AppPaymentFacadeInterfa
         PaymentCollectionDeleteCriteriaTransfer $paymentCollectionDeleteCriteriaTransfer
     ): void {
         $this->getEntityManager()->deletePaymentCollection($paymentCollectionDeleteCriteriaTransfer);
+    }
+
+    public function transferPayments(PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer): PaymentTransmissionsResponseTransfer
+    {
+        return $this->getFactory()->createPayment()->transferPayments($paymentTransmissionsRequestTransfer);
     }
 }

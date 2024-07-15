@@ -34,6 +34,11 @@ class AppPaymentBackendApiHelper extends Module
         return $this->buildBackendApiUrl('webhooks');
     }
 
+    public function buildPaymentsTransfersUrl(): string
+    {
+        return $this->buildBackendApiUrl('private/payments/transfers');
+    }
+
     /**
      * @param array<mixed>|string $params
      */
@@ -75,12 +80,13 @@ class AppPaymentBackendApiHelper extends Module
         $this->assertSame($quoteTransfer->toArray(), $paymentTransfer->getQuote()->toArray(), 'Expected that the persisted quote is the same as the one from the authorize request.');
     }
 
-    public function assertResponseHasErrorMessage(Response $response): void
+    public function assertResponseHasErrorMessage(Response $response, string $errorMessage): void
     {
         $response = json_decode($response->getContent(), true);
 
-        $initializePaymentResponseTransfer = (new InitializePaymentResponseTransfer())->fromArray($response['data']['attributes']);
+        $initializePaymentResponseTransfer = (new InitializePaymentResponseTransfer())->fromArray($response);
 
         $this->assertIsString($initializePaymentResponseTransfer->getMessage());
+        $this->assertSame($errorMessage, $initializePaymentResponseTransfer->getMessage());
     }
 }

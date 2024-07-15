@@ -15,7 +15,7 @@ use Ramsey\Uuid\Uuid;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
 use Spryker\Zed\AppPayment\Business\Payment\Webhook\WebhookDataType;
-use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use SprykerTest\AsyncApi\AppPayment\AppPaymentAsyncApiTester;
 use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
 
@@ -55,7 +55,7 @@ class PaymentAuthorizedTest extends Unit
             ->setType(WebhookDataType::PAYMENT)
             ->setTransactionId($transactionId);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'handleWebhook' => function (WebhookRequestTransfer $webhookRequestTransfer) use ($transactionId): WebhookResponseTransfer {
                 // Ensure that required data is passed to the PaymentPlatformPlugin
                 $this->assertNotNull($webhookRequestTransfer->getPayment());

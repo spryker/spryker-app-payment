@@ -10,7 +10,7 @@ namespace Spryker\Zed\AppPayment\Dependency\Plugin;
 use Generated\Shared\Transfer\PaymentPageRequestTransfer;
 use Generated\Shared\Transfer\PaymentPageResponseTransfer;
 
-interface PlatformPaymentPagePluginInterface extends PlatformPluginInterface
+interface AppPaymentPlatformPaymentPagePluginInterface extends AppPaymentPlatformPluginInterface
 {
     /**
      * Specification:

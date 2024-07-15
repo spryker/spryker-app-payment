@@ -13,7 +13,7 @@ use Codeception\Actor;
 use Codeception\Stub;
 use Generated\Shared\Transfer\WebhookResponseTransfer;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
-use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 
 /**
  * Inherited Methods
@@ -37,7 +37,7 @@ class AppPaymentAsyncApiTester extends Actor
 
     public function mockPlatformPlugin(string $status): void
     {
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
             'handleWebhook' => function () use ($status): WebhookResponseTransfer {
                 $webhookResponseTransfer = new WebhookResponseTransfer();
                 $webhookResponseTransfer->setIsSuccessful(true);

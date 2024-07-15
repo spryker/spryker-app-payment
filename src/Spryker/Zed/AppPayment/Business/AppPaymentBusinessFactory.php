@@ -25,7 +25,7 @@ use Spryker\Zed\AppPayment\Business\Payment\Payment;
 use Spryker\Zed\AppPayment\Business\Payment\Refund\PaymentRefunder;
 use Spryker\Zed\AppPayment\Business\Payment\Refund\PaymentRefundValidator;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatusTransitionValidator;
-use Spryker\Zed\AppPayment\Business\Payment\Validate\ConfigurationValidator;
+use Spryker\Zed\AppPayment\Business\Payment\Transfer\PaymentTransfer;
 use Spryker\Zed\AppPayment\Business\Payment\Webhook\Handler\PaymentRefundWebhookHandler;
 use Spryker\Zed\AppPayment\Business\Payment\Webhook\Handler\PaymentWebhookHandler;
 use Spryker\Zed\AppPayment\Business\Payment\Webhook\Handler\WebhookHandlerSelector;
@@ -35,8 +35,7 @@ use Spryker\Zed\AppPayment\Business\Payment\Webhook\WebhookRequestExtender;
 use Spryker\Zed\AppPayment\Business\Redirect\Redirect;
 use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToAppKernelFacadeInterface;
 use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToMessageBrokerFacadeInterface;
-use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
-use Spryker\Zed\AppPayment\Dependency\Service\AppPaymentToUtilEncodingServiceInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\Kernel\Business\AbstractBusinessFactory;
 
 /**
@@ -50,21 +49,28 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
     {
         return new Payment(
             $this->getPlatformPlugin(),
-            $this->createConfigurationValidator(),
             $this->createPaymentInitializer(),
+            $this->createPaymentTransfer(),
             $this->createPaymentPage(),
             $this->createWebhookHandler(),
         );
     }
 
-    public function createConfigurationValidator(): ConfigurationValidator
-    {
-        return new ConfigurationValidator($this->getPlatformPlugin(), $this->getUtilEncodingService());
-    }
-
     public function createPaymentInitializer(): PaymentInitializer
     {
         return new PaymentInitializer($this->getPlatformPlugin(), $this->getEntityManager(), $this->createMessageSender(), $this->getConfig(), $this->createAppConfigLoader());
+    }
+
+    public function createPaymentTransfer(): PaymentTransfer
+    {
+        return new PaymentTransfer(
+            $this->getPlatformPlugin(),
+            $this->getEntityManager(),
+            $this->getRepository(),
+            $this->getConfig(),
+            $this->createAppConfigLoader(),
+            $this->getPaymentTransmissionsRequestExtenderPlugins(),
+        );
     }
 
     public function createPaymentPage(): PaymentPage
@@ -124,15 +130,24 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
         return new WebhookMessageSender($this->createMessageSender());
     }
 
-    public function getPlatformPlugin(): PlatformPluginInterface
+    /**
+     * @return array<\Spryker\Zed\AppPayment\Dependency\Plugin\PaymentTransmissionsRequestExtenderPluginInterface>
+     */
+    protected function getPaymentTransmissionsRequestExtenderPlugins(): array
     {
-        /** @phpstan-var \Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface */
+        /** @phpstan-var array<\Spryker\Zed\AppPayment\Dependency\Plugin\PaymentTransmissionsRequestExtenderPluginInterface> */
+        return $this->getProvidedDependency(AppPaymentDependencyProvider::PLUGINS_PAYMENTS_TRANSMISSIONS_REQUEST_EXPANDER);
+    }
+
+    public function getPlatformPlugin(): AppPaymentPlatformPluginInterface
+    {
+        /** @phpstan-var \Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface */
         return $this->getProvidedDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM);
     }
 
     public function createMessageSender(): MessageSender
     {
-        return new MessageSender($this->getMessageBrokerFacade(), $this->getConfig(), $this->getAppKernelFacade());
+        return new MessageSender($this->getMessageBrokerFacade(), $this->getConfig());
     }
 
     public function createAppConfigLoader(): AppConfigLoader
@@ -150,12 +165,6 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
     {
         /** @phpstan-var \Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToMessageBrokerFacadeInterface */
         return $this->getProvidedDependency(AppPaymentDependencyProvider::FACADE_MESSAGE_BROKER);
-    }
-
-    public function getUtilEncodingService(): AppPaymentToUtilEncodingServiceInterface
-    {
-        /** @phpstan-var \Spryker\Zed\AppPayment\Dependency\Service\AppPaymentToUtilEncodingServiceInterface */
-        return $this->getProvidedDependency(AppPaymentDependencyProvider::SERVICE_UTIL_ENCODING);
     }
 
     public function createCancelPaymentMessageHandler(): CancelPaymentMessageHandlerInterface

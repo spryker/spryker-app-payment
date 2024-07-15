@@ -9,8 +9,6 @@ namespace SprykerTest\Zed\Testify\Helper;
 
 use Codeception\Lib\Framework;
 use Codeception\TestInterface;
-use Spryker\Glue\AppKernel\AppKernelDependencyProvider;
-use Spryker\Glue\AppPaymentBackendApi\Plugin\AppKernel\PaymentConfigurationValidatorPlugin;
 use Spryker\Shared\ErrorHandler\ErrorHandlerConstants;
 use Spryker\Shared\Http\Plugin\EventDispatcher\ResponseListenerEventDispatcherPlugin;
 use Spryker\Shared\Twig\Plugin\DebugTwigPlugin;
@@ -85,10 +83,6 @@ class PaymentBootstrapHelper extends Framework
 
         $this->getDependencyProviderHelper()->setDependency(RouterDependencyProvider::PLUGINS_BACKOFFICE_ROUTER, [
             new BackofficeRouterPlugin(),
-        ]);
-
-        $this->getDependencyProviderHelper()->setDependency(AppKernelDependencyProvider::PLUGINS_REQUEST_CONFIGURE_VALIDATOR, [
-            new PaymentConfigurationValidatorPlugin(),
         ]);
 
         $this->getDependencyProviderHelper()->setDependency(TwigDependencyProvider::PLUGINS_TWIG, [

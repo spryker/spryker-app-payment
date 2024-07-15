@@ -9,6 +9,7 @@ namespace Spryker\Zed\AppPayment\Persistence;
 
 use Generated\Shared\Transfer\PaymentRefundTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
+use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 use Orm\Zed\AppPayment\Persistence\SpyPayment;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTenantIdentifierAndOrderReferenceNotFoundException;
@@ -52,6 +53,28 @@ class AppPaymentRepository extends AbstractRepository implements AppPaymentRepos
     }
 
     /**
+     * @param array<string> $orderReferences
+     *
+     * @return array<\Generated\Shared\Transfer\PaymentTransfer>
+     */
+    public function getPaymentsByTenantIdentifierAndOrderReferences(string $tenantIdentifier, array $orderReferences): array
+    {
+        /** @var array<\Orm\Zed\AppPayment\Persistence\SpyPayment> $spyPaymentCollection */
+        $spyPaymentCollection = $this->getFactory()->createPaymentQuery()
+            ->filterByTenantIdentifier($tenantIdentifier)
+            ->filterByOrderReference_In($orderReferences)
+            ->find();
+
+        $paymentTransfers = [];
+
+        foreach ($spyPaymentCollection as $spyPaymentEntity) {
+            $paymentTransfers[] = $this->mapPaymentEntityToPaymentTransfer($spyPaymentEntity);
+        }
+
+        return $paymentTransfers;
+    }
+
+    /**
      * @throws \Spryker\Zed\AppPayment\Persistence\Exception\RefundByRefundIdNotFoundException
      */
     public function getRefundByRefundId(string $refundId): PaymentRefundTransfer
@@ -84,5 +107,24 @@ class AppPaymentRepository extends AbstractRepository implements AppPaymentRepos
     protected function mapPaymentEntityToPaymentTransfer(SpyPayment $spyPayment): PaymentTransfer
     {
         return $this->getFactory()->createPaymentMapper()->mapPaymentEntityToPaymentTransfer($spyPayment, new PaymentTransfer());
+    }
+
+    /**
+     * @param array<string> $transferIds
+     *
+     * @return array<\Generated\Shared\Transfer\PaymentTransmissionTransfer>
+     */
+    public function findPaymentTransmissionsByTransferIds(array $transferIds): array
+    {
+        $collection = $this->getFactory()->createPaymentTransferQuery()->filterByTransferId_In($transferIds)->find();
+
+        $paymentTransmissionTransfers = [];
+
+        foreach ($collection as $paymentTransferEntity) {
+            $paymentTransmissionTransfers[$paymentTransferEntity->getTransferId()] = $this->getFactory()->createPaymentMapper()
+                ->mapPaymentTransmissionEntityToPaymentTransmissionTransfer($paymentTransferEntity, new PaymentTransmissionTransfer());
+        }
+
+        return $paymentTransmissionTransfers;
     }
 }

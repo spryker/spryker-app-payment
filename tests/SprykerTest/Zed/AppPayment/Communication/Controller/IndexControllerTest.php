@@ -15,8 +15,8 @@ use Generated\Shared\Transfer\PaymentPageResponseTransfer;
 use Ramsey\Uuid\Uuid;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Business\Message\MessageBuilder;
-use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPaymentPagePluginInterface;
-use Spryker\Zed\AppPayment\Dependency\Plugin\PlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPaymentPagePluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
 use SprykerTest\Zed\AppPayment\AppPaymentCommunicationTester;
 
@@ -45,7 +45,7 @@ class IndexControllerTest extends Unit
         $this->tester->haveAppConfigForTenant($tenantIdentifier);
         $this->tester->havePaymentForTransactionId($transactionId, $tenantIdentifier);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPaymentPagePluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPaymentPagePluginInterface::class, [
             'getPaymentPage' => function (PaymentPageRequestTransfer $paymentPageRequestTransfer) use ($transactionId): PaymentPageResponseTransfer {
                 // Ensure that required data is passed to the PaymentPlatformPlugin
                 $this->assertNotNull($paymentPageRequestTransfer->getPayment());
@@ -75,7 +75,7 @@ class IndexControllerTest extends Unit
         $this->tester->haveAppConfigForTenant($tenantIdentifier);
         $this->tester->havePaymentForTransactionId($transactionId, $tenantIdentifier);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPaymentPagePluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPaymentPagePluginInterface::class, [
             'getPaymentPage' => function (PaymentPageRequestTransfer $paymentPageRequestTransfer) use ($transactionId): PaymentPageResponseTransfer {
                 // Ensure that required data is passed to the PaymentPlatformPlugin
                 $this->assertNotNull($paymentPageRequestTransfer->getPayment());
@@ -129,7 +129,7 @@ class IndexControllerTest extends Unit
         $tenantIdentifier = Uuid::uuid4()->toString();
         $transactionId = Uuid::uuid4()->toString();
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPaymentPagePluginInterface::class);
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPaymentPagePluginInterface::class);
 
         $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
 
@@ -146,7 +146,7 @@ class IndexControllerTest extends Unit
         $this->tester->haveAppConfigForTenant($tenantIdentifier);
         $this->tester->havePaymentForTransactionId($transactionId, $tenantIdentifier);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPaymentPagePluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPaymentPagePluginInterface::class, [
             'getPaymentPage' => static function (): never {
                 throw new Exception('GetPaymentPageThrowsAnException');
             },
@@ -167,7 +167,7 @@ class IndexControllerTest extends Unit
         $this->tester->haveAppConfigForTenant($tenantIdentifier);
         $this->tester->havePaymentForTransactionId($transactionId, $tenantIdentifier);
 
-        $platformPluginMock = Stub::makeEmpty(PlatformPluginInterface::class);
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class);
 
         $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
 

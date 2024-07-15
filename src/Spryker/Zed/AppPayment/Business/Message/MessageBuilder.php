@@ -58,4 +58,9 @@ class MessageBuilder
     {
         return sprintf('Could not find a refund with the refund id "%s"', $refundId);
     }
+
+    public static function paymentTransferByTransferIdNotFound(string $transferId): string
+    {
+        return sprintf('Could not find a payment transfer with the transfer id "%s"', $transferId);
+    }
 }
