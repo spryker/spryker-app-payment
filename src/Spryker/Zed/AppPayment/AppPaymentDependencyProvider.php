@@ -27,6 +27,7 @@ use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToAppKernelFacadeBridge;
 use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToAppKernelFacadeInterface;
 use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToMessageBrokerFacadeBridge;
 use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToMessageBrokerFacadeInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformMarketplacePluginInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPaymentPagePluginInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\Kernel\AbstractBundleDependencyProvider;
@@ -91,7 +92,7 @@ class AppPaymentDependencyProvider extends AbstractBundleDependencyProvider
     protected function getPlatformPlugin(): AppPaymentPlatformPluginInterface
     {
         // @codeCoverageIgnoreStart
-        return new class implements AppPaymentPlatformPluginInterface, AppPaymentPlatformPaymentPagePluginInterface {
+        return new class implements AppPaymentPlatformPluginInterface, AppPaymentPlatformPaymentPagePluginInterface, AppPaymentPlatformMarketplacePluginInterface {
             public function initializePayment(InitializePaymentRequestTransfer $initializePaymentRequestTransfer): InitializePaymentResponseTransfer
             {
                 return (new InitializePaymentResponseTransfer())->setIsSuccessful(true);
