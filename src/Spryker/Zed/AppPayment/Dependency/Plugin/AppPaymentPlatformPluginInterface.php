@@ -15,8 +15,6 @@ use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
 use Generated\Shared\Transfer\PaymentStatusRequestTransfer;
 use Generated\Shared\Transfer\PaymentStatusResponseTransfer;
-use Generated\Shared\Transfer\PaymentTransmissionsRequestTransfer;
-use Generated\Shared\Transfer\PaymentTransmissionsResponseTransfer;
 use Generated\Shared\Transfer\RefundPaymentRequestTransfer;
 use Generated\Shared\Transfer\RefundPaymentResponseTransfer;
 use Generated\Shared\Transfer\WebhookRequestTransfer;
@@ -99,21 +97,6 @@ interface AppPaymentPlatformPluginInterface
      * @api
      */
     public function handleWebhook(WebhookRequestTransfer $webhookRequestTransfer, WebhookResponseTransfer $webhookResponseTransfer): WebhookResponseTransfer;
-
-    /**
-     * Specification:
-     * - Transfers payments.
-     * - Requires `PaymentTransmissionsRequestTransfer::transactionId`to be set.
-     * - Requires `PaymentTransmissionsRequestTransfer::appConfig`to be set.
-     * - Returns a `PaymentTransmissionsResponseTransfer`.
-     * - Requires `PaymentTransmissionsResponseTransfer::isSuccessful`to be set.
-     * - Requires `PaymentTransmissionsResponseTransfer::message` to be set when the 3rd party provider could not process the request.
-     * - Requires `PaymentTransmissionsResponseTransfer::paymentTransmissions` to be set.
-     * - Returns a `PaymentTransmissionsResponseTransfer` with a failed response status and message when the 3rd party provider could not process the request.
-     *
-     * @api
-     */
-    public function transferPayments(PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer): PaymentTransmissionsResponseTransfer;
 
     /**
      * Specification:
