@@ -5,7 +5,6 @@
     "license": "proprietary",
     "require": {
         "php": ">=8.1",
-        "spryker/app-webhook": "dev-main",
         "spryker/glue-application-extension": "^1.0.0",
         "spryker/kernel": "^3.30.0",
         "spryker/log": "^3.0.0",
@@ -14,6 +13,7 @@
         "spryker/transfer": "^3.33.0"
     },
     "require-dev": {
+        "spryker/app-webhook": "dev-main",
         "codeception/codeception": "^5.0",
         "codeception/module-asserts": "^3.0.0",
         "codeception/module-cli": "^2.0.0",
