@@ -165,6 +165,15 @@ components:
                             items:
                                 $ref: '#/components/schemas/QuoteItem'
                             minItems: 1
+                        additionalPaymentData:
+                            type: object
+                            additionalProperties:
+                                type: string
+                            description: Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/
+                            example:
+                                internalId: '#061280'
+                                externalId: '#061114'
+
                 redirectSuccessUrl:
                     description: 'Provides redirect success URL.'
                     type: string

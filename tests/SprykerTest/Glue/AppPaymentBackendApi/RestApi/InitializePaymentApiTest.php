@@ -78,6 +78,50 @@ class InitializePaymentApiTest extends Unit
         $this->tester->assertSamePaymentQuoteAndRequestQuote($transactionId, $initializePaymentRequestTransfer->getOrderData());
     }
 
+    public function testInitializePaymentPostRequestReturnsHttpResponseCode200AndForwardsAdditionalPaymentDataToThePlatformImplementation(): void
+    {
+        // Arrange
+        $transactionId = Uuid::uuid4()->toString();
+
+        $additionalPaymentData = [
+            'internalId' => Uuid::uuid4()->toString(),
+            'externalId' => Uuid::uuid4()->toString(),
+        ];
+
+        $initializePaymentRequestTransfer = $this->tester->haveInitializePaymentRequestTransfer([], $additionalPaymentData);
+        $this->tester->haveAppConfigForTenant($initializePaymentRequestTransfer->getTenantIdentifier());
+
+        $initializePaymentResponseTransfer = new InitializePaymentResponseTransfer();
+        $initializePaymentResponseTransfer
+            ->setIsSuccessful(true)
+            ->setTransactionId($transactionId);
+
+        $forwardedAdditionalPaymentData = [];
+
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
+            'initializePayment' => function (InitializePaymentRequestTransfer $initializePaymentRequestTransfer) use ($initializePaymentResponseTransfer, &$forwardedAdditionalPaymentData) {
+                $forwardedAdditionalPaymentData = $initializePaymentRequestTransfer->getOrderData()->getPayment()->getAdditionalPaymentData();
+
+                // Ensure that the AppConfig is always passed to the platform plugin.
+                $this->assertInstanceOf(AppConfigTransfer::class, $initializePaymentRequestTransfer->getAppConfig());
+
+                return $initializePaymentResponseTransfer;
+            },
+        ]);
+
+        $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
+
+        // Act
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $initializePaymentRequestTransfer->getTenantIdentifier());
+        $this->tester->addHeader('Content-Type', 'application/json');
+
+        $response = $this->tester->sendPost($this->tester->buildPaymentUrl(), [RequestOptions::FORM_PARAMS => $initializePaymentRequestTransfer->toArray()]);
+
+        // Assert
+        $this->tester->seeResponseCodeIs(Response::HTTP_OK);
+        $this->tester->assertSame($forwardedAdditionalPaymentData, $additionalPaymentData);
+    }
+
     public function testGivenAPaymentWithOrderReferenceIsAlreadyUsedByOneTenantWhenAnotherTenantInitializesPaymentWithTheSameOrderReferenceThenThePaymentForTheNewTenantIsPersisted(): void
     {
         // Arrange
