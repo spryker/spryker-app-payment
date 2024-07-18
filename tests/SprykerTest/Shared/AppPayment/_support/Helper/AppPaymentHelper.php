@@ -106,15 +106,23 @@ class AppPaymentHelper extends Module
         return $paymentEntityManager->createPayment($paymentTransfer);
     }
 
-    public function haveInitializePaymentRequestTransfer(array $seed = []): InitializePaymentRequestTransfer
+    public function haveInitializePaymentRequestTransfer(array $seed = [], array $additionalPaymentData = []): InitializePaymentRequestTransfer
     {
         $tenantIdentifier = $seed[InitializePaymentRequestTransfer::TENANT_IDENTIFIER] ?? Uuid::uuid4()->toString();
         $quoteBuilder = new QuoteBuilder();
         $quoteBuilder->withItem()
             ->withAnotherItem();
 
+        $quoteTransfer = $quoteBuilder->build();
+
+        if ($additionalPaymentData) {
+            $paymentTransfer = $quoteTransfer->getPayment() ?? new PaymentTransfer();
+            $paymentTransfer->setAdditionalPaymentData($additionalPaymentData);
+            $quoteTransfer->setPayment($paymentTransfer);
+        }
+
         $initializePaymentRequestTransfer = (new InitializePaymentRequestBuilder($seed))->build();
-        $initializePaymentRequestTransfer->setOrderData($quoteBuilder->build());
+        $initializePaymentRequestTransfer->setOrderData($quoteTransfer);
         $initializePaymentRequestTransfer->setTenantIdentifier($tenantIdentifier);
 
         $this->getDataCleanupHelper()->addCleanup(function () use ($tenantIdentifier): void {
@@ -132,15 +140,23 @@ class AppPaymentHelper extends Module
      * This method should only be used by the PlatformPluginInterface implementation tests.
      * It Provides a request transfer as it would come from the Payment module.
      */
-    public function haveInitializePaymentRequestWithAppConfigTransfer(array $seed = []): InitializePaymentRequestTransfer
+    public function haveInitializePaymentRequestWithAppConfigTransfer(array $seed = [], array $additionalPaymentData = []): InitializePaymentRequestTransfer
     {
         $tenantIdentifier = $seed[InitializePaymentRequestTransfer::TENANT_IDENTIFIER] ?? Uuid::uuid4()->toString();
         $quoteBuilder = new QuoteBuilder($seed);
         $quoteBuilder->withItem()
             ->withAnotherItem();
 
+        $quoteTransfer = $quoteBuilder->build();
+
+        if ($additionalPaymentData) {
+            $paymentTransfer = $quoteTransfer->getPayment() ?? new PaymentTransfer();
+            $paymentTransfer->setAdditionalPaymentData($additionalPaymentData);
+            $quoteTransfer->setPayment($paymentTransfer);
+        }
+
         $initializePaymentRequestTransfer = (new InitializePaymentRequestBuilder($seed))->build();
-        $initializePaymentRequestTransfer->setOrderData($quoteBuilder->build());
+        $initializePaymentRequestTransfer->setOrderData($quoteTransfer);
         $initializePaymentRequestTransfer->setTenantIdentifier($tenantIdentifier);
 
         $appConfigTransfer = $this->getAppConfigHelper()->haveAppConfigForTenant($tenantIdentifier, $seed);

@@ -102,6 +102,7 @@
         <property name="currencyCode" type="string"/>
         <property name="grandTotal" type="string"/>
         <property name="paymentMethod" type="string"/>
+        <property name="payment" type="Payment"/>
         <property name="items" type="QuoteItem[]" singular="item"/>
     </transfer>
 
@@ -120,6 +121,7 @@
         <property name="status" type="string"/>
         <property name="redirectSuccessUrl" type="string"/>
         <property name="redirectCancelUrl" type="string"/>
+        <property name="additionalPaymentData" type="array" associative="true" singular="additionalPaymentDatum"/>
     </transfer>
 
     <transfer name="PaymentRefund" strict="true">
