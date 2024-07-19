@@ -122,6 +122,7 @@
         <property name="redirectSuccessUrl" type="string"/>
         <property name="redirectCancelUrl" type="string"/>
         <property name="additionalPaymentData" type="array" associative="true" singular="additionalPaymentDatum"/>
+        <property name="details" type="array" associative="true" singular="detail"/>
     </transfer>
 
     <transfer name="PaymentRefund" strict="true">

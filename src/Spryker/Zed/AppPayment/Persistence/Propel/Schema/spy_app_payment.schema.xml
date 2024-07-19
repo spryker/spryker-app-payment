@@ -9,7 +9,7 @@
         <column name="status" type="CHAR" size="64"/>
         <column name="redirect_success_url" type="LONGVARCHAR"/>
         <column name="redirect_cancel_url" type="LONGVARCHAR"/>
-        <column name="additional_payment_data" type="LONGVARCHAR"/>
+        <column name="details" type="LONGVARCHAR"/>
 
         <unique name="spy_payment-unique-order_reference">
             <unique-column name="order_reference"/>

@@ -14,7 +14,6 @@ use Orm\Zed\AppPayment\Persistence\SpyPayment;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentRefund;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentTransfer;
 use Propel\Runtime\Collection\Collection;
-use Propel\Runtime\Map\TableMap;
 
 class PaymentMapper
 {
@@ -22,23 +21,23 @@ class PaymentMapper
     {
         $quoteTransfer = $paymentTransfer->getQuoteOrFail();
         $quoteJson = json_encode($quoteTransfer->toArray());
-        $additionalPaymentData = json_encode($paymentTransfer->getAdditionalPaymentData() ?? []);
+        $details = json_encode($paymentTransfer->getDetails() ?? []);
 
-        $paymentData = $paymentTransfer->modifiedToArray(true, true);
+        $paymentData = $paymentTransfer->modifiedToArray();
         $paymentData[PaymentTransfer::QUOTE] = $quoteJson;
-        $paymentData[PaymentTransfer::ADDITIONAL_PAYMENT_DATA] = $additionalPaymentData;
+        $paymentData[PaymentTransfer::DETAILS] = $details;
 
-        return $spyPayment->fromArray($paymentData, TableMap::TYPE_CAMELNAME);
+        return $spyPayment->fromArray($paymentData);
     }
 
     public function mapPaymentEntityToPaymentTransfer(SpyPayment $spyPayment, PaymentTransfer $paymentTransfer): PaymentTransfer
     {
         $quoteData = json_decode((string)$spyPayment->getQuote(), true);
-        $additionalPaymentData = json_decode((string)$spyPayment->getAdditionalPaymentData(), true);
+        $details = json_decode((string)$spyPayment->getDetails(), true);
 
-        $paymentData = $spyPayment->toArray(TableMap::TYPE_CAMELNAME);
+        $paymentData = $spyPayment->toArray();
         $paymentData[PaymentTransfer::QUOTE] = $quoteData;
-        $paymentData[PaymentTransfer::ADDITIONAL_PAYMENT_DATA] = $additionalPaymentData;
+        $paymentData[PaymentTransfer::DETAILS] = $details;
 
         return $paymentTransfer->fromArray($paymentData, true);
     }

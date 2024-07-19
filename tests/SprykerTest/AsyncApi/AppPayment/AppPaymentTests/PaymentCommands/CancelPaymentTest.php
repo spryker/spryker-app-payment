@@ -41,7 +41,6 @@ class CancelPaymentTest extends Unit
     protected AppPaymentAsyncApiTester $tester;
 
     /**
-     * @group test1
      * Cancellable states are all states before a payment is captured. When a payment is captured, it cannot be cancelled anymore and only the refund operation is possible.
      * This test will check if the payment is updated to PaymentStatusEnum::STATUS_CANCELLED when the CancelPayment message is received and the payment is in a cancellable state.
      */
