@@ -9,6 +9,7 @@
     <transfer name="Payment" strict="true">
         <property name="redirectSuccessUrl" dataBuilderRule="url()"/>
         <property name="redirectCancelUrl" dataBuilderRule="url()"/>
+        <property name="additionalPaymentData" dataBuilderRule="=[]"/>
     </transfer>
 
     <transfer name="PaymentRefund" strict="true">
