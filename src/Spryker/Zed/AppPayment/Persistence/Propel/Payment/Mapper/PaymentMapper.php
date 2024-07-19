@@ -21,9 +21,11 @@ class PaymentMapper
     {
         $quoteTransfer = $paymentTransfer->getQuoteOrFail();
         $quoteJson = json_encode($quoteTransfer->toArray());
+        $additionalPaymentData = json_encode($paymentTransfer->getAdditionalPaymentData() ?? []);
 
         $paymentData = $paymentTransfer->modifiedToArray();
         $paymentData[PaymentTransfer::QUOTE] = $quoteJson;
+        $paymentData[PaymentTransfer::ADDITIONAL_PAYMENT_DATA] = $additionalPaymentData;
 
         return $spyPayment->fromArray($paymentData);
     }
@@ -31,9 +33,11 @@ class PaymentMapper
     public function mapPaymentEntityToPaymentTransfer(SpyPayment $spyPayment, PaymentTransfer $paymentTransfer): PaymentTransfer
     {
         $quoteData = json_decode((string)$spyPayment->getQuote(), true);
+        $additionalPaymentData = json_decode((string)$spyPayment->getAdditionalPaymentData(), true);
 
         $paymentData = $spyPayment->toArray();
         $paymentData[PaymentTransfer::QUOTE] = $quoteData;
+        $paymentData[PaymentTransfer::ADDITIONAL_PAYMENT_DATA] = $additionalPaymentData;
 
         return $paymentTransfer->fromArray($paymentData, true);
     }
