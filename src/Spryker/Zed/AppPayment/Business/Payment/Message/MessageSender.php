@@ -180,6 +180,7 @@ class MessageSender
         $quoteTransfer = $initializePaymentRequestTransfer->getOrderDataOrFail();
 
         $paymentCreatedTransfer = new PaymentCreatedTransfer();
+        $paymentCreatedTransfer->fromArray($initializePaymentResponseTransfer->toArray(), true);
         $paymentCreatedTransfer
             ->setEntityReference($quoteTransfer->getOrderReferenceOrFail())
             ->setPaymentReference($initializePaymentResponseTransfer->getTransactionIdOrFail());
