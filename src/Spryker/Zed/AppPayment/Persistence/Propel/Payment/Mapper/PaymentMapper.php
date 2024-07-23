@@ -31,7 +31,6 @@ class PaymentMapper
     public function mapPaymentEntityToPaymentTransfer(SpyPayment $spyPayment, PaymentTransfer $paymentTransfer): PaymentTransfer
     {
         $quoteData = json_decode((string)$spyPayment->getQuote(), true);
-        $details = json_decode((string)$spyPayment->getDetails(), true);
 
         $paymentData = $spyPayment->toArray();
         $paymentData[PaymentTransfer::QUOTE] = $quoteData;
