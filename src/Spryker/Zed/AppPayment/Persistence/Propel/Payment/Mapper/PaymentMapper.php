@@ -21,11 +21,9 @@ class PaymentMapper
     {
         $quoteTransfer = $paymentTransfer->getQuoteOrFail();
         $quoteJson = json_encode($quoteTransfer->toArray());
-        $details = json_encode($paymentTransfer->getDetails() ?? []);
 
         $paymentData = $paymentTransfer->modifiedToArray();
         $paymentData[PaymentTransfer::QUOTE] = $quoteJson;
-        $paymentData[PaymentTransfer::DETAILS] = $details;
 
         return $spyPayment->fromArray($paymentData);
     }
@@ -37,7 +35,6 @@ class PaymentMapper
 
         $paymentData = $spyPayment->toArray();
         $paymentData[PaymentTransfer::QUOTE] = $quoteData;
-        $paymentData[PaymentTransfer::DETAILS] = $details;
 
         return $paymentTransfer->fromArray($paymentData, true);
     }
