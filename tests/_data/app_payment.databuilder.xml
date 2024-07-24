@@ -134,6 +134,7 @@
     <transfer name="PaymentCreated" strict="true">
         <property name="entityReference" dataBuilderRule="unique()->uuid()"/>
         <property name="paymentReference" dataBuilderRule="unique()->uuid()"/>
+        <property name="details" dataBuilderRule="shuffle(array())"/>
     </transfer>
 
     <transfer name="MessageAttributes">
