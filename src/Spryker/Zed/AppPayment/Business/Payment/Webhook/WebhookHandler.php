@@ -36,6 +36,11 @@ class WebhookHandler
         try {
             $webhookRequestTransfer = $this->extendWebhookRequestTransfer($webhookRequestTransfer);
 
+            if ($webhookRequestTransfer->getAbortHandling() === true) {
+                // This will result in a 200 OK Response send back to the caller of the webhook endpoint.
+                return $webhookResponseTransfer->setIsSuccessful(true);
+            }
+
             $webhookResponseTransfer = $this->appPaymentPlatformPlugin->handleWebhook($webhookRequestTransfer, $webhookResponseTransfer);
         } catch (Throwable $throwable) {
             $this->getLogger()->error($throwable->getMessage(), [
