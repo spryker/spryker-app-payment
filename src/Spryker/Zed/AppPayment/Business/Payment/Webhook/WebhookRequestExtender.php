@@ -9,6 +9,7 @@ namespace Spryker\Zed\AppPayment\Business\Payment\Webhook;
 
 use Generated\Shared\Transfer\WebhookRequestTransfer;
 use Spryker\Zed\AppPayment\Business\Payment\AppConfig\AppConfigLoader;
+use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface;
 
@@ -28,6 +29,12 @@ class WebhookRequestExtender
 
         $webhookRequestTransfer->setPaymentOrFail($paymentTransfer);
         $webhookRequestTransfer->setAppConfigOrFail($appConfigTransfer);
+
+        // When the Payment Service Provider calls the refund webhook and the payment was cancelled before, there is no need for further process this webhook.
+        // This happens when the Payment is cancelled on the Tenant side before the refund process was initialized.
+        if ($webhookRequestTransfer->getTypeOrFail() === WebhookDataType::REFUND && $paymentTransfer->getStatus() === PaymentStatus::STATUS_CANCELED) {
+            return $webhookRequestTransfer->setAbortHandling(true);
+        }
 
         if ($webhookRequestTransfer->getTypeOrFail() === WebhookDataType::REFUND) {
             $webhookRequestTransfer->setRefundOrFail(

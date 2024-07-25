@@ -168,6 +168,7 @@
         <property name="content" type="string"/>
         <property name="payment" type="Payment"/>
         <property name="appConfig" type="AppConfig"/>
+        <property name="abortHandling" type="bool" description="This flag can be used to abort further Webhook handling."/>
     </transfer>
 
     <transfer name="WebhookResponse" strict="true">
