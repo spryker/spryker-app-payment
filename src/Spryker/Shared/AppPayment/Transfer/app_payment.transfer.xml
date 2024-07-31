@@ -43,6 +43,7 @@
         <property name="isSuccessful" type="bool"/>
         <property name="transactionId" type="string"/>
         <property name="redirectUrl" type="string"/>
+        <property name="clientSecret" type="string"/>
         <property name="message" type="string"/>
     </transfer>
 

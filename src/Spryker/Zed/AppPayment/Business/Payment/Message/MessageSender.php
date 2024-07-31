@@ -182,7 +182,7 @@ class MessageSender
         $paymentCreatedTransfer = new PaymentCreatedTransfer();
         $paymentCreatedTransfer->fromArray($initializePaymentResponseTransfer->toArray(), true);
         $paymentCreatedTransfer
-            ->setEntityReference($quoteTransfer->getOrderReferenceOrFail())
+            ->setEntityReference($quoteTransfer->getOrderReference())
             ->setPaymentReference($initializePaymentResponseTransfer->getTransactionIdOrFail());
 
         $paymentCreatedTransfer->setMessageAttributes($this->getMessageAttributes(
