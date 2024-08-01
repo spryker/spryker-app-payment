@@ -18,6 +18,7 @@ use Generated\Shared\Transfer\PaymentCaptureFailedTransfer;
 use Generated\Shared\Transfer\PaymentCreatedTransfer;
 use Generated\Shared\Transfer\PaymentRefundedTransfer;
 use Generated\Shared\Transfer\PaymentRefundFailedTransfer;
+use Generated\Shared\Transfer\PaymentUpdatedTransfer;
 use Generated\Shared\Transfer\RefundPaymentTransfer;
 use Ramsey\Uuid\Uuid;
 use Spryker\Shared\AppKernel\AppKernelConstants;
@@ -151,6 +152,7 @@ $config[MessageBrokerAwsConstants::MESSAGE_TO_CHANNEL_MAP] = [
     AddPaymentMethodTransfer::class => 'payment-method-commands',
     DeletePaymentMethodTransfer::class => 'payment-method-commands',
     PaymentCreatedTransfer::class => 'payment-events',
+    PaymentUpdatedTransfer::class => 'payment-events',
     // App event
     AppConfigUpdatedTransfer::class => 'app-events',
 ];

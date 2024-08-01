@@ -47,6 +47,21 @@
         <property name="message" type="string"/>
     </transfer>
 
+    <transfer name="ConfirmPreOrderPaymentRequest" strict="true">
+        <property name="appConfig" type="AppConfig"/>
+        <property name="payment" type="Payment"/>
+        <property name="transactionId" type="string"/>
+        <property name="tenantIdentifier" type="string"/>
+        <property name="orderReference" type="string"/>
+        <property name="paymentServiceProviderData" type="array" associative="true" singular="paymentServiceProviderDatum"/>
+    </transfer>
+
+    <transfer name="ConfirmPreOrderPaymentResponse" strict="true">
+        <property name="isSuccessful" type="bool"/>
+        <property name="message" type="string"/>
+        <property name="status" type="string" description="This will be set by the PSP implementation and is used to determine the Payment Status"/>
+    </transfer>
+
     <transfer name="CapturePaymentRequest" strict="true">
         <property name="appConfig" type="AppConfig"/>
         <property name="payment" type="Payment"/>
@@ -295,6 +310,12 @@
     </transfer>
 
     <transfer name="PaymentCreated" strict="true">
+        <property name="entityReference" type="string"/>
+        <property name="paymentReference" type="string"/>
+        <property name="messageAttributes" type="MessageAttributes"/>
+    </transfer>
+
+    <transfer name="PaymentUpdated" strict="true">
         <property name="entityReference" type="string"/>
         <property name="paymentReference" type="string"/>
         <property name="messageAttributes" type="MessageAttributes"/>

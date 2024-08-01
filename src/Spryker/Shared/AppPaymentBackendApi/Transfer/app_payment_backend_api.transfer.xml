@@ -7,12 +7,12 @@
     <transfer name="InitializePaymentResponse" strict="true">
     </transfer>
 
-    <transfer name="ConfirmPaymentRequest" strict="true">
+    <transfer name="ConfirmPreOrderPaymentRequest" strict="true">
         <property name="orderReference" type="string"/>
         <property name="paymentServiceProviderData" type="array" associative="true" singular="paymentServiceProviderDatum"/>
     </transfer>
 
-    <transfer name="ConfirmPaymentResponse" strict="true">
+    <transfer name="ConfirmPreOrderPaymentResponse" strict="true">
         <property name="isSuccessful" type="bool"/>
         <property name="message" type="string"/>
     </transfer>

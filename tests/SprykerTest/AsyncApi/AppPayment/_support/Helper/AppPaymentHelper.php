@@ -22,6 +22,7 @@ use Generated\Shared\DataBuilder\PaymentCaptureFailedBuilder;
 use Generated\Shared\DataBuilder\PaymentCreatedBuilder;
 use Generated\Shared\DataBuilder\PaymentRefundedBuilder;
 use Generated\Shared\DataBuilder\PaymentRefundFailedBuilder;
+use Generated\Shared\DataBuilder\PaymentUpdatedBuilder;
 use Generated\Shared\DataBuilder\RefundPaymentBuilder;
 use Generated\Shared\Transfer\AddPaymentMethodTransfer;
 use Generated\Shared\Transfer\CancelPaymentTransfer;
@@ -37,6 +38,7 @@ use Generated\Shared\Transfer\PaymentCaptureFailedTransfer;
 use Generated\Shared\Transfer\PaymentCreatedTransfer;
 use Generated\Shared\Transfer\PaymentRefundedTransfer;
 use Generated\Shared\Transfer\PaymentRefundFailedTransfer;
+use Generated\Shared\Transfer\PaymentUpdatedTransfer;
 use Generated\Shared\Transfer\RefundPaymentTransfer;
 
 class AppPaymentHelper extends Module
@@ -121,5 +123,10 @@ class AppPaymentHelper extends Module
     public function havePaymentCreatedTransfer(array $seed = []): PaymentCreatedTransfer
     {
         return (new PaymentCreatedBuilder($seed))->build();
+    }
+
+    public function havePaymentUpdatedTransfer(array $seed = []): PaymentUpdatedTransfer
+    {
+        return (new PaymentUpdatedBuilder($seed))->build();
     }
 }

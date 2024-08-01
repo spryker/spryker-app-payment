@@ -27,6 +27,7 @@ use Generated\Shared\Transfer\PaymentMethodAppConfigurationTransfer;
 use Generated\Shared\Transfer\PaymentRefundedTransfer;
 use Generated\Shared\Transfer\PaymentRefundFailedTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
+use Generated\Shared\Transfer\PaymentUpdatedTransfer;
 use Generated\Shared\Transfer\QuoteItemTransfer;
 use Generated\Shared\Transfer\QuoteTransfer;
 use Spryker\Shared\Kernel\Transfer\TransferInterface;
@@ -56,6 +57,13 @@ class MessageSender
         $authorizationEndpointTransfer
             ->setName('authorization')
             ->setPath('/private/initialize-payment'); // Defined in app_payment_openapi.yml
+
+        $paymentMethodAppConfigurationTransfer->addEndpoint($authorizationEndpointTransfer);
+
+        $authorizationEndpointTransfer = new EndpointTransfer();
+        $authorizationEndpointTransfer
+            ->setName('pre-order')
+            ->setPath('/private/confirm-pre-order-payment'); // Defined in app_payment_openapi.yml
 
         $paymentMethodAppConfigurationTransfer->addEndpoint($authorizationEndpointTransfer);
 
@@ -137,7 +145,7 @@ class MessageSender
         $this->appPaymentToMessageBrokerFacade->sendMessage($paymentAuthorizedTransfer);
     }
 
-    public function sendPaymentPreAuthorizationFailedMessage(PaymentTransfer $paymentTransfer): void
+    public function sendPaymentAuthorizationFailedMessage(PaymentTransfer $paymentTransfer): void
     {
         $paymentAuthorizationFailedTransfer = $this->mapPaymentTransferToPaymentMessageTransfer($paymentTransfer, new PaymentAuthorizationFailedTransfer());
 
@@ -191,6 +199,21 @@ class MessageSender
         ));
 
         $this->appPaymentToMessageBrokerFacade->sendMessage($paymentCreatedTransfer);
+    }
+
+    public function sendPaymentUpdatedMessage(PaymentTransfer $paymentTransfer): void
+    {
+        $paymentUpdatedTransfer = new PaymentUpdatedTransfer();
+        $paymentUpdatedTransfer
+            ->setEntityReference($paymentTransfer->getOrderReference())
+            ->setPaymentReference($paymentTransfer->getTransactionIdOrFail());
+
+        $paymentUpdatedTransfer->setMessageAttributes($this->getMessageAttributes(
+            $paymentTransfer->getTenantIdentifierOrFail(),
+            $paymentUpdatedTransfer::class,
+        ));
+
+        $this->appPaymentToMessageBrokerFacade->sendMessage($paymentUpdatedTransfer);
     }
 
     public function sendPaymentRefundedMessage(

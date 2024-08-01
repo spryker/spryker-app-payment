@@ -62,11 +62,11 @@ paths:
                             schema:
                                 type: string
 
-    '/private/confirm-payment':
+    '/private/confirm-pre-order-payment':
         post:
             x-spryker:
                 module: PaymentBackendApi
-                controller: ConfirmPaymentResourceController
+                controller: ConfirmPreOrderPaymentResourceController
             summary: 'Confirms a Pre-Order Payment (Payment Initialized without an orderReference before the order was persisted) and connects the payment with an order.'
             parameters:
                 - $ref: '#/components/parameters/tenantIdentifier'
@@ -76,14 +76,14 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/ConfirmPaymentRequest'
+                            $ref: '#/components/schemas/ConfirmPreOrderPaymentRequest'
             responses:
                 200:
                     description: 'Expected response to a valid request.'
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ConfirmPaymentResponse'
+                                $ref: '#/components/schemas/ConfirmPreOrderPaymentResponse'
                 400:
                     description: 'Bad request.'
                 default:
@@ -251,7 +251,7 @@ components:
                     type: string
                     example: 'https://example.com/summary'
 
-        ConfirmPaymentRequest:
+        ConfirmPreOrderPaymentRequest:
             type: object
             required:
                 - orderReference
@@ -269,7 +269,7 @@ components:
                         internalId: '#061280'
                         externalId: '#061114'
 
-        ConfirmPaymentResponse:
+        ConfirmPreOrderPaymentResponse:
             properties:
                 isSuccessful:
                     type: boolean

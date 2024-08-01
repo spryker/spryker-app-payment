@@ -22,6 +22,7 @@ use Spryker\Zed\AppPayment\Business\Payment\Initialize\PaymentInitializer;
 use Spryker\Zed\AppPayment\Business\Payment\Message\MessageSender;
 use Spryker\Zed\AppPayment\Business\Payment\Page\PaymentPage;
 use Spryker\Zed\AppPayment\Business\Payment\Payment;
+use Spryker\Zed\AppPayment\Business\Payment\PreOrder\PaymentPreOrder;
 use Spryker\Zed\AppPayment\Business\Payment\Refund\PaymentRefunder;
 use Spryker\Zed\AppPayment\Business\Payment\Refund\PaymentRefundValidator;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatusTransitionValidator;
@@ -50,6 +51,7 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
         return new Payment(
             $this->getPlatformPlugin(),
             $this->createPaymentInitializer(),
+            $this->createPaymentPreOrder(),
             $this->createPaymentTransfer(),
             $this->createPaymentPage(),
             $this->createWebhookHandler(),
@@ -59,6 +61,11 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
     public function createPaymentInitializer(): PaymentInitializer
     {
         return new PaymentInitializer($this->getPlatformPlugin(), $this->getEntityManager(), $this->createMessageSender(), $this->getConfig(), $this->createAppConfigLoader());
+    }
+
+    public function createPaymentPreOrder(): PaymentPreOrder
+    {
+        return new PaymentPreOrder($this->getPlatformPlugin(), $this->getRepository(), $this->getEntityManager(), $this->createMessageSender(), $this->getConfig(), $this->createAppConfigLoader());
     }
 
     public function createPaymentTransfer(): PaymentTransfer

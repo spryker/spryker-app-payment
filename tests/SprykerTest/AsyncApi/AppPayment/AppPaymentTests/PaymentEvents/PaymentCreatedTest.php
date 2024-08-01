@@ -50,7 +50,6 @@ class PaymentCreatedTest extends Unit
         $initializePaymentResponseTransfer = new InitializePaymentResponseTransfer();
         $initializePaymentResponseTransfer
             ->setIsSuccessful(true)
-            ->setIsSuccessful(true)
             ->setTransactionId($transactionId);
 
         $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [

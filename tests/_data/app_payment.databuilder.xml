@@ -136,6 +136,11 @@
         <property name="paymentReference" dataBuilderRule="unique()->uuid()"/>
     </transfer>
 
+    <transfer name="PaymentUpdated" strict="true">
+        <property name="entityReference" dataBuilderRule="unique()->uuid()"/>
+        <property name="paymentReference" dataBuilderRule="unique()->uuid()"/>
+    </transfer>
+
     <transfer name="MessageAttributes">
         <property name="tenantIdentifier" type="string" dataBuilderRule="lexify('??????????')"/>
     </transfer>
