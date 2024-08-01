@@ -14,7 +14,9 @@ use Spryker\Shared\Log\LoggerTrait;
 use Spryker\Zed\AppPayment\AppPaymentConfig;
 use Spryker\Zed\AppPayment\Business\Payment\AppConfig\AppConfigLoader;
 use Spryker\Zed\AppPayment\Business\Payment\Message\MessageSender;
+use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPreOrderPaymentPlatformPluginInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentEntityManagerInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface;
 use Spryker\Zed\Kernel\Persistence\EntityManager\TransactionTrait;
@@ -41,7 +43,17 @@ class PaymentPreOrder
         try {
             $confirmPreOrderPaymentRequestTransfer->setAppConfigOrFail($this->appConfigLoader->loadAppConfig($confirmPreOrderPaymentRequestTransfer->getTenantIdentifierOrFail()));
             $confirmPreOrderPaymentRequestTransfer->setPayment($this->appPaymentRepository->getPaymentByTransactionId($confirmPreOrderPaymentRequestTransfer->getTransactionIdOrFail()));
-            $confirmPreOrderPaymentResponseTransfer = $this->appPaymentPlatformPlugin->confirmPreOrderPayment($confirmPreOrderPaymentRequestTransfer);
+
+            // When the payment platform plugin does not implement the `AppPreOrderPaymentPlatformPluginInterface` we assume there is no further action from the PSP implementation
+            // needed, and we can simply update the Payment with the missing orderReference.
+            $confirmPreOrderPaymentResponseTransfer = new ConfirmPreOrderPaymentResponseTransfer();
+            $confirmPreOrderPaymentResponseTransfer
+                ->setIsSuccessful(true)
+                ->setStatus(PaymentStatus::STATUS_CAPTURED);
+
+            if ($this->appPaymentPlatformPlugin instanceof AppPreOrderPaymentPlatformPluginInterface) {
+                $confirmPreOrderPaymentResponseTransfer = $this->appPaymentPlatformPlugin->confirmPreOrderPayment($confirmPreOrderPaymentRequestTransfer);
+            }
         } catch (Throwable $throwable) {
             $this->getLogger()->error($throwable->getMessage(), [
                 PaymentTransfer::TENANT_IDENTIFIER => $confirmPreOrderPaymentRequestTransfer->getTenantIdentifierOrFail(),
