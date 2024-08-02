@@ -68,9 +68,21 @@ class AppPaymentFacade extends AbstractFacade implements AppPaymentFacadeInterfa
      *
      * @inheritDoc
      */
+    public function addPaymentMethods(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
+    {
+        return $this->getFactory()->createPaymentMethods()->addPaymentMethods($appConfigTransfer);
+    }
+
+    /**
+     * @api
+     *
+     * @inheritDoc
+     *
+     * @deprecated Use `\Spryker\Zed\AppPayment\Business\AppPaymentFacade::addPaymentMethods()` instead
+     */
     public function sendAddPaymentMethodMessage(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
     {
-        return $this->getFactory()->createMessageSender()->sendAddPaymentMethodMessage($appConfigTransfer);
+        return $this->getFactory()->createPaymentMethods()->addPaymentMethods($appConfigTransfer);
     }
 
     /**
@@ -78,9 +90,21 @@ class AppPaymentFacade extends AbstractFacade implements AppPaymentFacadeInterfa
      *
      * @inheritDoc
      */
+    public function deletePaymentMethods(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
+    {
+        return $this->getFactory()->createPaymentMethods()->deletePaymentMethods($appConfigTransfer);
+    }
+
+    /**
+     * @api
+     *
+     * @inheritDoc
+     *
+     * @deprecated Use `\Spryker\Zed\AppPayment\Business\AppPaymentFacade::deletePaymentMethods()` instead
+     */
     public function sendDeletePaymentMethodMessage(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
     {
-        return $this->getFactory()->createMessageSender()->sendDeletePaymentMethodMessage($appConfigTransfer);
+        return $this->getFactory()->createPaymentMethods()->deletePaymentMethods($appConfigTransfer);
     }
 
     /**

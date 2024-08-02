@@ -46,3 +46,4 @@ suites:
                 - \SprykerTest\Shared\AppPayment\Helper\AppPaymentHelper
                 - \SprykerTest\Shared\AppPayment\Helper\AppPaymentRefundHelper
                 - \SprykerTest\Shared\AppPayment\Helper\AppPaymentAssertionHelper
+                - \SprykerTest\Zed\Testify\Helper\Business\BusinessHelper

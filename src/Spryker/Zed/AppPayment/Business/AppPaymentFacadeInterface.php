@@ -82,6 +82,24 @@ interface AppPaymentFacadeInterface
 
     /**
      * Specification:
+     * - Requests the `AppPaymentPaymentMethodsPlatformPluginInterface::configurePaymentMethods()` method to return a list PaymentMethods to add and to delete.
+     * - When the passed `AppPaymentPlatformPluginInterface` is not an instance of `AppPaymentPaymentMethodsPlatformPluginInterface` it will return early.
+     *
+     * @api
+     */
+    public function addPaymentMethods(AppConfigTransfer $appConfigTransfer): AppConfigTransfer;
+
+    /**
+     * Specification:
+     * - Requests the `AppPaymentPaymentMethodsPlatformPluginInterface::configurePaymentMethods()` method to return a list PaymentMethods to add and to delete.
+     * - When the passed `AppPaymentPlatformPluginInterface` is not an instance of `AppPaymentPaymentMethodsPlatformPluginInterface` it will return early.
+     *
+     * @api
+     */
+    public function deletePaymentMethods(AppConfigTransfer $appConfigTransfer): AppConfigTransfer;
+
+    /**
+     * Specification:
      * - Sends a `AddPaymentMethod` message when the AppConfiguration is in state NEW.
      * - Updates the AppConfiguration and sets its state to connected after the `AddPaymentMethod` message was sent.
      * - When the AppConfiguration is in state CONNECTED the `AddPaymentMethod` message will not be sent.

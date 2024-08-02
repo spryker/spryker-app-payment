@@ -200,6 +200,9 @@ components:
                                     example:
                                         - /authorization
                                         - /transfer
+                        configuration:
+                            type: array
+                            description: 'Optional configuration for sophisticated payment methods that support e.g. CheckoutSession or Embedded payment forms.'
             required:
                 - name
                 - providerName
