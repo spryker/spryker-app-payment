@@ -200,9 +200,18 @@ components:
                                     example:
                                         - /authorization
                                         - /transfer
-                        configuration:
-                            type: array
+                        checkoutConfiguration:
+                            type: object
                             description: 'Optional configuration for sophisticated payment methods that support e.g. CheckoutSession or Embedded payment forms.'
+                            properties:
+                                strategy:
+                                    type: string
+                                    examples:
+                                        - embedded
+                                        - checkout-session
+                                scripts:
+                                    type: array
+                                    description: 'List of scripts that should be included in the checkout page.'
             required:
                 - name
                 - providerName

@@ -310,7 +310,12 @@
     <transfer name="PaymentMethodAppConfiguration" strict="true">
         <property name="baseUrl" type="string"/>
         <property name="endpoints" type="Endpoint[]" singular="endpoint"/>
-        <property name="configuration" type="array"/>
+        <property name="checkoutConfiguration" type="CheckoutConfiguration"/>
+    </transfer>
+
+    <transfer name="CheckoutConfiguration" strict="true">
+        <property name="strategy" type="string"/>
+        <property name="scripts" type="array" singular="script"/>
     </transfer>
 
     <transfer name="Endpoint" strict="true">

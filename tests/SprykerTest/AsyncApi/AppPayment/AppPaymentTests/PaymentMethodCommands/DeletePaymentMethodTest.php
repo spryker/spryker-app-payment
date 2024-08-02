@@ -10,7 +10,6 @@ namespace SprykerTest\AsyncApi\AppPayment\PaymentTests\PaymentMethodCommands;
 use Codeception\Stub;
 use Codeception\Test\Unit;
 use Generated\Shared\Transfer\AppConfigTransfer;
-use Generated\Shared\Transfer\PaymentMethodAppConfigurationTransfer;
 use Generated\Shared\Transfer\PaymentMethodConfigurationResponseTransfer;
 use Generated\Shared\Transfer\PaymentMethodTransfer;
 use Ramsey\Uuid\Uuid;
@@ -72,10 +71,7 @@ class DeletePaymentMethodTest extends Unit
                 $paymentMethodTransfer = new PaymentMethodTransfer();
                 $paymentMethodTransfer
                     ->setName('foo')
-                    ->setProviderName('bar')
-                    ->setPaymentMethodAppConfiguration((new PaymentMethodAppConfigurationTransfer())->setConfiguration(
-                        ['foo' => 'bar'],
-                    ));
+                    ->setProviderName('bar');
 
                 $paymentMethodConfigurationResponseTransfer = new PaymentMethodConfigurationResponseTransfer();
                 $paymentMethodConfigurationResponseTransfer->addPaymentMethodToDelete($paymentMethodTransfer);

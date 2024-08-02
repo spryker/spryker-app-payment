@@ -58,7 +58,7 @@ class PaymentMethods
         /** @var \Generated\Shared\Transfer\PaymentMethodTransfer $paymentMethodTransfer */
         foreach ($paymentMethodCollectionResponseTransfer->getPaymentMethodsToAdd() as $paymentMethodTransfer) {
             // Add the passed configuration to the default configuration.
-            $paymentMethodAppConfigurationTransfer->setConfiguration($paymentMethodTransfer->getPaymentMethodAppConfiguration()->getConfiguration());
+            $paymentMethodAppConfigurationTransfer->setCheckoutConfiguration($paymentMethodTransfer->getPaymentMethodAppConfiguration()->getCheckoutConfiguration());
 
             $addPaymentMethodTransfer = new AddPaymentMethodTransfer();
             $addPaymentMethodTransfer

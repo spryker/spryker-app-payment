@@ -11,6 +11,7 @@ use Codeception\Stub;
 use Codeception\Test\Unit;
 use Generated\Shared\Transfer\AddPaymentMethodTransfer;
 use Generated\Shared\Transfer\AppConfigTransfer;
+use Generated\Shared\Transfer\CheckoutConfigurationTransfer;
 use Generated\Shared\Transfer\PaymentMethodAppConfigurationTransfer;
 use Generated\Shared\Transfer\PaymentMethodConfigurationResponseTransfer;
 use Generated\Shared\Transfer\PaymentMethodTransfer;
@@ -68,13 +69,14 @@ class AddPaymentMethodTest extends Unit
         // Arrange
         $platformPluginMock = Stub::makeEmpty(AppPaymentPaymentMethodsPlatformPluginInterface::class, [
             'configurePaymentMethods' => function ($paymentMethodConfigurationRequestTransfer) {
+                $checkoutConfigurationTransfer = new CheckoutConfigurationTransfer();
+                $checkoutConfigurationTransfer->setStrategy('embedded');
+
                 $paymentMethodTransfer = new PaymentMethodTransfer();
                 $paymentMethodTransfer
                     ->setName('foo')
                     ->setProviderName('bar')
-                    ->setPaymentMethodAppConfiguration((new PaymentMethodAppConfigurationTransfer())->setConfiguration(
-                        ['foo' => 'bar'],
-                    ));
+                    ->setPaymentMethodAppConfiguration((new PaymentMethodAppConfigurationTransfer())->setCheckoutConfiguration($checkoutConfigurationTransfer));
 
                 $paymentMethodConfigurationResponseTransfer = new PaymentMethodConfigurationResponseTransfer();
                 $paymentMethodConfigurationResponseTransfer->addPaymentMethodToAdd($paymentMethodTransfer);
