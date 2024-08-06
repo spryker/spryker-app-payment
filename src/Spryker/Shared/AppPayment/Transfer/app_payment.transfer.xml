@@ -101,15 +101,48 @@
         <property name="customerReference" type="string"/>
         <property name="currencyCode" type="string"/>
         <property name="grandTotal" type="string"/>
+        <property name="discountTotal" type="string"/>
         <property name="paymentMethod" type="string"/>
         <property name="payment" type="Payment"/>
+        <property name="salutation" type="string"/>
+        <property name="city" type="string"/>
+        <property name="state" type="string"/>
+        <property name="address1" type="string"/>
+        <property name="address2" type="string"/>
+        <property name="address3" type="string"/>
+        <property name="zip" type="string"/>
+        <property name="phone" type="string"/>
+        <property name="shippingSalutation" type="string"/>
+        <property name="shippingCountryCode" type="string"/>
+        <property name="shippingFirstName" type="string"/>
+        <property name="shippingLastName" type="string"/>
+        <property name="shippingCity" type="string"/>
+        <property name="shippingState" type="string"/>
+        <property name="shippingAddress1" type="string"/>
+        <property name="shippingAddress2" type="string"/>
+        <property name="shippingAddress3" type="string"/>
+        <property name="shippingZip" type="string"/>
+        <property name="shippingPhone" type="string"/>
         <property name="items" type="QuoteItem[]" singular="item"/>
+        <property name="expenses" type="QuoteExpense[]" singular="expense"/>
     </transfer>
 
     <transfer name="QuoteItem" strict="true">
         <property name="idSalesOrderItem" type="string"/>
         <property name="name" type="string"/>
         <property name="sku" type="string"/>
+        <property name="quantity" type="int"/>
+        <property name="unitPrice" type="int"/>
+        <property name="taxRate" type="float"/>
+    </transfer>
+
+    <transfer name="QuoteExpense" strict="true">
+        <property name="name" type="string"/>
+        <property name="type" type="string"/>
+        <property name="quantity" type="int"/>
+        <property name="unitGrossPrice" type="int"/>
+        <property name="unitPrice" type="int"/>
+        <property name="taxRate" type="float"/>
     </transfer>
 
     <transfer name="Payment" strict="true">
