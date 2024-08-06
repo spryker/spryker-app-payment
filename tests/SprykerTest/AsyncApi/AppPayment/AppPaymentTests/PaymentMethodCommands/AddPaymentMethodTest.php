@@ -79,7 +79,7 @@ class AddPaymentMethodTest extends Unit
                     ->setPaymentMethodAppConfiguration((new PaymentMethodAppConfigurationTransfer())->setCheckoutConfiguration($checkoutConfigurationTransfer));
 
                 $paymentMethodConfigurationResponseTransfer = new PaymentMethodConfigurationResponseTransfer();
-                $paymentMethodConfigurationResponseTransfer->addPaymentMethodToAdd($paymentMethodTransfer);
+                $paymentMethodConfigurationResponseTransfer->addPaymentMethod($paymentMethodTransfer);
 
                 return $paymentMethodConfigurationResponseTransfer;
             },

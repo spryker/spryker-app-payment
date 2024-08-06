@@ -21,8 +21,7 @@
     </transfer>
 
     <transfer name="PaymentMethodConfigurationResponse" strict="true">
-        <property name="paymentMethodsToAdd" type="PaymentMethod[]" singular="paymentMethodToAdd"/>
-        <property name="paymentMethodsToDelete" type="PaymentMethod[]" singular="paymentMethodToDelete"/>
+        <property name="paymentMethods" type="PaymentMethod[]" singular="paymentMethod"/>
     </transfer>
 
     <transfer name="PaymentPageRequest" strict="true">
@@ -297,6 +296,7 @@
         <property name="name" type="string"/>
         <property name="providerName" type="string"/>
         <property name="paymentMethodAppConfiguration" type="PaymentMethodAppConfiguration"/>
+        <property name="tenantIdentifier" type="string"/>
     </transfer>
 
     <transfer name="AddPaymentMethod" strict="true">

@@ -21,7 +21,7 @@ use Spryker\Zed\AppPayment\Business\Payment\Capture\PaymentCapturer;
 use Spryker\Zed\AppPayment\Business\Payment\Initialize\PaymentInitializer;
 use Spryker\Zed\AppPayment\Business\Payment\Message\MessageSender;
 use Spryker\Zed\AppPayment\Business\Payment\Message\PaymentMethodMessageSender;
-use Spryker\Zed\AppPayment\Business\Payment\Methods\PaymentMethods;
+use Spryker\Zed\AppPayment\Business\Payment\Method\PaymentMethod;
 use Spryker\Zed\AppPayment\Business\Payment\Page\PaymentPage;
 use Spryker\Zed\AppPayment\Business\Payment\Payment;
 use Spryker\Zed\AppPayment\Business\Payment\PreOrder\PaymentPreOrder;
@@ -159,9 +159,9 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
         return new MessageSender($this->getConfig(), $this->getMessageBrokerFacade());
     }
 
-    public function createPaymentMethods(): PaymentMethods
+    public function createPaymentMethod(): PaymentMethod
     {
-        return new PaymentMethods($this->getPlatformPlugin(), $this->getConfig(), $this->createPaymentMethodMessageSender());
+        return new PaymentMethod($this->getPlatformPlugin(), $this->getConfig(), $this->createPaymentMethodMessageSender(), $this->getRepository());
     }
 
     public function createPaymentMethodMessageSender(): PaymentMethodMessageSender

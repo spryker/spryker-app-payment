@@ -66,15 +66,33 @@ class DeletePaymentMethodTest extends Unit
     public function testDeletePaymentMethodMessageIsSendWhenAppConfigGetsDeactivatedAndPlatformPluginCanConfigurePaymentMethods(): void
     {
         // Arrange
+        $tenantIdentifier = Uuid::uuid4()->toString();
+        $paymentMethodNameFoo = Uuid::uuid4()->toString();
+        $paymentMethodNameBar = Uuid::uuid4()->toString();
+
+        $this->tester->havePaymentMethodPersisted([
+            PaymentMethodTransfer::NAME => $paymentMethodNameFoo,
+            PaymentMethodTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
+        ]);
+
+        $this->tester->havePaymentMethodPersisted([
+            PaymentMethodTransfer::NAME => $paymentMethodNameBar,
+            PaymentMethodTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
+        ]);
+
+        // Ensure payment methods are persisted
+        $this->tester->seePaymentMethodForTenant($paymentMethodNameFoo, $tenantIdentifier);
+        $this->tester->seePaymentMethodForTenant($paymentMethodNameBar, $tenantIdentifier);
+
         $platformPluginMock = Stub::makeEmpty(AppPaymentPaymentMethodsPlatformPluginInterface::class, [
-            'configurePaymentMethods' => function ($paymentMethodConfigurationRequestTransfer) {
+            'configurePaymentMethods' => function () use ($paymentMethodNameFoo) {
                 $paymentMethodTransfer = new PaymentMethodTransfer();
                 $paymentMethodTransfer
-                    ->setName('foo')
+                    ->setName($paymentMethodNameFoo)
                     ->setProviderName('bar');
 
                 $paymentMethodConfigurationResponseTransfer = new PaymentMethodConfigurationResponseTransfer();
-                $paymentMethodConfigurationResponseTransfer->addPaymentMethodToDelete($paymentMethodTransfer);
+                $paymentMethodConfigurationResponseTransfer->addPaymentMethod($paymentMethodTransfer);
 
                 return $paymentMethodConfigurationResponseTransfer;
             },
@@ -90,7 +108,6 @@ class DeletePaymentMethodTest extends Unit
 
         $deletePaymentMethodTransfer = $this->tester->haveDeletePaymentMethodTransfer();
 
-        $tenantIdentifier = Uuid::uuid4()->toString();
         $this->tester->haveAppConfigForTenant($tenantIdentifier);
 
         $appConfigTransfer = new AppConfigTransfer();

@@ -70,7 +70,7 @@ class AppPaymentFacade extends AbstractFacade implements AppPaymentFacadeInterfa
      */
     public function addPaymentMethods(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
     {
-        return $this->getFactory()->createPaymentMethods()->addPaymentMethods($appConfigTransfer);
+        return $this->getFactory()->createPaymentMethod()->addPaymentMethods($appConfigTransfer);
     }
 
     /**
@@ -82,7 +82,7 @@ class AppPaymentFacade extends AbstractFacade implements AppPaymentFacadeInterfa
      */
     public function sendAddPaymentMethodMessage(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
     {
-        return $this->getFactory()->createPaymentMethods()->addPaymentMethods($appConfigTransfer);
+        return $this->getFactory()->createPaymentMethod()->addPaymentMethods($appConfigTransfer);
     }
 
     /**
@@ -92,7 +92,7 @@ class AppPaymentFacade extends AbstractFacade implements AppPaymentFacadeInterfa
      */
     public function deletePaymentMethods(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
     {
-        return $this->getFactory()->createPaymentMethods()->deletePaymentMethods($appConfigTransfer);
+        return $this->getFactory()->createPaymentMethod()->deletePaymentMethods($appConfigTransfer);
     }
 
     /**
@@ -104,7 +104,7 @@ class AppPaymentFacade extends AbstractFacade implements AppPaymentFacadeInterfa
      */
     public function sendDeletePaymentMethodMessage(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
     {
-        return $this->getFactory()->createPaymentMethods()->deletePaymentMethods($appConfigTransfer);
+        return $this->getFactory()->createPaymentMethod()->deletePaymentMethods($appConfigTransfer);
     }
 
     /**
