@@ -5,6 +5,7 @@
  */
 
 use Generated\Shared\Transfer\AddPaymentMethodTransfer;
+use Generated\Shared\Transfer\UpdatePaymentMethodTransfer;
 use Generated\Shared\Transfer\AppConfigUpdatedTransfer;
 use Generated\Shared\Transfer\CancelPaymentTransfer;
 use Generated\Shared\Transfer\CapturePaymentTransfer;
@@ -150,6 +151,7 @@ $config[MessageBrokerAwsConstants::MESSAGE_TO_CHANNEL_MAP] = [
     CapturePaymentTransfer::class => 'payment-commands',
     RefundPaymentTransfer::class => 'payment-commands',
     AddPaymentMethodTransfer::class => 'payment-method-commands',
+    UpdatePaymentMethodTransfer::class => 'payment-method-commands',
     DeletePaymentMethodTransfer::class => 'payment-method-commands',
     PaymentCreatedTransfer::class => 'payment-events',
     PaymentUpdatedTransfer::class => 'payment-events',

@@ -82,12 +82,15 @@ interface AppPaymentFacadeInterface
 
     /**
      * Specification:
-     * - Requests the `AppPaymentPaymentMethodsPlatformPluginInterface::configurePaymentMethods()` method to return a list PaymentMethods to add and to delete.
+     * - Requests the `AppPaymentPaymentMethodsPlatformPluginInterface::configurePaymentMethods()` method to return a list PaymentMethods to be added.
      * - When the passed `AppPaymentPlatformPluginInterface` is not an instance of `AppPaymentPaymentMethodsPlatformPluginInterface` it will return early.
+     * - PaymentMethods that were already added will not be added again.
+     * - PaymentMethods that were already persisted and are no longer returned from `AppPaymentPaymentMethodsPlatformPluginInterface::configurePaymentMethods()` method will be deleted and trigger a `DeletePaymentMethod` message.
+     * - PaymentMethods that were already persisted and require an update will trigger a `UpdatePaymentMethod` message.
      *
      * @api
      */
-    public function addPaymentMethods(AppConfigTransfer $appConfigTransfer): AppConfigTransfer;
+    public function configurePaymentMethods(AppConfigTransfer $appConfigTransfer): AppConfigTransfer;
 
     /**
      * Specification:
@@ -105,6 +108,8 @@ interface AppPaymentFacadeInterface
      * - When the AppConfiguration is in state CONNECTED the `AddPaymentMethod` message will not be sent.
      *
      * @api
+     *
+     * @deprecated Use {@link \Spryker\Zed\AppPayment\Business\AppPaymentFacadeInterface::configurePaymentMethods() } instead
      */
     public function sendAddPaymentMethodMessage(AppConfigTransfer $appConfigTransfer): AppConfigTransfer;
 
@@ -113,6 +118,8 @@ interface AppPaymentFacadeInterface
      * - Sends a `DeletePaymentMethod` message when the AppConfiguration is removed.
      *
      * @api
+     *
+     * @deprecated Use {@link \Spryker\Zed\AppPayment\Business\AppPaymentFacade::deletePaymentMethods() } instead
      */
     public function sendDeletePaymentMethodMessage(AppConfigTransfer $appConfigTransfer): AppConfigTransfer;
 

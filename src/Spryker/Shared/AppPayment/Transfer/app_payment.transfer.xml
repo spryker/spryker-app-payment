@@ -307,6 +307,20 @@
         <property name="messageAttributes" type="MessageAttributes"/>
     </transfer>
 
+    <transfer name="UpdatePaymentMethod" strict="true">
+        <property name="name" type="string"/>
+        <property name="providerName" type="string"/>
+        <property name="paymentAuthorizationEndpoint" type="string"/>
+        <property name="paymentMethodAppConfiguration" type="PaymentMethodAppConfiguration"/>
+        <property name="messageAttributes" type="MessageAttributes"/>
+    </transfer>
+
+    <transfer name="DeletePaymentMethod" strict="true">
+        <property name="name" type="string"/>
+        <property name="providerName" type="string"/>
+        <property name="messageAttributes" type="MessageAttributes"/>
+    </transfer>
+
     <transfer name="PaymentMethodAppConfiguration" strict="true">
         <property name="baseUrl" type="string"/>
         <property name="endpoints" type="Endpoint[]" singular="endpoint"/>
@@ -321,13 +335,6 @@
     <transfer name="Endpoint" strict="true">
         <property name="name" type="string"/>
         <property name="path" type="string"/>
-    </transfer>
-
-    <transfer name="DeletePaymentMethod" strict="true">
-        <property name="name" type="string"/>
-        <property name="providerName" type="string"/>
-        <property name="paymentAuthorizationEndpoint" type="string"/>
-        <property name="messageAttributes" type="MessageAttributes"/>
     </transfer>
 
     <transfer name="PaymentCreated" strict="true">

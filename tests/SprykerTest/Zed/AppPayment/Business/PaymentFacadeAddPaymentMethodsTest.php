@@ -79,7 +79,7 @@ class PaymentFacadeAddPaymentMethodsTest extends Unit
         $this->tester->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
 
         // Act
-        $this->tester->getFacade()->addPaymentMethods($appConfigTransfer);
+        $this->tester->getFacade()->configurePaymentMethods($appConfigTransfer);
 
         // Assert
         $this->tester->seePaymentMethodForTenant($paymentMethodNameFoo, $tenantIdentifier);
@@ -137,7 +137,7 @@ class PaymentFacadeAddPaymentMethodsTest extends Unit
         $this->tester->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
 
         // Act
-        $this->tester->getFacade()->addPaymentMethods($appConfigTransfer);
+        $this->tester->getFacade()->configurePaymentMethods($appConfigTransfer);
 
         // Assert
         $this->tester->seePaymentMethodForTenant($paymentMethodNameFoo, $tenantIdentifier);

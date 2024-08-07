@@ -20,10 +20,10 @@ use Spryker\Zed\Kernel\Communication\AbstractPlugin;
  * @method \Spryker\Zed\AppPayment\Business\AppPaymentFacadeInterface getFacade()
  * @method \Spryker\Zed\AppPayment\Business\AppPaymentBusinessFactory getFactory()
  */
-class SendAddPaymentMethodMessagesConfigurationAfterSavePlugin extends AbstractPlugin implements ConfigurationAfterSavePluginInterface
+class ConfigurePaymentMethodsConfigurationAfterSavePlugin extends AbstractPlugin implements ConfigurationAfterSavePluginInterface
 {
     public function afterSave(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
     {
-        return $this->getFacade()->addPaymentMethods($appConfigTransfer);
+        return $this->getFacade()->configurePaymentMethods($appConfigTransfer);
     }
 }

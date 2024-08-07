@@ -14,6 +14,7 @@ use Generated\Shared\Transfer\EndpointTransfer;
 use Generated\Shared\Transfer\PaymentMethodAppConfigurationTransfer;
 use Generated\Shared\Transfer\PaymentMethodConfigurationRequestTransfer;
 use Generated\Shared\Transfer\PaymentMethodTransfer;
+use Generated\Shared\Transfer\UpdatePaymentMethodTransfer;
 use Spryker\Zed\AppKernel\AppKernelConfig;
 use Spryker\Zed\AppPayment\AppPaymentConfig;
 use Spryker\Zed\AppPayment\Business\Payment\Message\PaymentMethodMessageSender;
@@ -31,7 +32,7 @@ class PaymentMethod
     ) {
     }
 
-    public function addPaymentMethods(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
+    public function configurePaymentMethods(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
     {
         // Do not send the message(s) when App is in state "disconnected" or when the app is marked as inactive.
         if ($appConfigTransfer->getStatus() === AppKernelConfig::APP_STATUS_DISCONNECTED || $appConfigTransfer->getIsActive() === false) {
@@ -57,13 +58,19 @@ class PaymentMethod
         $persistedPaymentMethodTransfers = $this->appPaymentRepository->getTenantPaymentMethods($tenantIdentifier);
 
         // Get current configured payment methods
+        /** @var array<\Generated\Shared\Transfer\PaymentMethodTransfer> $configuredPaymentMethodTransfers */
         $configuredPaymentMethodTransfers = $paymentMethodCollectionResponseTransfer->getPaymentMethods()->getArrayCopy();
 
         $paymentMethodTransfersToAdd = $this->getPaymentMethodsToAdd($persistedPaymentMethodTransfers, $configuredPaymentMethodTransfers);
+        $paymentMethodTransfersToUpdate = $this->getPaymentMethodsToUpdate($persistedPaymentMethodTransfers, $configuredPaymentMethodTransfers);
         $paymentMethodTransfersToDelete = $this->getPaymentMethodsToDelete($persistedPaymentMethodTransfers, $configuredPaymentMethodTransfers);
 
         foreach ($paymentMethodTransfersToAdd as $paymentMethodTransferToAdd) {
             $this->addPaymentMethod($paymentMethodTransferToAdd, $appConfigTransfer);
+        }
+
+        foreach ($paymentMethodTransfersToUpdate as $paymentMethodTransferToUpdate) {
+            $this->updatePaymentMethod($paymentMethodTransferToUpdate, $appConfigTransfer);
         }
 
         foreach ($paymentMethodTransfersToDelete as $paymentMethodTransferToDelete) {
@@ -92,6 +99,27 @@ class PaymentMethod
         $this->appPaymentRepository->savePaymentMethod($paymentMethodTransfer, $appConfigTransfer->getTenantIdentifierOrFail());
 
         $this->paymentMethodMessageSender->sendAddPaymentMethodMessage($addPaymentMethodTransfer, $appConfigTransfer);
+    }
+
+    protected function updatePaymentMethod(PaymentMethodTransfer $paymentMethodTransfer, AppConfigTransfer $appConfigTransfer): void
+    {
+        // Add the passed configuration to the default configuration.
+        $paymentMethodAppConfigurationTransfer = $this->getDefaultPaymentMethodAppConfiguration();
+
+        if ($paymentMethodTransfer->getPaymentMethodAppConfiguration() instanceof PaymentMethodAppConfigurationTransfer) {
+            $paymentMethodAppConfigurationTransfer->setCheckoutConfiguration($paymentMethodTransfer->getPaymentMethodAppConfiguration()->getCheckoutConfiguration());
+        }
+
+        $updatePaymentMethodTransfer = new UpdatePaymentMethodTransfer();
+        $updatePaymentMethodTransfer
+            ->setName($paymentMethodTransfer->getNameOrFail())
+            ->setProviderName($paymentMethodTransfer->getProviderNameOrFail())
+            ->setPaymentAuthorizationEndpoint(sprintf('%s/private/initialize-payment', $this->appPaymentConfig->getGlueBaseUrl()))
+            ->setPaymentMethodAppConfiguration($paymentMethodAppConfigurationTransfer);
+
+        $this->appPaymentRepository->savePaymentMethod($paymentMethodTransfer, $appConfigTransfer->getTenantIdentifierOrFail());
+
+        $this->paymentMethodMessageSender->sendUpdatePaymentMethodMessage($updatePaymentMethodTransfer, $appConfigTransfer);
     }
 
     /**
@@ -125,6 +153,65 @@ class PaymentMethod
         }
 
         return false;
+    }
+
+    /**
+     * @param array<\Generated\Shared\Transfer\PaymentMethodTransfer> $persistedPaymentMethodTransfers
+     * @param array<\Generated\Shared\Transfer\PaymentMethodTransfer> $configuredPaymentMethodTransfers
+     *
+     * @return array<\Generated\Shared\Transfer\PaymentMethodTransfer>
+     */
+    protected function getPaymentMethodsToUpdate(array $persistedPaymentMethodTransfers, array $configuredPaymentMethodTransfers): array
+    {
+        $methodsToUpdate = [];
+
+        foreach ($configuredPaymentMethodTransfers as $configuredPaymentMethodTransfer) {
+            $persistedPaymentMethodTransfer = $this->getPersistedPaymentMethodByName($configuredPaymentMethodTransfer->getNameOrFail(), $persistedPaymentMethodTransfers);
+            if (!$persistedPaymentMethodTransfer instanceof PaymentMethodTransfer) {
+                continue;
+            }
+
+            if (!$this->isPaymentMethodUpdateRequired($configuredPaymentMethodTransfer, $persistedPaymentMethodTransfer)) {
+                continue;
+            }
+
+            $methodsToUpdate[] = $configuredPaymentMethodTransfer;
+        }
+
+        return $methodsToUpdate;
+    }
+
+    /**
+     * @param array<\Generated\Shared\Transfer\PaymentMethodTransfer> $persistedPaymentMethodTransfers
+     */
+    protected function getPersistedPaymentMethodByName(string $paymentMethodName, array $persistedPaymentMethodTransfers): ?PaymentMethodTransfer
+    {
+        foreach ($persistedPaymentMethodTransfers as $persistedPaymentMethodTransfer) {
+            if ($paymentMethodName === $persistedPaymentMethodTransfer->getName()) {
+                return $persistedPaymentMethodTransfer;
+            }
+        }
+
+        return null;
+    }
+
+    protected function isPaymentMethodUpdateRequired(
+        PaymentMethodTransfer $configuredPaymentMethodTransfer,
+        PaymentMethodTransfer $persistedPaymentMethodTransfer
+    ): bool {
+        if (!$configuredPaymentMethodTransfer->getPaymentMethodAppConfiguration() instanceof PaymentMethodAppConfigurationTransfer && !$persistedPaymentMethodTransfer->getPaymentMethodAppConfiguration() instanceof PaymentMethodAppConfigurationTransfer) {
+            return false;
+        }
+
+        if ($configuredPaymentMethodTransfer->getPaymentMethodAppConfiguration() instanceof PaymentMethodAppConfigurationTransfer && !$persistedPaymentMethodTransfer->getPaymentMethodAppConfiguration() instanceof PaymentMethodAppConfigurationTransfer) {
+            return true;
+        }
+
+        if ($persistedPaymentMethodTransfer->getPaymentMethodAppConfiguration() instanceof PaymentMethodAppConfigurationTransfer && !$configuredPaymentMethodTransfer->getPaymentMethodAppConfiguration() instanceof PaymentMethodAppConfigurationTransfer) {
+            return true;
+        }
+
+        return $configuredPaymentMethodTransfer->getPaymentMethodAppConfiguration()->toArray() !== $persistedPaymentMethodTransfer->getPaymentMethodAppConfiguration()->toArray();
     }
 
     /**

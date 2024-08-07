@@ -31,6 +31,7 @@ channels:
             message:
                 oneOf:
                     - $ref: '#/components/messages/AddPaymentMethod'
+                    - $ref: '#/components/messages/UpdatePaymentMethod'
                     - $ref: '#/components/messages/DeletePaymentMethod'
 components:
     messages:
@@ -39,6 +40,15 @@ components:
             x-spryker:
                 module: Payment
             summary: 'Informs about a new Payment method.'
+            payload:
+                $ref: '#/components/schemas/PaymentMethodPayload'
+            headers:
+                $ref: '#/components/schemas/message-broker/components/schemas/headers'
+        UpdatePaymentMethod:
+            name: UpdatePaymentMethod
+            x-spryker:
+                module: Payment
+            summary: 'Informs about an update of an existing Payment method.'
             payload:
                 $ref: '#/components/schemas/PaymentMethodPayload'
             headers:

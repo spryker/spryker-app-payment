@@ -10,6 +10,7 @@ namespace Spryker\Zed\AppPayment\Business\Payment\Message;
 use Generated\Shared\Transfer\AddPaymentMethodTransfer;
 use Generated\Shared\Transfer\AppConfigTransfer;
 use Generated\Shared\Transfer\DeletePaymentMethodTransfer;
+use Generated\Shared\Transfer\UpdatePaymentMethodTransfer;
 use Spryker\Zed\AppPayment\AppPaymentConfig;
 use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToMessageBrokerFacadeInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
@@ -32,6 +33,16 @@ class PaymentMethodMessageSender extends AbstractMessageSender
         ));
 
         $this->appPaymentToMessageBrokerFacade->sendMessage($addPaymentMethodTransfer);
+    }
+
+    public function sendUpdatePaymentMethodMessage(UpdatePaymentMethodTransfer $updatePaymentMethodTransfer, AppConfigTransfer $appConfigTransfer): void
+    {
+        $updatePaymentMethodTransfer->setMessageAttributes($this->getMessageAttributes(
+            $appConfigTransfer->getTenantIdentifierOrFail(),
+            $updatePaymentMethodTransfer::class,
+        ));
+
+        $this->appPaymentToMessageBrokerFacade->sendMessage($updatePaymentMethodTransfer);
     }
 
     public function sendDeletePaymentMethodMessage(DeletePaymentMethodTransfer $deletePaymentMethodTransfer, AppConfigTransfer $appConfigTransfer): void
