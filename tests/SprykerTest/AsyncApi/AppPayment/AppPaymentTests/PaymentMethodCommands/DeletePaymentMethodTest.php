@@ -7,15 +7,20 @@
 
 namespace SprykerTest\AsyncApi\AppPayment\PaymentTests\PaymentMethodCommands;
 
+use Codeception\Stub;
 use Codeception\Test\Unit;
 use Generated\Shared\Transfer\AppConfigTransfer;
+use Generated\Shared\Transfer\PaymentMethodTransfer;
 use Ramsey\Uuid\Uuid;
 use Spryker\Shared\AppPayment\AppPaymentConstants;
 use Spryker\Zed\AppKernel\AppKernelDependencyProvider;
 use Spryker\Zed\AppKernel\Business\AppKernelFacade;
+use Spryker\Zed\AppPayment\AppPaymentConfig;
+use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Communication\Plugin\AppKernel\DeleteTenantPaymentsConfigurationAfterDeletePlugin;
 use Spryker\Zed\AppPayment\Communication\Plugin\AppKernel\SendDeletePaymentMethodMessageConfigurationAfterDeletePlugin;
 use Spryker\Zed\AppPayment\Communication\Plugin\AppKernel\SendDeletePaymentMethodMessagesConfigurationAfterDeletePlugin;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPaymentMethodsPlatformPluginInterface;
 use SprykerTest\AsyncApi\AppPayment\AppPaymentAsyncApiTester;
 
 /**
@@ -36,14 +41,23 @@ class DeletePaymentMethodTest extends Unit
     public function testDeletePaymentMethodMessageIsSendWhenAppConfigGetsDeactivated(): void
     {
         // Arrange
-        $deletePaymentMethodTransfer = $this->tester->haveDeletePaymentMethodTransfer();
+        $tenantIdentifier = Uuid::uuid4()->toString();
 
+        $appPaymentConfig = new AppPaymentConfig();
+
+        $this->tester->havePaymentMethodPersisted([
+            PaymentMethodTransfer::NAME => $appPaymentConfig->getPaymentMethodName(),
+            PaymentMethodTransfer::PROVIDER_NAME => $appPaymentConfig->getPaymentProviderName(),
+            PaymentMethodTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
+        ]);
+
+        // Ensure payment methods are persisted
+        $this->tester->seePaymentMethodForTenant($appPaymentConfig->getPaymentMethodName(), $tenantIdentifier);
         $this->tester->setDependency(AppKernelDependencyProvider::PLUGIN_CONFIGURATION_AFTER_DELETE_PLUGINS, [
             new SendDeletePaymentMethodMessagesConfigurationAfterDeletePlugin(),
             new DeleteTenantPaymentsConfigurationAfterDeletePlugin(),
         ]);
 
-        $tenantIdentifier = Uuid::uuid4()->toString();
         $this->tester->haveAppConfigForTenant($tenantIdentifier);
 
         $appConfigTransfer = new AppConfigTransfer();
@@ -53,23 +67,44 @@ class DeletePaymentMethodTest extends Unit
         $appKernelFacade = new AppKernelFacade();
         $appKernelFacade->saveConfig($appConfigTransfer);
 
+        $deletePaymentMethodTransfer = $this->tester->haveDeletePaymentMethodTransfer();
+
         // Assert
         $this->tester->assertMessageWasEmittedOnChannel($deletePaymentMethodTransfer, 'payment-method-commands');
         $this->tester->assertAppConfigurationForTenantIsDeactivated($tenantIdentifier);
     }
 
-    public function testDeletePaymentMethodMessageIsSendAndPaymentAreDeletedWhenAppConfigGetsDeactivated(): void
+    public function testDeletePaymentMethodMessageIsSendWhenAppConfigGetsDeactivatedAndPlatformPluginCanConfigurePaymentMethods(): void
     {
         // Arrange
-        $deletePaymentMethodTransfer = $this->tester->haveDeletePaymentMethodTransfer();
+        $tenantIdentifier = Uuid::uuid4()->toString();
+        $paymentMethodNameFoo = Uuid::uuid4()->toString();
+        $paymentMethodNameBar = Uuid::uuid4()->toString();
 
+        $this->tester->havePaymentMethodPersisted([
+            PaymentMethodTransfer::NAME => $paymentMethodNameFoo,
+            PaymentMethodTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
+        ]);
+
+        $this->tester->havePaymentMethodPersisted([
+            PaymentMethodTransfer::NAME => $paymentMethodNameBar,
+            PaymentMethodTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
+        ]);
+
+        // Ensure payment methods are persisted
+        $this->tester->seePaymentMethodForTenant($paymentMethodNameFoo, $tenantIdentifier);
+        $this->tester->seePaymentMethodForTenant($paymentMethodNameBar, $tenantIdentifier);
+
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPaymentMethodsPlatformPluginInterface::class);
+
+        $this->tester->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
         $this->tester->setDependency(AppKernelDependencyProvider::PLUGIN_CONFIGURATION_AFTER_DELETE_PLUGINS, [
             new SendDeletePaymentMethodMessagesConfigurationAfterDeletePlugin(),
             new DeleteTenantPaymentsConfigurationAfterDeletePlugin(),
         ]);
-        $this->tester->setConfig(AppPaymentConstants::IS_TENANT_PAYMENTS_DELETION_AFTER_DISCONNECTION_ENABLED, true);
 
-        $tenantIdentifier = Uuid::uuid4()->toString();
+        $deletePaymentMethodTransfer = $this->tester->haveDeletePaymentMethodTransfer();
+
         $this->tester->haveAppConfigForTenant($tenantIdentifier);
 
         $appConfigTransfer = new AppConfigTransfer();
