@@ -45,7 +45,10 @@ class PaymentMapper
         SpyPaymentMethod $spyPaymentMethod
     ): SpyPaymentMethod {
         $paymentMethodData = $paymentMethodTransfer->modifiedToArray();
-        $paymentMethodData['payment_method_app_configuration'] = json_encode($paymentMethodData['payment_method_app_configuration']);
+
+        if (isset($paymentMethodData['payment_method_app_configuration'])) {
+            $paymentMethodData['payment_method_app_configuration'] = json_encode($paymentMethodData['payment_method_app_configuration']);
+        }
 
         return $spyPaymentMethod->fromArray($paymentMethodData);
     }
@@ -55,7 +58,10 @@ class PaymentMapper
         PaymentMethodTransfer $paymentMethodTransfer
     ): PaymentMethodTransfer {
         $paymentMethodData = $spyPaymentMethod->toArray();
-        $paymentMethodData['payment_method_app_configuration'] = json_decode($paymentMethodData['payment_method_app_configuration'], true);
+
+        if (isset($paymentMethodData['payment_method_app_configuration'])) {
+            $paymentMethodData['payment_method_app_configuration'] = json_decode($paymentMethodData['payment_method_app_configuration'], true);
+        }
 
         return $paymentMethodTransfer->fromArray($paymentMethodData, true);
     }

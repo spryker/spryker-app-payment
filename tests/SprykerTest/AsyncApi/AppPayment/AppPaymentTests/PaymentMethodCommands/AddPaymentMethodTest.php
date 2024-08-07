@@ -46,6 +46,9 @@ class AddPaymentMethodTest extends Unit
     public function testAddPaymentMethodMessageIsSendWhenAppConfigIsNew(): void
     {
         // Arrange
+//        $this->tester->mockConfigMethod('getPaymentMethodName', 'foo', 'AppPayment');
+//        $this->tester->mockConfigMethod('getPaymentProviderName', 'foo', 'AppPayment');
+
         $this->tester->setDependency(AppKernelDependencyProvider::PLUGIN_CONFIGURATION_BEFORE_SAVE_PLUGINS, []);
         $this->tester->setDependency(AppKernelDependencyProvider::PLUGIN_CONFIGURATION_AFTER_SAVE_PLUGINS, [new SendAddPaymentMethodMessageConfigurationAfterSavePlugin()]);
 

@@ -36,7 +36,7 @@ class PaymentFacadeDeletePaymentMethodsTest extends Unit
     /**
      * @return void
      */
-    public function testGivenTwoPaymentMethodsArePersistedWhenOnlyOneIsConfiguredToBeUsedThenOnePaymentMethodIsDeleted(): void
+    public function testGivenTwoPaymentMethodsArePersistedWhenDeletePaymentMethodsIsCalledAllPersistedPaymentMethodsWillBeDeleted(): void
     {
         // Arrange
         $tenantIdentifier = Uuid::uuid4()->toString();
@@ -87,7 +87,7 @@ class PaymentFacadeDeletePaymentMethodsTest extends Unit
         $this->tester->getFacade()->deletePaymentMethods($appConfigTransfer);
 
         // Assert
-        $this->tester->seePaymentMethodForTenant($paymentMethodNameFoo, $tenantIdentifier);
+        $this->tester->dontSeePaymentMethodForTenant($paymentMethodNameFoo, $tenantIdentifier);
         $this->tester->dontSeePaymentMethodForTenant($paymentMethodNameBar, $tenantIdentifier);
     }
 }

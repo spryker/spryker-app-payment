@@ -13,6 +13,7 @@ use Generated\Shared\Transfer\DeletePaymentMethodTransfer;
 use Generated\Shared\Transfer\EndpointTransfer;
 use Generated\Shared\Transfer\PaymentMethodAppConfigurationTransfer;
 use Generated\Shared\Transfer\PaymentMethodConfigurationRequestTransfer;
+use Generated\Shared\Transfer\PaymentMethodTransfer;
 use Spryker\Zed\AppKernel\AppKernelConfig;
 use Spryker\Zed\AppPayment\AppPaymentConfig;
 use Spryker\Zed\AppPayment\Business\Payment\Message\PaymentMethodMessageSender;
@@ -37,22 +38,15 @@ class PaymentMethod
             return $appConfigTransfer;
         }
 
-        $tenantIdentifier = $appConfigTransfer->getTenantIdentifierOrFail();
-
-        $paymentMethodAppConfigurationTransfer = $this->getDefaultPaymentMethodAppConfiguration();
-
         if (!($this->appPaymentPlatformPlugin instanceof AppPaymentPaymentMethodsPlatformPluginInterface)) {
-            $addPaymentMethodTransfer = new AddPaymentMethodTransfer();
-            $addPaymentMethodTransfer
-                ->setName($this->appPaymentConfig->getPaymentMethodName())
-                ->setPaymentAuthorizationEndpoint(sprintf('%s/private/initialize-payment', $this->appPaymentConfig->getGlueBaseUrl()))
-                ->setProviderName($this->appPaymentConfig->getPaymentProviderName())
-                ->setPaymentMethodAppConfiguration($paymentMethodAppConfigurationTransfer);
+            $paymentMethodTransfer = $this->getDefaultPaymentMethodTransfer();
 
-            $this->paymentMethodMessageSender->sendAddPaymentMethodMessage($addPaymentMethodTransfer, $appConfigTransfer);
+            $this->addPaymentMethod($paymentMethodTransfer, $appConfigTransfer);
 
             return $appConfigTransfer;
         }
+
+        $tenantIdentifier = $appConfigTransfer->getTenantIdentifierOrFail();
 
         $paymentMethodConfigurationRequestTransfer = new PaymentMethodConfigurationRequestTransfer();
         $paymentMethodConfigurationRequestTransfer->setAppConfig($appConfigTransfer);
@@ -66,32 +60,52 @@ class PaymentMethod
         $configuredPaymentMethodTransfers = $paymentMethodCollectionResponseTransfer->getPaymentMethods()->getArrayCopy();
 
         $paymentMethodTransfersToAdd = $this->getPaymentMethodsToAdd($persistedPaymentMethodTransfers, $configuredPaymentMethodTransfers);
+        $paymentMethodTransfersToDelete = $this->getPaymentMethodsToDelete($persistedPaymentMethodTransfers, $configuredPaymentMethodTransfers);
 
         foreach ($paymentMethodTransfersToAdd as $paymentMethodTransferToAdd) {
-            // Add the passed configuration to the default configuration.
-            $paymentMethodAppConfigurationTransfer->setCheckoutConfiguration($paymentMethodTransferToAdd->getPaymentMethodAppConfiguration()->getCheckoutConfiguration());
+            $this->addPaymentMethod($paymentMethodTransferToAdd, $appConfigTransfer);
+        }
 
-            $addPaymentMethodTransfer = new AddPaymentMethodTransfer();
-            $addPaymentMethodTransfer
-                ->setName($paymentMethodTransferToAdd->getName())
-                ->setProviderName($paymentMethodTransferToAdd->getProviderName())
-                ->setPaymentAuthorizationEndpoint(sprintf('%s/private/initialize-payment', $this->appPaymentConfig->getGlueBaseUrl()))
-                ->setPaymentMethodAppConfiguration($paymentMethodAppConfigurationTransfer);
-
-            $this->appPaymentRepository->savePaymentMethod($paymentMethodTransferToAdd, $tenantIdentifier);
-
-            $this->paymentMethodMessageSender->sendAddPaymentMethodMessage($addPaymentMethodTransfer, $appConfigTransfer);
+        foreach ($paymentMethodTransfersToDelete as $paymentMethodTransferToDelete) {
+            $this->deletePaymentMethod($paymentMethodTransferToDelete, $appConfigTransfer);
         }
 
         return $appConfigTransfer;
     }
 
+    protected function addPaymentMethod(PaymentMethodTransfer $paymentMethodTransfer, AppConfigTransfer $appConfigTransfer): void
+    {
+        // Add the passed configuration to the default configuration.
+        $paymentMethodAppConfigurationTransfer = $this->getDefaultPaymentMethodAppConfiguration();
+
+        if ($paymentMethodTransfer->getPaymentMethodAppConfiguration() instanceof PaymentMethodAppConfigurationTransfer) {
+            $paymentMethodAppConfigurationTransfer->setCheckoutConfiguration($paymentMethodTransfer->getPaymentMethodAppConfiguration()->getCheckoutConfiguration());
+        }
+
+        $addPaymentMethodTransfer = new AddPaymentMethodTransfer();
+        $addPaymentMethodTransfer
+            ->setName($paymentMethodTransfer->getNameOrFail())
+            ->setProviderName($paymentMethodTransfer->getProviderNameOrFail())
+            ->setPaymentAuthorizationEndpoint(sprintf('%s/private/initialize-payment', $this->appPaymentConfig->getGlueBaseUrl()))
+            ->setPaymentMethodAppConfiguration($paymentMethodAppConfigurationTransfer);
+
+        $this->appPaymentRepository->savePaymentMethod($paymentMethodTransfer, $appConfigTransfer->getTenantIdentifierOrFail());
+
+        $this->paymentMethodMessageSender->sendAddPaymentMethodMessage($addPaymentMethodTransfer, $appConfigTransfer);
+    }
+
+    /**
+     * @param array<\Generated\Shared\Transfer\PaymentMethodTransfer> $persistedPaymentMethodTransfers
+     * @param array<\Generated\Shared\Transfer\PaymentMethodTransfer> $configuredPaymentMethodTransfers
+     *
+     * @return array<\Generated\Shared\Transfer\PaymentMethodTransfer>
+     */
     protected function getPaymentMethodsToAdd(array $persistedPaymentMethodTransfers, array $configuredPaymentMethodTransfers): array
     {
         $methodsToAdd = [];
 
         foreach ($configuredPaymentMethodTransfers as $configuredPaymentMethodTransfer) {
-            if (!$this->isPaymentMethodPersisted($configuredPaymentMethodTransfer->getName(), $persistedPaymentMethodTransfers)) {
+            if (!$this->isPaymentMethodPersisted($configuredPaymentMethodTransfer->getNameOrFail(), $persistedPaymentMethodTransfers)) {
                 $methodsToAdd[] = $configuredPaymentMethodTransfer;
             }
         }
@@ -113,12 +127,18 @@ class PaymentMethod
         return false;
     }
 
+    /**
+     * @param array<\Generated\Shared\Transfer\PaymentMethodTransfer> $persistedPaymentMethodTransfers
+     * @param array<\Generated\Shared\Transfer\PaymentMethodTransfer> $configuredPaymentMethodTransfers
+     *
+     * @return array<\Generated\Shared\Transfer\PaymentMethodTransfer>
+     */
     protected function getPaymentMethodsToDelete(array $persistedPaymentMethodTransfers, array $configuredPaymentMethodTransfers): array
     {
         $methodsToDelete = [];
 
         foreach ($persistedPaymentMethodTransfers as $persistedPaymentMethodTransfer) {
-            if (!$this->isPaymentMethodConfigured($persistedPaymentMethodTransfer->getName(), $configuredPaymentMethodTransfers)) {
+            if (!$this->isPaymentMethodConfigured($persistedPaymentMethodTransfer->getNameOrFail(), $configuredPaymentMethodTransfers)) {
                 $methodsToDelete[] = $persistedPaymentMethodTransfer;
             }
         }
@@ -143,43 +163,44 @@ class PaymentMethod
     public function deletePaymentMethods(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
     {
         if (!($this->appPaymentPlatformPlugin instanceof AppPaymentPaymentMethodsPlatformPluginInterface)) {
-            $deletePaymentMethodTransfer = new DeletePaymentMethodTransfer();
-            $deletePaymentMethodTransfer
-                ->setName($this->appPaymentConfig->getPaymentMethodName())
-                ->setProviderName($this->appPaymentConfig->getPaymentProviderName());
+            $paymentMethodTransfer = $this->getDefaultPaymentMethodTransfer();
 
-            $this->paymentMethodMessageSender->sendDeletePaymentMethodMessage($deletePaymentMethodTransfer, $appConfigTransfer);
+            $this->deletePaymentMethod($paymentMethodTransfer, $appConfigTransfer);
 
             return $appConfigTransfer;
         }
 
         $tenantIdentifier = $appConfigTransfer->getTenantIdentifierOrFail();
 
-        $paymentMethodConfigurationRequestTransfer = new PaymentMethodConfigurationRequestTransfer();
-        $paymentMethodConfigurationRequestTransfer->setAppConfig($appConfigTransfer);
-
-        $paymentMethodCollectionResponseTransfer = $this->appPaymentPlatformPlugin->configurePaymentMethods($paymentMethodConfigurationRequestTransfer);
-
         // Get current persisted Tenants payment methods
         $persistedPaymentMethodTransfers = $this->appPaymentRepository->getTenantPaymentMethods($tenantIdentifier);
 
-        // Get current configured payment methods
-        $configuredPaymentMethodTransfers = $paymentMethodCollectionResponseTransfer->getPaymentMethods()->getArrayCopy();
-
-        $paymentMethodTransfersToDelete = $this->getPaymentMethodsToDelete($persistedPaymentMethodTransfers, $configuredPaymentMethodTransfers);
-
-        foreach ($paymentMethodTransfersToDelete as $paymentMethodTransferToDelete) {
-            $deletePaymentMethodTransfer = new DeletePaymentMethodTransfer();
-            $deletePaymentMethodTransfer
-                ->setName($paymentMethodTransferToDelete->getName())
-                ->setProviderName($paymentMethodTransferToDelete->getProviderName());
-
-            $this->appPaymentRepository->deletePaymentMethod($paymentMethodTransferToDelete, $tenantIdentifier);
-
-            $this->paymentMethodMessageSender->sendDeletePaymentMethodMessage($deletePaymentMethodTransfer, $appConfigTransfer);
+        foreach ($persistedPaymentMethodTransfers as $persistedPaymentMethodTransfer) {
+            $this->deletePaymentMethod($persistedPaymentMethodTransfer, $appConfigTransfer);
         }
 
         return $appConfigTransfer;
+    }
+
+    protected function deletePaymentMethod(PaymentMethodTransfer $paymentMethodTransfer, AppConfigTransfer $appConfigTransfer): void
+    {
+        $deletePaymentMethodTransfer = new DeletePaymentMethodTransfer();
+        $deletePaymentMethodTransfer
+            ->setName($paymentMethodTransfer->getNameOrFail())
+            ->setProviderName($paymentMethodTransfer->getProviderNameOrFail());
+
+        $this->paymentMethodMessageSender->sendDeletePaymentMethodMessage($deletePaymentMethodTransfer, $appConfigTransfer);
+        $this->appPaymentRepository->deletePaymentMethod($paymentMethodTransfer, $appConfigTransfer->getTenantIdentifierOrFail());
+    }
+
+    protected function getDefaultPaymentMethodTransfer(): PaymentMethodTransfer
+    {
+        $paymentMethodTransfer = new PaymentMethodTransfer();
+        $paymentMethodTransfer
+            ->setName($this->appPaymentConfig->getPaymentMethodName())
+            ->setProviderName($this->appPaymentConfig->getPaymentProviderName());
+
+        return $paymentMethodTransfer;
     }
 
     protected function getDefaultPaymentMethodAppConfiguration(): PaymentMethodAppConfigurationTransfer
