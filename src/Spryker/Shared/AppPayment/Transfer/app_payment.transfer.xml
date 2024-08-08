@@ -25,7 +25,7 @@
     </transfer>
 
     <transfer name="PaymentPageRequest" strict="true">
-        <property name="requestData" type="array"/>
+        <property name="requestData" type="array" singular="requestDatum"/>
         <property name="payment" type="Payment"/>
         <property name="appConfig" type="AppConfig"/>
         <property name="transactionId" type="string"/>
@@ -35,7 +35,7 @@
     <transfer name="PaymentPageResponse" strict="true">
         <property name="isSuccessful" type="bool"/>
         <property name="paymentPageTemplate" type="string"/>
-        <property name="paymentPageData" type="array"/>
+        <property name="paymentPageData" type="array" singular="paymentPageDatum"/>
     </transfer>
 
     <transfer name="InitializePaymentRequest" strict="true">
