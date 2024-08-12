@@ -75,7 +75,7 @@
 
     <table name="spy_payment_method" idMethod="native" class="SpyPaymentRefund">
         <column name="id_payment_method" required="true" type="INTEGER" autoIncrement="true" primaryKey="true"/>
-        <column name="tenant_identifier" type="CHAR" size="36"/>
+        <column name="tenant_identifier" type="CHAR" size="60"/>
         <column name="name" required="true" type="VARCHAR" size="128"/>
         <column name="provider_name" required="true" type="VARCHAR" size="128"/>
         <column name="payment_method_app_configuration" type="LONGVARCHAR"/>
