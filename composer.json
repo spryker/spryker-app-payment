@@ -13,7 +13,7 @@
         "spryker/transfer": "^3.33.0"
     },
     "require-dev": {
-        "spryker/app-webhook": "dev-main",
+        "spryker/app-webhook": "^1.0.0",
         "codeception/codeception": "^5.0",
         "codeception/module-asserts": "^3.0.0",
         "codeception/module-cli": "^2.0.0",
@@ -29,7 +29,7 @@
         "phpstan/phpstan": "1.10.66",
         "rector/rector": "^0.19.0",
         "spryker-sdk/async-api": "dev-master as 0.3.1",
-        "spryker/app-kernel": "dev-master",
+        "spryker/app-kernel": "^1.0.0",
         "spryker/code-sniffer": "*",
         "spryker/container": "*",
         "spryker/development": "^3.34.0",
