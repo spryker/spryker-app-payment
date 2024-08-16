@@ -192,7 +192,6 @@ class PaymentTransfer
 
     /**
      * @param array<string, \Generated\Shared\Transfer\PaymentTransmissionItemTransfer> $paymentTransmissionItems
-     *
      */
     protected function createPaymentTransmissionTransfer(
         GeneratedPaymentTransfer $generatedPaymentTransfer,
