@@ -85,14 +85,14 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
     }
 
     /**
-     * @param \ArrayObject<int, \Generated\Shared\Transfer\OrderItemTransfer|\Generated\Shared\Transfer\PaymentTransmissionItemTransfer> $paymentTransmissionItems
+     * @param \ArrayObject<int, (\Generated\Shared\Transfer\OrderItemTransfer | \Generated\Shared\Transfer\PaymentTransmissionItemTransfer)> $arrayObject
      *
      * @return array<int, array<string, string|null>>
      */
-    protected function formatPaymentTransmissionItemsForTransferResponse(ArrayObject $paymentTransmissionItems): array
+    protected function formatPaymentTransmissionItemsForTransferResponse(ArrayObject $arrayObject): array
     {
         $paymentTransmissionItemsData = [];
-        foreach ($paymentTransmissionItems as $paymentTransmissionItem) {
+        foreach ($arrayObject as $paymentTransmissionItem) {
             $paymentTransmissionItemsData[] = [
                 'merchantReference' => $paymentTransmissionItem->getMerchantReferenceOrFail(),
                 'orderReference' => $paymentTransmissionItem->getOrderReferenceOrFail(),

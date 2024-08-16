@@ -91,7 +91,8 @@ class PaymentTransfer
         return $paymentTransmissionsResponseTransfer;
     }
 
-    protected function addAppConfigToRequest(PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer): PaymentTransmissionsRequestTransfer {
+    protected function addAppConfigToRequest(PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer): PaymentTransmissionsRequestTransfer
+    {
         return $paymentTransmissionsRequestTransfer->setAppConfigOrFail(
             $this->appConfigLoader->loadAppConfig($paymentTransmissionsRequestTransfer->getTenantIdentifierOrFail()),
         );
@@ -190,11 +191,8 @@ class PaymentTransfer
     }
 
     /**
-     * @param \Generated\Shared\Transfer\PaymentTransfer $generatedPaymentTransfer
-     * @param string $orderReference
      * @param array<string, \Generated\Shared\Transfer\PaymentTransmissionItemTransfer> $paymentTransmissionItems
      *
-     * @return \Generated\Shared\Transfer\PaymentTransmissionTransfer
      */
     protected function createPaymentTransmissionTransfer(
         GeneratedPaymentTransfer $generatedPaymentTransfer,
@@ -254,8 +252,8 @@ class PaymentTransfer
     ): array {
         $orderReferences = [];
 
-        foreach ($paymentTransmissionItemsGroupedByTransferIdAndOrderReference as $paymentTransmissionItemsGroupedByOrderReference) {
-            foreach (array_keys($paymentTransmissionItemsGroupedByOrderReference) as $orderReference) {
+        foreach ($paymentTransmissionItemsGroupedByTransferIdAndOrderReference as $paymentTransmissionItemsGrouped) {
+            foreach (array_keys($paymentTransmissionItemsGrouped) as $orderReference) {
                 $orderReferences[$orderReference] = $orderReference;
             }
         }
