@@ -45,13 +45,13 @@ class AppPaymentBackendApiTester extends Actor
         $this->assertTrue($initializePaymentResponseTransfer->getIsSuccessful());
     }
 
-    public function seeResponseJsonContainsClientSecret(Response $response): void
+    public function seeResponseJsonContainsPaymentProviderData(Response $response, array $paymentProviderData): void
     {
         $response = json_decode($response->getContent(), true);
 
         $initializePaymentResponseTransfer = (new InitializePaymentResponseTransfer())->fromArray($response);
 
-        $this->assertNotNull($initializePaymentResponseTransfer->getClientSecret(), 'Expected to get a client secret but got null');
+        $this->assertSame($initializePaymentResponseTransfer->getPaymentProviderData(), $paymentProviderData);
     }
 
     public function haveTransferDefaults(string $tenantIdentifier, string $merchantReference, string $transactionId, string $orderReference): void

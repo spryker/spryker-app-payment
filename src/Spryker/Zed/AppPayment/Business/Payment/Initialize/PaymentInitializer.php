@@ -17,6 +17,7 @@ use Spryker\Zed\AppPayment\Business\Payment\Message\MessageSender;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentEntityManagerInterface;
+use Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface;
 use Spryker\Zed\Kernel\Persistence\EntityManager\TransactionTrait;
 use Throwable;
 
@@ -28,6 +29,7 @@ class PaymentInitializer
     public function __construct(
         protected AppPaymentPlatformPluginInterface $appPaymentPlatformPlugin,
         protected AppPaymentEntityManagerInterface $appPaymentEntityManager,
+        protected AppPaymentRepositoryInterface $appPaymentRepository,
         protected MessageSender $messageSender,
         protected AppPaymentConfig $appPaymentConfig,
         protected AppConfigLoader $appConfigLoader
@@ -38,6 +40,14 @@ class PaymentInitializer
     {
         try {
             $initializePaymentRequestTransfer->setAppConfigOrFail($this->appConfigLoader->loadAppConfig($initializePaymentRequestTransfer->getTenantIdentifierOrFail()));
+
+            // In case of a pre-order payment, the payment provider data is already set, and we have to load the previously made payment and pass it to the platform implementation.
+            if ($initializePaymentRequestTransfer->getPaymentProviderData() !== [] && isset($initializePaymentRequestTransfer->getPaymentProviderData()[PaymentTransfer::TRANSACTION_ID])) {
+                $initializePaymentRequestTransfer->setPayment(
+                    $this->appPaymentRepository->getPaymentByTransactionId($initializePaymentRequestTransfer->getPaymentProviderData()[PaymentTransfer::TRANSACTION_ID]),
+                );
+            }
+
             $initializePaymentResponseTransfer = $this->appPaymentPlatformPlugin->initializePayment($initializePaymentRequestTransfer);
         } catch (Throwable $throwable) {
             $this->getLogger()->error($throwable->getMessage(), [
@@ -61,6 +71,11 @@ class PaymentInitializer
 
         /** @phpstan-var \Generated\Shared\Transfer\InitializePaymentResponseTransfer */
         return $this->getTransactionHandler()->handleTransaction(function () use ($initializePaymentRequestTransfer, $initializePaymentResponseTransfer) {
+            // We only persist and only send the message with the initial request once.
+            if ($initializePaymentRequestTransfer->getPayment() instanceof PaymentTransfer) {
+                return $initializePaymentResponseTransfer;
+            }
+
             $this->savePayment($initializePaymentRequestTransfer, $initializePaymentResponseTransfer);
             $this->messageSender->sendPaymentCreatedMessage($initializePaymentRequestTransfer, $initializePaymentResponseTransfer);
 

@@ -62,7 +62,7 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
 
     public function createPaymentInitializer(): PaymentInitializer
     {
-        return new PaymentInitializer($this->getPlatformPlugin(), $this->getEntityManager(), $this->createMessageSender(), $this->getConfig(), $this->createAppConfigLoader());
+        return new PaymentInitializer($this->getPlatformPlugin(), $this->getEntityManager(), $this->getRepository(), $this->createMessageSender(), $this->getConfig(), $this->createAppConfigLoader());
     }
 
     public function createPaymentPreOrder(): PaymentPreOrder
