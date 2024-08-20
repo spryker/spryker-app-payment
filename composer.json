@@ -69,7 +69,7 @@
         "setup": "tests/bin/console app-payment:setup && tests/bin/console transfer:generate && tests/bin/console transfer:databuilder:generate && tests/bin/console dev:ide-auto-completion:zed:generate && tests/bin/console dev:ide-auto-completion:glue:generate && tests/bin/console propel:install && vendor/bin/codecept build",
         "cs-check": "phpcs -p src/ tests/",
         "cs-fix": "phpcbf -p src/ tests/",
-        "stan": "phpstan analyze src/Spryker/",
+        "stan": "phpstan analyze src/Spryker/ --memory-limit=1G",
         "test": "codecept build && codecept run",
         "test-cover": "codecept build && codecept run --coverage-xml",
         "test-cover-html": "codecept build && codecept run --coverage-html",

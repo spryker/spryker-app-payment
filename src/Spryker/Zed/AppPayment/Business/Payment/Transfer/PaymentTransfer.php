@@ -192,7 +192,11 @@ class PaymentTransfer
     }
 
     /**
-     * @param array<string, \Generated\Shared\Transfer\PaymentTransmissionItemTransfer> $paymentTransmissionItems
+     * @param \Generated\Shared\Transfer\PaymentTransfer $generatedPaymentTransfer
+     * @param string $orderReference
+     * @param array<string|int, \Generated\Shared\Transfer\PaymentTransmissionItemTransfer> $paymentTransmissionItems
+     *
+     * @return \Generated\Shared\Transfer\PaymentTransmissionTransfer
      */
     protected function createPaymentTransmissionTransfer(
         GeneratedPaymentTransfer $generatedPaymentTransfer,
@@ -213,7 +217,7 @@ class PaymentTransfer
     /**
      * Group payment transmission items(order items, order expenses and any additional type) by their transferId and inside of this by their orderReference. They were transferred together in the payout process.
      *
-     * @return array<string, array<string, \Generated\Shared\Transfer\PaymentTransmissionItemTransfer>>
+     * @return array<string, array<string, array<int, \Generated\Shared\Transfer\PaymentTransmissionItemTransfer>>>
      */
     protected function getTransmissionItemsGroupedByTransferIdAndOrderReference(
         PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer
@@ -240,7 +244,7 @@ class PaymentTransfer
     }
 
     /**
-     * @param array<string, array<string, \Generated\Shared\Transfer\PaymentTransmissionItemTransfer>> $paymentTransmissionItemsGroupedByTransferIdAndOrderReference
+     * @param array<string, array<string, array<int, \Generated\Shared\Transfer\PaymentTransmissionItemTransfer>>> $paymentTransmissionItemsGroupedByTransferIdAndOrderReference
      *
      * @return array<string, string>
      */
