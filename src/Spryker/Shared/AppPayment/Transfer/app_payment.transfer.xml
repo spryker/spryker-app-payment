@@ -207,6 +207,10 @@
         <property name="message" type="string"/>
     </transfer>
 
+    <transfer name="WebhookInboxCriteria" strict="true">
+        <property name="identifier" type="array" singular="identifier"/>
+    </transfer>
+
     <transfer name="MessageAttributes"/>
 
     <transfer name="CapturePayment" strict="true">

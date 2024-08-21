@@ -14,12 +14,14 @@ use Generated\Shared\Transfer\AppConfigTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentRequestTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentResponseTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
+use Generated\Shared\Transfer\WebhookRequestTransfer;
 use Ramsey\Uuid\Uuid;
 use Spryker\Glue\AppPaymentBackendApi\Mapper\Payment\GlueRequestPaymentMapper;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPreOrderPaymentPlatformPluginInterface;
+use Spryker\Zed\AppWebhook\AppWebhookDependencyProvider;
 use SprykerTest\Glue\AppPaymentBackendApi\AppPaymentBackendApiTester;
 use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
 use Symfony\Component\HttpFoundation\Response;
@@ -103,6 +105,45 @@ class ConfirmPreOrderPaymentApiTest extends Unit
 
         // Assert
         $this->tester->seeResponseCodeIs(Response::HTTP_OK);
+    }
+
+    public function testConfirmPreOrderPaymentPostRequestReturnsHttpResponseCode200AndProcessesUnprocessedWebhooks(): void
+    {
+        // Arrange
+        $transactionId = Uuid::uuid4()->toString();
+
+        $webhookRequestTransfer = new WebhookRequestTransfer();
+        $webhookRequestTransfer->setIdentifier($transactionId);
+
+        $this->tester->haveWebhookRequestPersisted($webhookRequestTransfer);
+
+        $this->tester->assertWebhookIsPersisted($transactionId);
+
+        $confirmPreOrderPaymentRequestTransfer = $this->tester->haveConfirmPreOrderPaymentRequestTransfer([
+            ConfirmPreOrderPaymentRequestTransfer::TRANSACTION_ID => $transactionId,
+        ]);
+
+        $this->tester->haveAppConfigForTenant($confirmPreOrderPaymentRequestTransfer->getTenantIdentifier());
+        $this->tester->havePaymentForTransactionId($confirmPreOrderPaymentRequestTransfer->getTransactionId(), $confirmPreOrderPaymentRequestTransfer->getTenantIdentifier());
+
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class);
+
+        $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
+
+        // This will mark the persisted webhook as being handled.
+        $webhookHandlerPlugin = $this->tester->createSuccessfulWebhookHandlerPlugin();
+        $this->tester->setDependency(AppWebhookDependencyProvider::PLUGINS_WEBHOOK_HANDLER, [$webhookHandlerPlugin]);
+
+        // Act
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $confirmPreOrderPaymentRequestTransfer->getTenantIdentifier());
+        $this->tester->addHeader('Content-Type', 'application/json');
+
+        $this->tester->sendPost($this->tester->buildConfirmPreOrderPaymentUrl(), $confirmPreOrderPaymentRequestTransfer->toArray());
+
+        // Assert
+        $this->tester->seeResponseCodeIs(Response::HTTP_OK);
+
+        $this->tester->assertWebhookIsNotPersisted($transactionId);
     }
 
     public function testConfirmPreOrderPaymentPostRequestReturnsHttpResponseCode400WhenThePaymentCanNotBeUpdatedWithTheMissingOrderReference(): void

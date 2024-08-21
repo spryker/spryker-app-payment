@@ -10,11 +10,13 @@ namespace Spryker\Zed\AppPayment\Business\Payment\PreOrder;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentRequestTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentResponseTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
+use Generated\Shared\Transfer\WebhookInboxCriteriaTransfer;
 use Spryker\Shared\Log\LoggerTrait;
 use Spryker\Zed\AppPayment\AppPaymentConfig;
 use Spryker\Zed\AppPayment\Business\Payment\AppConfig\AppConfigLoader;
 use Spryker\Zed\AppPayment\Business\Payment\Message\MessageSender;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
+use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToAppWebhookFacadeInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPreOrderPaymentPlatformPluginInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentEntityManagerInterface;
@@ -31,6 +33,7 @@ class PaymentPreOrder
         protected AppPaymentPlatformPluginInterface $appPaymentPlatformPlugin,
         protected AppPaymentRepositoryInterface $appPaymentRepository,
         protected AppPaymentEntityManagerInterface $appPaymentEntityManager,
+        protected AppPaymentToAppWebhookFacadeInterface $appPaymentToAppWebhookFacade,
         protected MessageSender $messageSender,
         protected AppPaymentConfig $appPaymentConfig,
         protected AppConfigLoader $appConfigLoader
@@ -69,6 +72,15 @@ class PaymentPreOrder
         /** @phpstan-var \Generated\Shared\Transfer\ConfirmPreOrderPaymentResponseTransfer */
         return $this->getTransactionHandler()->handleTransaction(function () use ($confirmPreOrderPaymentRequestTransfer, $confirmPreOrderPaymentResponseTransfer) {
             $this->savePayment($confirmPreOrderPaymentRequestTransfer, $confirmPreOrderPaymentResponseTransfer);
+
+            // In case of pre-order payment we may have unprocessed webhook requests persisted and we must process them here
+            $webhookInboxCriteriaTransfer = new WebhookInboxCriteriaTransfer();
+
+            // Unprocessed webhooks will be perstsited by the transaction id
+            $webhookInboxCriteriaTransfer->addIdentifier($confirmPreOrderPaymentRequestTransfer->getTransactionIdOrFail());
+
+            $this->appPaymentToAppWebhookFacade->processUnprocessedWebhooks($webhookInboxCriteriaTransfer);
+
             $this->sendMessages($confirmPreOrderPaymentRequestTransfer, $confirmPreOrderPaymentResponseTransfer);
 
             return $confirmPreOrderPaymentResponseTransfer;

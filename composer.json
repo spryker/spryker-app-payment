@@ -10,10 +10,10 @@
         "spryker/log": "^3.0.0",
         "spryker/message-broker": "^1.11.0",
         "spryker/symfony": "^3.0.0",
-        "spryker/transfer": "^3.33.0"
+        "spryker/transfer": "^3.33.0",
+        "spryker/app-webhook": "dev-feature/acp-3507/acp-3746-persist-webhooks-and-allow-to-run-them-later as 1.1.0"
     },
     "require-dev": {
-        "spryker/app-webhook": "^1.0.0",
         "codeception/codeception": "^5.0",
         "codeception/module-asserts": "^3.0.0",
         "codeception/module-cli": "^2.0.0",
