@@ -66,7 +66,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "scripts": {
-        "setup": "tests/bin/console app-payment:setup && tests/bin/console transfer:generate && tests/bin/console transfer:databuilder:generate && tests/bin/console dev:ide-auto-completion:zed:generate && tests/bin/console dev:ide-auto-completion:glue:generate && tests/bin/console propel:install && vendor/bin/codecept build",
+        "setup": "tests/bin/console app-payment:setup && tests/bin/console transfer:generate && tests/bin/console transfer:databuilder:generate && tests/bin/console dev:ide-auto-completion:zed:generate && tests/bin/console dev:ide-auto-completion:glue-backend:generate && tests/bin/console propel:install && vendor/bin/codecept build",
         "cs-check": "phpcs -p src/ tests/",
         "cs-fix": "phpcbf -p src/ tests/",
         "stan": "phpstan analyze src/Spryker/",

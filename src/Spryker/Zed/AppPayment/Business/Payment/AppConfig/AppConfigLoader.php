@@ -21,7 +21,6 @@ class AppConfigLoader
     {
         return $this->appPaymentToAppKernelFacade->getConfig(
             (new AppConfigCriteriaTransfer())->setTenantIdentifier($tenantIdentifier),
-            new AppConfigTransfer(),
         );
     }
 }

@@ -1,0 +1,7 @@
+parameters:
+    level: 7
+    bootstrapFiles:
+        - phpstan-bootstrap.php
+    checkMissingIterableValueType: true
+    ignoreErrors:
+        - '#Call to an undefined method Spryker\\.+\\AbstractTransfer::getMessageAttributesOrFail\(\)#'
