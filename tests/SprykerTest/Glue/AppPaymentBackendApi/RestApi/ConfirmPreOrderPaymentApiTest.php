@@ -20,7 +20,7 @@ use Spryker\Glue\AppPaymentBackendApi\Mapper\Payment\GlueRequestPaymentMapper;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
-use Spryker\Zed\AppPayment\Dependency\Plugin\AppPreOrderPaymentPlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPreOrderPluginInterface;
 use Spryker\Zed\AppWebhook\AppWebhookDependencyProvider;
 use SprykerTest\Glue\AppPaymentBackendApi\AppPaymentBackendApiTester;
 use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
@@ -59,7 +59,7 @@ class ConfirmPreOrderPaymentApiTest extends Unit
             ->setIsSuccessful(true)
             ->setStatus(PaymentStatus::STATUS_CAPTURED);
 
-        $platformPluginMock = Stub::makeEmpty(AppPreOrderPaymentPlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPreOrderPluginInterface::class, [
             'confirmPreOrderPayment' => function (ConfirmPreOrderPaymentRequestTransfer $confirmPreOrderPaymentRequestTransfer) use ($confirmPreOrderPaymentResponseTransfer) {
                 // Ensure that the AppConfig is always passed to the platform plugin.
                 $this->assertInstanceOf(AppConfigTransfer::class, $confirmPreOrderPaymentRequestTransfer->getAppConfig());
@@ -164,7 +164,7 @@ class ConfirmPreOrderPaymentApiTest extends Unit
             ->setMessage('Payment confirmation failed')
             ->setStatus(PaymentStatus::STATUS_CAPTURED);
 
-        $platformPluginMock = Stub::makeEmpty(AppPreOrderPaymentPlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPreOrderPluginInterface::class, [
             'confirmPreOrderPayment' => function (ConfirmPreOrderPaymentRequestTransfer $confirmPreOrderPaymentRequestTransfer) use ($confirmPreOrderPaymentResponseTransfer) {
                 // Ensure that the AppConfig is always passed to the platform plugin.
                 $this->assertInstanceOf(AppConfigTransfer::class, $confirmPreOrderPaymentRequestTransfer->getAppConfig());
@@ -198,7 +198,7 @@ class ConfirmPreOrderPaymentApiTest extends Unit
         $this->tester->haveAppConfigForTenant($confirmPreOrderPaymentRequestTransfer->getTenantIdentifier());
         $this->tester->havePaymentForTransactionId($confirmPreOrderPaymentRequestTransfer->getTransactionId(), $confirmPreOrderPaymentRequestTransfer->getTenantIdentifier());
 
-        $platformPluginMock = Stub::makeEmpty(AppPreOrderPaymentPlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPreOrderPluginInterface::class, [
             'confirmPreOrderPayment' => function (ConfirmPreOrderPaymentRequestTransfer $confirmPreOrderPaymentRequestTransfer): void {
                 // Ensure that the AppConfig is always passed to the platform plugin.
                 throw new Exception('Confirm pre-order payment failed');

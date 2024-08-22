@@ -22,7 +22,7 @@ use Spryker\Zed\AppKernel\Business\AppKernelFacade;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Communication\Plugin\AppKernel\ConfigurePaymentMethodsConfigurationAfterSavePlugin;
 use Spryker\Zed\AppPayment\Communication\Plugin\AppKernel\SendAddPaymentMethodMessageConfigurationAfterSavePlugin;
-use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPaymentMethodsPlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPaymentMethodsPluginInterface;
 use SprykerTest\AsyncApi\AppPayment\AppPaymentAsyncApiTester;
 use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
 
@@ -46,7 +46,7 @@ class AddPaymentMethodTest extends Unit
     public function testAddPaymentMethodMessageIsSendWhenAppConfigIsNewAndPlatformPluginCanConfigurePaymentMethods(): void
     {
         // Arrange
-        $platformPluginMock = Stub::makeEmpty(AppPaymentPaymentMethodsPlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPaymentMethodsPluginInterface::class, [
             'configurePaymentMethods' => function ($paymentMethodConfigurationRequestTransfer) {
                 $checkoutConfigurationTransfer = new CheckoutConfigurationTransfer();
                 $checkoutConfigurationTransfer->setStrategy('embedded');
@@ -103,7 +103,7 @@ class AddPaymentMethodTest extends Unit
             PaymentMethodTransfer::PAYMENT_METHOD_APP_CONFIGURATION => $paymentMethodAppConfigurationTransfer,
         ]);
 
-        $platformPluginMock = Stub::makeEmpty(AppPaymentPaymentMethodsPlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPaymentMethodsPluginInterface::class, [
             'configurePaymentMethods' => function () use ($paymentMethodName, $paymentProviderName, $paymentMethodAppConfigurationTransfer) {
                 $checkoutConfigurationTransfer = new CheckoutConfigurationTransfer();
                 $checkoutConfigurationTransfer->setStrategy('updated-strategy');

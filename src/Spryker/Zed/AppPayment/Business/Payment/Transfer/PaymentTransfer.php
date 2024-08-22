@@ -30,15 +30,10 @@ class PaymentTransfer
     use LoggerTrait;
 
     /**
-     * @var array<\Generated\Shared\Transfer\PaymentTransmissionTransfer>
-     */
-    protected array $failedPaymentTransmissionTransfers = [];
-
-    /**
      * @param array<\Spryker\Zed\AppPayment\Dependency\Plugin\PaymentTransmissionsRequestExtenderPluginInterface> $paymentTransmissionsRequestExpanderPlugins
      */
     public function __construct(
-        protected AppPaymentPlatformMarketplacePluginInterface $appPaymentPlatformPlugin,
+        protected AppPaymentPlatformPluginInterface $appPaymentPlatformPlugin,
         protected AppPaymentEntityManagerInterface $appPaymentEntityManager,
         protected AppPaymentRepositoryInterface $appPaymentRepository,
         protected AppPaymentConfig $appPaymentConfig,
@@ -49,6 +44,20 @@ class PaymentTransfer
 
     public function transferPayments(PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer): PaymentTransmissionsResponseTransfer
     {
+        if (!$this->appPaymentPlatformPlugin instanceof AppPaymentPlatformMarketplacePluginInterface) {
+            $this->getLogger()->error(MessageBuilder::getPlatformPluginDoesNotProvideMarketplaceFeatures(), [
+                PaymentTransmissionsRequestTransfer::TENANT_IDENTIFIER => $paymentTransmissionsRequestTransfer->getTenantIdentifier(),
+                PaymentTransmissionsRequestTransfer::TRANSACTION_ID => $paymentTransmissionsRequestTransfer->getTransactionId(),
+            ]);
+
+            $paymentTransmissionsResponseTransfer = new PaymentTransmissionsResponseTransfer();
+            $paymentTransmissionsResponseTransfer
+                ->setIsSuccessful(false)
+                ->setMessage(MessageBuilder::getPlatformPluginDoesNotProvideMarketplaceFeatures());
+
+            return $paymentTransmissionsResponseTransfer;
+        }
+
         // In case all payment transmissions fail, we do not request the platform to do something, and we need to return a response with the failed ones.
         $paymentTransmissionsResponseTransfer = new PaymentTransmissionsResponseTransfer();
 
@@ -193,7 +202,7 @@ class PaymentTransfer
     }
 
     /**
-     * @param array<string, string> $orderItems
+     * @param array<\Generated\Shared\Transfer\OrderItemTransfer> $orderItems
      */
     protected function createPaymentTransmissionTransfer(
         GeneratedPaymentTransfer $generatedPaymentTransfer,
@@ -214,7 +223,7 @@ class PaymentTransfer
     /**
      * Group orderItems by their transferId and inside of this by their orderReference. They were transferred together in the payout process.
      *
-     * @return array<string, array>
+     * @return array<string, array<string, array<int, \Generated\Shared\Transfer\OrderItemTransfer>>>
      */
     protected function getOrderItemsGroupedByTransferIdAndOrderReference(PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer): array
     {
@@ -240,7 +249,7 @@ class PaymentTransfer
     }
 
     /**
-     * @param array<string, array> $orderItemsGroupedByTransferId
+     * @param array<string, array<string, array<int, \Generated\Shared\Transfer\OrderItemTransfer>>> $orderItemsGroupedByTransferId
      *
      * @return array<string, string>
      */
@@ -260,7 +269,7 @@ class PaymentTransfer
     /**
      * Group orderItems by their orderReference. Items with a transferId are ignored as they are grouped into a different stack
      *
-     * @return array<string, array>
+     * @return array<string, array<string, \Generated\Shared\Transfer\OrderItemTransfer>>
      */
     protected function getOrderItemsGroupedByOrderReference(PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer): array
     {

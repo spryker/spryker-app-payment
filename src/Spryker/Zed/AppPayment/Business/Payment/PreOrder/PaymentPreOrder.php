@@ -18,7 +18,7 @@ use Spryker\Zed\AppPayment\Business\Payment\Message\MessageSender;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
 use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToAppWebhookFacadeInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
-use Spryker\Zed\AppPayment\Dependency\Plugin\AppPreOrderPaymentPlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPreOrderPluginInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentEntityManagerInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface;
 use Spryker\Zed\Kernel\Persistence\EntityManager\TransactionTrait;
@@ -54,7 +54,7 @@ class PaymentPreOrder
                 ->setIsSuccessful(true)
                 ->setStatus(PaymentStatus::STATUS_CAPTURED);
 
-            if ($this->appPaymentPlatformPlugin instanceof AppPreOrderPaymentPlatformPluginInterface) {
+            if ($this->appPaymentPlatformPlugin instanceof AppPaymentPlatformPreOrderPluginInterface) {
                 $confirmPreOrderPaymentResponseTransfer = $this->appPaymentPlatformPlugin->confirmPreOrderPayment($confirmPreOrderPaymentRequestTransfer);
             }
         } catch (Throwable $throwable) {

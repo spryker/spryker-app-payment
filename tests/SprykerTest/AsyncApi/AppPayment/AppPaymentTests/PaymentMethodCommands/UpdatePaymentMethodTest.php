@@ -19,7 +19,7 @@ use Spryker\Zed\AppKernel\AppKernelDependencyProvider;
 use Spryker\Zed\AppKernel\Business\AppKernelFacade;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Communication\Plugin\AppKernel\ConfigurePaymentMethodsConfigurationAfterSavePlugin;
-use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPaymentMethodsPlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPaymentMethodsPluginInterface;
 use SprykerTest\AsyncApi\AppPayment\AppPaymentAsyncApiTester;
 use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
 
@@ -60,7 +60,7 @@ class UpdatePaymentMethodTest extends Unit
             PaymentMethodTransfer::PAYMENT_METHOD_APP_CONFIGURATION => $paymentMethodAppConfigurationTransfer,
         ]);
 
-        $platformPluginMock = Stub::makeEmpty(AppPaymentPaymentMethodsPlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPaymentMethodsPluginInterface::class, [
             'configurePaymentMethods' => function () use ($paymentMethodName, $paymentProviderName, $paymentMethodAppConfigurationTransfer) {
                 $checkoutConfigurationTransfer = new CheckoutConfigurationTransfer();
                 $checkoutConfigurationTransfer->setStrategy('updated-strategy');
@@ -119,7 +119,7 @@ class UpdatePaymentMethodTest extends Unit
             PaymentMethodTransfer::PROVIDER_NAME => $paymentProviderName,
         ]);
 
-        $platformPluginMock = Stub::makeEmpty(AppPaymentPaymentMethodsPlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPaymentMethodsPluginInterface::class, [
             'configurePaymentMethods' => function () use ($paymentMethodName, $paymentProviderName, $paymentMethodAppConfigurationTransfer) {
                 $checkoutConfigurationTransfer = new CheckoutConfigurationTransfer();
                 $checkoutConfigurationTransfer->setStrategy('updated-strategy');
@@ -179,7 +179,7 @@ class UpdatePaymentMethodTest extends Unit
             PaymentMethodTransfer::PAYMENT_METHOD_APP_CONFIGURATION => $paymentMethodAppConfigurationTransfer,
         ]);
 
-        $platformPluginMock = Stub::makeEmpty(AppPaymentPaymentMethodsPlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPaymentMethodsPluginInterface::class, [
             'configurePaymentMethods' => function () use ($paymentMethodName, $paymentProviderName) {
                 $paymentMethodTransfer = new PaymentMethodTransfer();
                 $paymentMethodTransfer
@@ -225,7 +225,7 @@ class UpdatePaymentMethodTest extends Unit
             PaymentMethodTransfer::PROVIDER_NAME => $paymentProviderName,
         ]);
 
-        $platformPluginMock = Stub::makeEmpty(AppPaymentPaymentMethodsPlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPaymentMethodsPluginInterface::class, [
             'configurePaymentMethods' => function () use ($paymentMethodName, $paymentProviderName) {
                 $paymentMethodTransfer = new PaymentMethodTransfer();
                 $paymentMethodTransfer
@@ -276,7 +276,7 @@ class UpdatePaymentMethodTest extends Unit
             PaymentMethodTransfer::PAYMENT_METHOD_APP_CONFIGURATION => $paymentMethodAppConfigurationTransfer,
         ]);
 
-        $platformPluginMock = Stub::makeEmpty(AppPaymentPaymentMethodsPlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPaymentMethodsPluginInterface::class, [
             'configurePaymentMethods' => function () use ($paymentMethodName, $paymentProviderName, $paymentMethodAppConfigurationTransfer) {
                 $paymentMethodTransfer = new PaymentMethodTransfer();
                 $paymentMethodTransfer

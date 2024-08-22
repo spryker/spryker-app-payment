@@ -18,7 +18,7 @@ use Generated\Shared\Transfer\UpdatePaymentMethodTransfer;
 use Spryker\Zed\AppKernel\AppKernelConfig;
 use Spryker\Zed\AppPayment\AppPaymentConfig;
 use Spryker\Zed\AppPayment\Business\Payment\Message\PaymentMethodMessageSender;
-use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPaymentMethodsPlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPaymentMethodsPluginInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface;
 
@@ -39,7 +39,7 @@ class PaymentMethod
             return $appConfigTransfer;
         }
 
-        if (!($this->appPaymentPlatformPlugin instanceof AppPaymentPaymentMethodsPlatformPluginInterface)) {
+        if (!($this->appPaymentPlatformPlugin instanceof AppPaymentPlatformPaymentMethodsPluginInterface)) {
             $paymentMethodTransfer = $this->getDefaultPaymentMethodTransfer();
 
             $this->addPaymentMethod($paymentMethodTransfer, $appConfigTransfer);
@@ -249,7 +249,7 @@ class PaymentMethod
 
     public function deletePaymentMethods(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
     {
-        if (!($this->appPaymentPlatformPlugin instanceof AppPaymentPaymentMethodsPlatformPluginInterface)) {
+        if (!($this->appPaymentPlatformPlugin instanceof AppPaymentPlatformPaymentMethodsPluginInterface)) {
             $paymentMethodTransfer = $this->getDefaultPaymentMethodTransfer();
 
             $this->deletePaymentMethod($paymentMethodTransfer, $appConfigTransfer);

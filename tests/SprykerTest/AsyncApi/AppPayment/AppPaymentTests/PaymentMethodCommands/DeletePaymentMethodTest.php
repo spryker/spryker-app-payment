@@ -20,7 +20,7 @@ use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Communication\Plugin\AppKernel\DeleteTenantPaymentsConfigurationAfterDeletePlugin;
 use Spryker\Zed\AppPayment\Communication\Plugin\AppKernel\SendDeletePaymentMethodMessageConfigurationAfterDeletePlugin;
 use Spryker\Zed\AppPayment\Communication\Plugin\AppKernel\SendDeletePaymentMethodMessagesConfigurationAfterDeletePlugin;
-use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPaymentMethodsPlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPaymentMethodsPluginInterface;
 use SprykerTest\AsyncApi\AppPayment\AppPaymentAsyncApiTester;
 
 /**
@@ -95,7 +95,7 @@ class DeletePaymentMethodTest extends Unit
         $this->tester->seePaymentMethodForTenant($paymentMethodNameFoo, $tenantIdentifier);
         $this->tester->seePaymentMethodForTenant($paymentMethodNameBar, $tenantIdentifier);
 
-        $platformPluginMock = Stub::makeEmpty(AppPaymentPaymentMethodsPlatformPluginInterface::class);
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPaymentMethodsPluginInterface::class);
 
         $this->tester->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
         $this->tester->setDependency(AppKernelDependencyProvider::PLUGIN_CONFIGURATION_AFTER_DELETE_PLUGINS, [

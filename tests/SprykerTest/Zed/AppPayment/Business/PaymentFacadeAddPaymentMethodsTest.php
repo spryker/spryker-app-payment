@@ -15,7 +15,7 @@ use Generated\Shared\Transfer\PaymentMethodConfigurationResponseTransfer;
 use Generated\Shared\Transfer\PaymentMethodTransfer;
 use Ramsey\Uuid\Uuid;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
-use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPaymentMethodsPlatformPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPaymentMethodsPluginInterface;
 use SprykerTest\Zed\AppPayment\AppPaymentBusinessTester;
 
 /**
@@ -50,7 +50,7 @@ class PaymentFacadeAddPaymentMethodsTest extends Unit
             ],
         ]);
 
-        $platformPluginMock = Stub::makeEmpty(AppPaymentPaymentMethodsPlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPaymentMethodsPluginInterface::class, [
             'configurePaymentMethods' => function () use ($paymentMethodNameFoo, $paymentMethodNameBar) {
                 $paymentMethodConfigurationResponseTransfer = new PaymentMethodConfigurationResponseTransfer();
 
@@ -116,7 +116,7 @@ class PaymentFacadeAddPaymentMethodsTest extends Unit
             ],
         ]);
 
-        $platformPluginMock = Stub::makeEmpty(AppPaymentPaymentMethodsPlatformPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPaymentMethodsPluginInterface::class, [
             'configurePaymentMethods' => function () use ($paymentMethodNameFoo) {
                 $paymentMethodConfigurationResponseTransfer = new PaymentMethodConfigurationResponseTransfer();
 
