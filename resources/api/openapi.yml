@@ -236,8 +236,8 @@ components:
                     additionalProperties:
                         type: string
                     example:
-                        internalId: '#061280'
-                        externalId: '#061114'
+                        paymentId: '#061280'
+                        other: '#061114'
 
         ConfirmPreOrderPaymentResponse:
             properties:
