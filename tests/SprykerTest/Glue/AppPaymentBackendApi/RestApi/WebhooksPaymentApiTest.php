@@ -72,6 +72,26 @@ class WebhooksPaymentApiTest extends Unit
         $this->tester->assertPaymentIsInState($transactionId, PaymentStatus::STATUS_AUTHORIZED);
     }
 
+    public function testGivenPaymentInStateNewWhenThePlatformPluginReturnsASuccessfulWebhookResponseTransferAndIsHandledIsSetToFalseThenWebhookResponseIsEmidiatelyReturned(): void
+    {
+        // Arrange
+        $transactionId = Uuid::uuid4()->toString();
+        $tenantIdentifier = Uuid::uuid4()->toString();
+
+        $this->tester->haveAppConfigForTenant($tenantIdentifier);
+        $this->tester->havePaymentForTransactionId($transactionId, $tenantIdentifier);
+
+        $this->tester->mockGlueRequestWebhookMapperPlugin(WebhookDataType::PAYMENT, $transactionId);
+        $this->mockPaymentPlatformPlugin(true, null, null, false);
+
+        // Act
+        $this->tester->sendPost($this->tester->buildWebhookUrl(), ['data' => ['object' => ['id' => 123456789]]]);
+
+        // Assert
+        $this->tester->seeResponseCodeIs(Response::HTTP_OK);
+        $this->tester->assertPaymentIsInState($transactionId, PaymentStatus::STATUS_NEW);
+    }
+
     public function testGivenPaymentInStateAuthorizedWhenThePlatformPluginReturnsASuccessfulWebhookResponseTransferAndCaptureStatusThenPaymentIsMovedToCaptured(): void
     {
         // Arrange
@@ -383,13 +403,18 @@ class WebhooksPaymentApiTest extends Unit
     /**
      * Mock ensures that the Payment module passed the AppConfigTransfer and the PaymentTransfer to the PlatformPlugin.
      */
-    protected function mockPaymentPlatformPlugin(bool $webhookResponseSuccessful, ?string $paymentStatus = null, ?string $transactionId = null): void
-    {
+    protected function mockPaymentPlatformPlugin(
+        bool $webhookResponseSuccessful,
+        ?string $paymentStatus = null,
+        ?string $transactionId = null,
+        ?bool $isHandled = null
+    ): void {
         $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
-            'handleWebhook' => function (WebhookRequestTransfer $webhookRequestTransfer) use ($webhookResponseSuccessful, $paymentStatus, $transactionId): WebhookResponseTransfer {
+            'handleWebhook' => function (WebhookRequestTransfer $webhookRequestTransfer) use ($webhookResponseSuccessful, $paymentStatus, $transactionId, $isHandled): WebhookResponseTransfer {
                 $webhookResponseTransfer = new WebhookResponseTransfer();
                 $webhookResponseTransfer->setIsSuccessful($webhookResponseSuccessful);
                 $webhookResponseTransfer->setPaymentStatus($paymentStatus);
+                $webhookResponseTransfer->setIsHandled($isHandled);
 
                 if ($transactionId) {
                     // Changing the transaction id from the PlatformPlugin is not allowed and will fail when persisting the payment.

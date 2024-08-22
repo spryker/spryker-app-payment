@@ -86,7 +86,7 @@ interface AppPaymentFacadeInterface
      * - When the passed `AppPaymentPlatformPluginInterface` is not an instance of `AppPaymentPaymentMethodsPlatformPluginInterface` it will return early.
      * - PaymentMethods that were already added will not be added again.
      * - PaymentMethods that were already persisted and are no longer returned from `AppPaymentPaymentMethodsPlatformPluginInterface::configurePaymentMethods()` method will be deleted and trigger a `DeletePaymentMethod` message.
-     * - PaymentMethods that were already persisted and require an update will trigger a `UpdatePaymentMethod` message.
+     * - PaymentMethods that were already persisted and require an update (payment method data has changed) will trigger a `UpdatePaymentMethod` message.
      *
      * @api
      */

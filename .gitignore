@@ -41,6 +41,7 @@ src/Generated/
 /src/Orm/Zed/
 tests/_data/app_payment_db
 /data/cache
+/data/DE/logs/ZED/propel.log
 
 # tools
 .phpstorm.meta.php
