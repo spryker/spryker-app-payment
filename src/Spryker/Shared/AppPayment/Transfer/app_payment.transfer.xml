@@ -92,6 +92,7 @@
 
     <transfer name="Quote">
         <property name="orderReference" type="string"/>
+        <property name="priceMode" type="string"/>
         <property name="storeName" type="string"/>
         <property name="localeName" type="string"/>
         <property name="countryCode" type="string"/>
@@ -102,6 +103,7 @@
         <property name="currencyCode" type="string"/>
         <property name="grandTotal" type="string"/>
         <property name="discountTotal" type="string"/>
+        <property name="taxTotal" type="string"/>
         <property name="paymentMethod" type="string"/>
         <property name="payment" type="Payment"/>
         <property name="salutation" type="string"/>
