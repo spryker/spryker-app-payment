@@ -82,10 +82,10 @@ interface AppPaymentFacadeInterface
 
     /**
      * Specification:
-     * - Requests the `AppPaymentPaymentMethodsPlatformPluginInterface::configurePaymentMethods()` method to return a list PaymentMethods to be added.
-     * - When the passed `AppPaymentPlatformPluginInterface` is not an instance of `AppPaymentPaymentMethodsPlatformPluginInterface` it will return early.
+     * - Requests the `AppPaymentPlatformPaymentMethodsPluginInterface::configurePaymentMethods()` method to return a list PaymentMethods to be added.
+     * - When the passed `AppPaymentPlatformPluginInterface` is not an instance of `AppPaymentPlatformPaymentMethodsPluginInterface` it will return early.
      * - PaymentMethods that were already added will not be added again.
-     * - PaymentMethods that were already persisted and are no longer returned from `AppPaymentPaymentMethodsPlatformPluginInterface::configurePaymentMethods()` method will be deleted and trigger a `DeletePaymentMethod` message.
+     * - PaymentMethods that were already persisted and are no longer returned from `AppPaymentPlatformPaymentMethodsPluginInterface::configurePaymentMethods()` method will be deleted and trigger a `DeletePaymentMethod` message.
      * - PaymentMethods that were already persisted and require an update (payment method data has changed) will trigger a `UpdatePaymentMethod` message.
      *
      * @api
@@ -94,8 +94,8 @@ interface AppPaymentFacadeInterface
 
     /**
      * Specification:
-     * - Requests the `AppPaymentPaymentMethodsPlatformPluginInterface::configurePaymentMethods()` method to return a list PaymentMethods to add and to delete.
-     * - When the passed `AppPaymentPlatformPluginInterface` is not an instance of `AppPaymentPaymentMethodsPlatformPluginInterface` it will return early.
+     * - Requests the `AppPaymentPlatformPaymentMethodsPluginInterface::configurePaymentMethods()` method to return a list PaymentMethods to add and to delete.
+     * - When the passed `AppPaymentPlatformPluginInterface` is not an instance of `AppPaymentPlatformPaymentMethodsPluginInterface` it will return early.
      *
      * @api
      */
