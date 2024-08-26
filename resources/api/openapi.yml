@@ -224,9 +224,67 @@ components:
         ConfirmPreOrderPaymentRequest:
             type: object
             required:
+                - orderData
                 - orderReference
                 - paymentServiceProviderData
             properties:
+                orderData:
+                    description: 'Order data.'
+                    type: object
+                    required:
+                        - countryCode
+                        - customerFirstName
+                        - customerLastName
+                        - currencyCode
+                        - grandTotal
+                        - paymentMethod
+                        - items
+                    properties:
+                        orderReference:
+                            type: string
+                            example: 'DE--123456'
+                        storeName:
+                            type: string
+                            example: 'DE'
+                        localeName:
+                            type: string
+                            enum:
+                                - en_US
+                                - de_DE
+                        countryCode:
+                            type: string
+                            example: 'DE'
+                        customerFirstName:
+                            type: string
+                            example: 'John'
+                        customerLastName:
+                            type: string
+                            example: 'McClane'
+                        currencyCode:
+                            type: string
+                            example: 'EUR'
+                        grandTotal:
+                            type: integer
+                            example: 10000
+                            description: 'Total in lowest denominator (cents)'
+                        paymentMethod:
+                            type: string
+                            enum:
+                                - 'Credit Card'
+                                - 'PayPal'
+                        items:
+                            type: array
+                            items:
+                                $ref: '#/components/schemas/QuoteItem'
+                            minItems: 1
+                        additionalPaymentData:
+                            type: object
+                            additionalProperties:
+                                type: string
+                            description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
+                            example:
+                                paymentId: '#061280'
+                                other: '#061114'
                 orderReference:
                     type: string
                     example: 'DE-123456'

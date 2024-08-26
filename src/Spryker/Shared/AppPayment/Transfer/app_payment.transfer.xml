@@ -60,6 +60,7 @@
     <transfer name="ConfirmPreOrderPaymentRequest" strict="true">
         <property name="appConfig" type="AppConfig"/>
         <property name="payment" type="Payment"/>
+        <property name="orderData" type="Quote"/>
         <property name="transactionId" type="string"/>
         <property name="tenantIdentifier" type="string"/>
         <property name="orderReference" type="string"/>

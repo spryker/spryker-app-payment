@@ -94,7 +94,8 @@ class PaymentPreOrder
         $paymentTransfer = $confirmPreOrderPaymentRequestTransfer->getPaymentOrFail();
         $paymentTransfer
             ->setOrderReference($confirmPreOrderPaymentRequestTransfer->getOrderReference())
-            ->setStatus($confirmPreOrderPaymentResponseTransfer->getStatus());
+            ->setStatus($confirmPreOrderPaymentResponseTransfer->getStatus())
+            ->setQuote($confirmPreOrderPaymentRequestTransfer->getOrderData());
 
         $this->appPaymentEntityManager->savePayment($paymentTransfer);
     }
