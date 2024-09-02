@@ -105,6 +105,7 @@
         <property name="discountTotal" type="string"/>
         <property name="taxTotal" type="string"/>
         <property name="paymentMethod" type="string"/>
+        <property name="additionalPaymentData" type="array" associative="true" singular="additionalPaymentDatum"/>
         <property name="payment" type="Payment"/>
         <property name="salutation" type="string"/>
         <property name="city" type="string"/>
