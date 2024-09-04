@@ -149,11 +149,7 @@ class AppPaymentHelper extends Module
 
         $quoteTransfer = $quoteBuilder->build();
 
-        if ($additionalPaymentData) {
-            $paymentTransfer = $quoteTransfer->getPayment() ?? new PaymentTransfer();
-            $paymentTransfer->setAdditionalPaymentData($additionalPaymentData);
-            $quoteTransfer->setPayment($paymentTransfer);
-        }
+        $quoteTransfer->setAdditionalPaymentData($additionalPaymentData);
 
         $initializePaymentRequestTransfer = (new InitializePaymentRequestBuilder($seed))->build();
         $initializePaymentRequestTransfer->setOrderData($quoteTransfer);
