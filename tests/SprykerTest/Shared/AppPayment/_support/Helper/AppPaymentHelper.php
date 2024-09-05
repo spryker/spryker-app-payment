@@ -317,24 +317,24 @@ class AppPaymentHelper extends Module
     }
 
     /**
-     * @param array<\Generated\Shared\Transfer\OrderItemTransfer> $expectedOrderItems
+     * @param array<\Generated\Shared\Transfer\OrderItemTransfer> $expectedPaymentTransmissionItems
      */
     public function assertPaymentTransmissionEquals(
         PaymentTransmissionTransfer $paymentTransmissionTransfer,
-        array $expectedOrderItems,
+        array $expectedPaymentTransmissionItems,
         ?string $merchantReference = null
     ): void {
         if ($merchantReference) {
             $this->assertSame($merchantReference, $paymentTransmissionTransfer->getMerchantOrFail()->getMerchantReference(), 'Expected to have the same Merchant Reference but got different ones.');
         }
 
-        /** @var \ArrayObject<int, \Generated\Shared\Transfer\OrderItemTransfer> $orderItems */
-        $orderItems = $paymentTransmissionTransfer->getOrderItems();
-        $this->assertCount(count($expectedOrderItems), $orderItems);
+        /** @var \ArrayObject<int, \Generated\Shared\Transfer\PaymentTransmissionItemTransfer> $paymentTransmissionItems */
+        $paymentTransmissionItems = $paymentTransmissionTransfer->getPaymentTransmissionItems();
+        $this->assertCount(count($expectedPaymentTransmissionItems), $paymentTransmissionItems);
 
-        foreach ($expectedOrderItems as $position => $expectedOrderItemTransfer) {
-            $this->assertSame($expectedOrderItemTransfer->getOrderReference(), $orderItems[$position]->getOrderReference(), 'Expected to have the same Order Reference but got different ones.');
-            $this->assertSame($expectedOrderItemTransfer->getItemReference(), $orderItems[$position]->getItemReference(), 'Expected to have the same Item Reference but got different ones.');
+        foreach ($expectedPaymentTransmissionItems as $position => $expectedPaymentTransmissionItem) {
+            $this->assertSame($expectedPaymentTransmissionItem->getOrderReference(), $paymentTransmissionItems[$position]->getOrderReference(), 'Expected to have the same Order Reference but got different ones.');
+            $this->assertSame($expectedPaymentTransmissionItem->getItemReference(), $paymentTransmissionItems[$position]->getItemReference(), 'Expected to have the same Item Reference but got different ones.');
         }
     }
 }

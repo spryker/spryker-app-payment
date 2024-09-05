@@ -75,7 +75,7 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
                 'failureMessage' => $paymentTransmission->getMessage(),
                 'merchantReference' => $paymentTransmission->getMerchantReference(),
                 'orderReference' => $paymentTransmission->getOrderReference(),
-                'orderItems' => $this->formatOrderItemsForTransferResponse($paymentTransmission->getOrderItems()),
+                'paymentTransmissionItems' => $this->formatPaymentTransmissionItemsForTransferResponse($paymentTransmission->getPaymentTransmissionItems()),
                 'amount' => $paymentTransmission->getAmount(),
                 'transferId' => $paymentTransmission->getTransferId(), // Return the transfer identifier as transaction id to be known on the Tenant side. May be empty in case oif a failure
             ];
@@ -85,23 +85,22 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
     }
 
     /**
-     * @param \ArrayObject<int, \Generated\Shared\Transfer\OrderItemTransfer> $arrayObject
+     * @param \ArrayObject<int, (\Generated\Shared\Transfer\OrderItemTransfer | \Generated\Shared\Transfer\PaymentTransmissionItemTransfer)> $arrayObject
      *
      * @return array<int, array<string, string|null>>
      */
-    protected function formatOrderItemsForTransferResponse(ArrayObject $arrayObject): array
+    protected function formatPaymentTransmissionItemsForTransferResponse(ArrayObject $arrayObject): array
     {
-        $orderItemsData = [];
-
-        foreach ($arrayObject as $orderItem) {
-            $orderItemsData[] = [
-                'merchantReference' => $orderItem->getMerchantReferenceOrFail(),
-                'orderReference' => $orderItem->getOrderReferenceOrFail(),
-                'itemReference' => $orderItem->getItemReferenceOrFail(),
-                'amount' => $orderItem->getAmountOrFail(),
+        $paymentTransmissionItemsData = [];
+        foreach ($arrayObject as $paymentTransmissionItem) {
+            $paymentTransmissionItemsData[] = [
+                'merchantReference' => $paymentTransmissionItem->getMerchantReferenceOrFail(),
+                'orderReference' => $paymentTransmissionItem->getOrderReferenceOrFail(),
+                'itemReference' => $paymentTransmissionItem->getItemReferenceOrFail(),
+                'amount' => $paymentTransmissionItem->getAmountOrFail(),
             ];
         }
 
-        return $orderItemsData;
+        return $paymentTransmissionItemsData;
     }
 }
