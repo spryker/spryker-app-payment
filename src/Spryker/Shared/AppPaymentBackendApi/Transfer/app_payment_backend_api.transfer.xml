@@ -22,8 +22,8 @@
         <property name="tenantIdentifier" type="string"/>
         <property name="transactionId" type="string"/>
         <property name="transferId" type="string"/>
-        <property name="orderItems" type="OrderItem[]" singular="orderItem"/>
         <property name="paymentTransmissions" type="PaymentTransmission[]" singular="paymentTransmission"/>
+        <property name="paymentTransmissionItems" type="PaymentTransmissionItem[]" singular="paymentTransmissionItem"/>
     </transfer>
 
     <transfer name="OrderItem" strict="true">
@@ -31,6 +31,15 @@
         <property name="merchantReference" type="string"/>
         <property name="orderReference" type="string"/>
         <property name="itemReference" type="string" description="UUID of the sales_order_item"/>
+        <property name="amount" type="string" description="Amount in lowest denominator (cents, YEN). When negative money has to be refunded, when positive money has to be transferred."/>
+    </transfer>
+
+    <transfer name="PaymentTransmissionItem">
+        <property name="transferId" type="string" description="The ID returned from the Platform implementation"/>
+        <property name="type" type="string" description="Indicates whether the item is an order item or an order expense. Can be 'order-item', 'order-expense', or any additional type."/>
+        <property name="merchantReference" type="string"/>
+        <property name="orderReference" type="string"/>
+        <property name="itemReference" type="string" description="UUID of the sales_order_item or spy_sales_expense"/>
         <property name="amount" type="string" description="Amount in lowest denominator (cents, YEN). When negative money has to be refunded, when positive money has to be transferred."/>
     </transfer>
 
@@ -49,7 +58,7 @@
         <property name="merchantReference" type="string"/>
         <property name="orderReference" type="string"/>
         <property name="itemReferences" type="array" singular="itemReference" description="UUIDs of the sales_order_item(s)"/>
-        <property name="orderItems" type="OrderItem[]" singular="orderItem"/>
+        <property name="paymentTransmissionItems" type="PaymentTransmissionItem[]" singular="paymentTransmissionItem"/>
         <property name="amount" type="string" description="Amount in lowest denominator (cents, YEN). When negative money has to be refunded, when positive money has to be transferred."/>
         <property name="payment" type="Payment"/>
     </transfer>

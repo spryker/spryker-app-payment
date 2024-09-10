@@ -154,6 +154,11 @@ class AppPaymentFacade extends AbstractFacade implements AppPaymentFacadeInterfa
         $this->getEntityManager()->deletePaymentCollection($paymentCollectionDeleteCriteriaTransfer);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @api
+     */
     public function transferPayments(PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer): PaymentTransmissionsResponseTransfer
     {
         return $this->getFactory()->createPayment()->transferPayments($paymentTransmissionsRequestTransfer);

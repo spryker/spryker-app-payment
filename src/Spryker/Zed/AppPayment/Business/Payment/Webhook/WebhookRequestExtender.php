@@ -36,6 +36,13 @@ class WebhookRequestExtender
             return $webhookRequestTransfer->setAbortHandling(true);
         }
 
+        $webhookRequestTransfer = $this->extendRefundWebhookRequestTransfer($webhookRequestTransfer);
+
+        return $webhookRequestTransfer;
+    }
+
+    protected function extendRefundWebhookRequestTransfer(WebhookRequestTransfer $webhookRequestTransfer): WebhookRequestTransfer
+    {
         if ($webhookRequestTransfer->getTypeOrFail() === WebhookDataType::REFUND) {
             $webhookRequestTransfer->setRefundOrFail(
                 $this->appPaymentRepository->getRefundByRefundId($webhookRequestTransfer->getRefundOrFail()->getRefundIdOrFail()),
