@@ -2,7 +2,3 @@ parameters:
     level: 8
     ignoreErrors:
           - '#Call to an undefined method Spryker\\Shared\\Kernel\\Transfer\\AbstractTransfer::getMessageAttributesOrFail\(\)#'
-          - '#Call to method appPayment\(\) on an unknown class Generated\\GlueBackend\\Ide\\AutoCompletion.#'
-          - '#Call to an undefined method Spryker\\Zed\\AppPayment\\Dependency\\Plugin\\AppPaymentPlatformPluginInterface::transferPayments\(\).#'
-          - '#Method Spryker\\Zed\\AppPayment\\Business\\Payment\\AppConfig\\AppConfigLoader::loadAppConfig\(\) should return Generated\\Shared\\Transfer\\AppConfigTransfer but returns Spryker\\Shared\\Kernel\\Transfer\\TransferInterface.#'
-          - '#Method Spryker\\Zed\\AppKernel\\Business\\AppKernelFacadeInterface::getConfig\(\) invoked with 2 parameters, 1 required.#'

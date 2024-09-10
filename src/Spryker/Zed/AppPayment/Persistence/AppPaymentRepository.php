@@ -171,6 +171,10 @@ class AppPaymentRepository extends AbstractRepository implements AppPaymentRepos
             ->filterByName($paymentMethodTransfer->getName())
             ->findOne();
 
+        if ($paymentMethodEntity === null) {
+            return $paymentMethodTransfer;
+        }
+
         $paymentMethodEntity->delete();
 
         return $paymentMethodTransfer;

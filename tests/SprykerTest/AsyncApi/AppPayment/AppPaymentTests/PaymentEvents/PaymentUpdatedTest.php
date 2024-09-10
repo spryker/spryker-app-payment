@@ -46,7 +46,8 @@ class PaymentUpdatedTest extends Unit
         ]);
 
         $this->tester->haveAppConfigForTenant($confirmPreOrderPaymentRequestTransfer->getTenantIdentifier());
-        $this->tester->havePaymentForTransactionId($confirmPreOrderPaymentRequestTransfer->getTransactionId(), $confirmPreOrderPaymentRequestTransfer->getTenantIdentifier());
+        $paymentTransfer = $this->tester->havePaymentForTransactionId($confirmPreOrderPaymentRequestTransfer->getTransactionId(), $confirmPreOrderPaymentRequestTransfer->getTenantIdentifier());
+        $confirmPreOrderPaymentRequestTransfer->setOrderData($paymentTransfer->getQuote());
 
         $confirmPreOrderPaymentResponseTransfer = new ConfirmPreOrderPaymentResponseTransfer();
         $confirmPreOrderPaymentResponseTransfer

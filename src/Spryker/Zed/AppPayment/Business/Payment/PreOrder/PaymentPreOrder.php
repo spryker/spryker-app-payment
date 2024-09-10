@@ -76,7 +76,7 @@ class PaymentPreOrder
             // In case of pre-order payment we may have unprocessed webhook requests persisted and we must process them here
             $webhookInboxCriteriaTransfer = new WebhookInboxCriteriaTransfer();
 
-            // Unprocessed webhooks will be perstsited by the transaction id
+            // Unprocessed webhooks will be persisted by the transaction id
             $webhookInboxCriteriaTransfer->addIdentifier($confirmPreOrderPaymentRequestTransfer->getTransactionIdOrFail());
 
             $this->appPaymentToAppWebhookFacade->processUnprocessedWebhooks($webhookInboxCriteriaTransfer);

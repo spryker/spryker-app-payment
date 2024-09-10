@@ -211,7 +211,7 @@ class PaymentMethod
             return true;
         }
 
-        return $configuredPaymentMethodTransfer->getPaymentMethodAppConfiguration()->toArray() !== $persistedPaymentMethodTransfer->getPaymentMethodAppConfiguration()->toArray();
+        return $configuredPaymentMethodTransfer->getPaymentMethodAppConfigurationOrFail()->toArray() !== $persistedPaymentMethodTransfer->getPaymentMethodAppConfigurationOrFail()->toArray();
     }
 
     /**

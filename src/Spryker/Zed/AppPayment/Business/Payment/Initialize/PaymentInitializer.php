@@ -65,7 +65,7 @@ class PaymentInitializer
             return $initializePaymentResponseTransfer;
         }
 
-        if ($initializePaymentRequestTransfer->getOrderData()->getOrderReference()) {
+        if ($initializePaymentRequestTransfer->getOrderDataOrFail()->getOrderReference()) {
             $initializePaymentResponseTransfer = $this->addRedirectUrl($initializePaymentRequestTransfer, $initializePaymentResponseTransfer);
         }
 
