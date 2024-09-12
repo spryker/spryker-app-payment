@@ -7,6 +7,7 @@
 
 namespace Spryker\Zed\AppPayment\Persistence\Propel\Payment\Mapper;
 
+use Generated\Shared\Transfer\PaymentCollectionTransfer;
 use Generated\Shared\Transfer\PaymentRefundTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 use Generated\Shared\Transfer\PaymentTransmissionTransfer;
@@ -17,6 +18,17 @@ use Propel\Runtime\Collection\Collection;
 
 class PaymentMapper
 {
+    public function mapPaymentEntitiesToPaymentCollectionTransfer(
+        Collection $paymentEntityCollection,
+        PaymentCollectionTransfer $paymentCollectionTransfer
+    ): PaymentCollectionTransfer {
+        foreach ($paymentEntityCollection as $paymentEntity) {
+            $paymentCollectionTransfer->addPayment($this->mapPaymentEntityToPaymentTransfer($paymentEntity, new PaymentTransfer()));
+        }
+
+        return $paymentCollectionTransfer;
+    }
+
     public function mapPaymentTransferToPaymentEntity(PaymentTransfer $paymentTransfer, SpyPayment $spyPayment): SpyPayment
     {
         $quoteTransfer = $paymentTransfer->getQuoteOrFail();

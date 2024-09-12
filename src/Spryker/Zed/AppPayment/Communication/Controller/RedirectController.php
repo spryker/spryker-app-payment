@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @method \Spryker\Zed\AppPayment\Business\AppPaymentFacadeInterface getFacade()
- * @method \Spryker\Zed\AppPayment\Communication\PaymentCommunicationFactory getFactory()
  * @method \Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface getRepository()
  */
 class RedirectController extends AbstractController

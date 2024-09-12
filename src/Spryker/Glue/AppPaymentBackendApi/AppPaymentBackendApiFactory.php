@@ -8,6 +8,7 @@
 namespace Spryker\Glue\AppPaymentBackendApi;
 
 use Spryker\Glue\AppPaymentBackendApi\Dependency\Facade\AppPaymentBackendApiToAppPaymentFacadeInterface;
+use Spryker\Glue\AppPaymentBackendApi\Dependency\Facade\AppPaymentBackendApiToTranslatorFacadeInterface;
 use Spryker\Glue\AppPaymentBackendApi\Mapper\Payment\GlueRequestPaymentMapper;
 use Spryker\Glue\AppPaymentBackendApi\Mapper\Payment\GlueRequestPaymentMapperInterface;
 use Spryker\Glue\AppPaymentBackendApi\Mapper\Payment\GlueResponsePaymentMapper;
@@ -33,5 +34,11 @@ class AppPaymentBackendApiFactory extends AbstractFactory
     {
         /** @phpstan-var \Spryker\Glue\AppPaymentBackendApi\Dependency\Facade\AppPaymentBackendApiToAppPaymentFacadeInterface */
         return $this->getProvidedDependency(AppPaymentBackendApiDependencyProvider::FACADE_APP_PAYMENT);
+    }
+
+    public function getTranslatorFacade(): AppPaymentBackendApiToTranslatorFacadeInterface
+    {
+        /** @phpstan-var \Spryker\Glue\AppPaymentBackendApi\Dependency\Facade\AppPaymentBackendApiToTranslatorFacadeInterface */
+        return $this->getProvidedDependency(AppPaymentBackendApiDependencyProvider::FACADE_TRANSLATOR);
     }
 }

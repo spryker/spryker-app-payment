@@ -7,11 +7,15 @@
 
 namespace Spryker\Zed\AppPayment\Persistence;
 
+use Generated\Shared\Transfer\PaymentCollectionTransfer;
+use Generated\Shared\Transfer\PaymentCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentRefundTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 
 interface AppPaymentRepositoryInterface
 {
+    public function getPaymentCollection(PaymentCriteriaTransfer $paymentCriteriaTransfer): PaymentCollectionTransfer;
+
     /**
      * @throws \Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTransactionIdNotFoundException
      */

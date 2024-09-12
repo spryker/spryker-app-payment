@@ -42,3 +42,18 @@ suites:
                 - \SprykerTest\Zed\MessageBroker\Helper\InMemoryMessageBrokerHelper
                 - \SprykerTest\Shared\Propel\Helper\ConnectionHelper
                 - \SprykerTest\Shared\Testify\Helper\DataCleanupHelper
+
+    Plugin:
+        actor: AppPaymentBackendApiPluginTester
+        modules:
+            enabled:
+                - Asserts
+                - \SprykerTest\Shared\AppPayment\Helper\AppPaymentHelper
+                - \SprykerTest\Zed\AppKernel\Helper\AppKernelHelper
+                - \SprykerTest\Shared\Testify\Helper\Environment
+                -   \SprykerTest\Shared\Testify\Helper\LocatorHelper:
+                        projectNamespaces:
+                            - Spryker
+                - \SprykerTest\Glue\Testify\Helper\DependencyProviderHelper
+                - \SprykerTest\Shared\Propel\Helper\TransactionHelper
+                - \SprykerTest\Shared\Testify\Helper\DataCleanupHelper

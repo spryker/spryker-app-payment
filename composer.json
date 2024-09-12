@@ -5,15 +5,20 @@
     "license": "proprietary",
     "require": {
         "php": ">=8.1",
+        "spryker/application": "^3.35.0",
+        "spryker/app-kernel": "dev-feature/acp-2930/master-stripe-app-disconnection-criteria as 2.1.0",
+        "spryker/app-webhook": "^1.0.0",
         "spryker/glue-application-extension": "^1.0.0",
+        "spryker/glue-json-api-convention": "^1.3",
         "spryker/kernel": "^3.30.0",
         "spryker/log": "^3.0.0",
         "spryker/message-broker": "^1.11.0",
+        "spryker/message-broker-aws-extension": "^1.0.0",
         "spryker/symfony": "^3.0.0",
-        "spryker/transfer": "^3.33.0"
+        "spryker/transfer": "^3.33.0",
+        "spryker/translator": "^1.13.0"
     },
     "require-dev": {
-        "spryker/app-webhook": "^1.0.0",
         "codeception/codeception": "^5.0",
         "codeception/module-asserts": "^3.0.0",
         "codeception/module-cli": "^2.0.0",
@@ -29,20 +34,16 @@
         "phpstan/phpstan": "1.10.66",
         "rector/rector": "^0.19.0",
         "spryker-sdk/async-api": "dev-master as 0.3.1",
-        "spryker/app-kernel": "^1.0.0",
         "spryker/code-sniffer": "*",
         "spryker/container": "*",
         "spryker/development": "^3.34.0",
         "spryker/event-dispatcher": "^1.6",
         "spryker/glue-backend-api-application": "*",
-        "spryker/glue-json-api-convention": "^1.3",
         "spryker/http": "^1.11",
         "spryker/message-broker-aws": "*",
-        "spryker/propel": "*",
         "spryker/router": "^1.19",
         "spryker/testify": "*",
-        "spryker/testify-async-api": "*",
-        "spryker/translator": "^1.13"
+        "spryker/testify-async-api": "*"
     },
     "autoload": {
         "psr-4": {
