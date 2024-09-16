@@ -51,13 +51,13 @@ This plugin provides the routes for the AppPaymentBackendApi module.
 ###### Routes provided
 
 - /private/initialize-payment - Used from the Tenant side to initialize a payment.
-
+- /private/confirm-pre-order-payment - Used from the Tenant side to confirm pre-order payment after the order was persisted.
 
 ### AppKernel
-- \Spryker\Glue\AppPaymentBackendApi\Plugin\AppKernel\PaymentConfigurationValidatorPlugin
+- \Spryker\Zed\AppPayment\Communication\Plugin\AppKernel\ConfigurePaymentMethodsConfigurationAfterSavePlugin
 - \Spryker\Zed\AppPayment\Communication\Plugin\AppKernel\DeleteTenantPaymentsConfigurationAfterDeletePlugin
 - \Spryker\Zed\AppPayment\Communication\Plugin\AppKernel\SendAddPaymentMethodMessageConfigurationAfterSavePlugin
-- \Spryker\Zed\AppPayment\Communication\Plugin\AppKernel\SendDeletePaymentMethodMessageConfigurationAfterDeletePlugin
+- \Spryker\Zed\AppPayment\Communication\Plugin\AppKernel\SendDeletePaymentMethodMessagesConfigurationAfterDeletePlugin
 
 ### AppWebhook
 - \Spryker\Zed\AppPayment\Communication\Plugin\AppWebhook\PaymentWebhookHandlerPlugin
@@ -70,7 +70,44 @@ This plugin provides the routes for the AppPaymentBackendApi module.
 ### MessageBrokerAws
 - \Spryker\Zed\AppPayment\Communication\Plugin\MessageBrokerAws\ConsumerIdHttpChannelMessageReceiverRequestExpanderPlugin
 
-### Configure the MessageBroker
+## Extensions
+
+- \Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformMarketplacePluginInterface
+- \Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPaymentMethodsPluginInterface
+- \Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPaymentPagePluginInterface
+- \Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface
+- \Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPreOrderPluginInterface
+- \Spryker\Zed\AppPayment\Dependency\Plugin\PaymentTransmissionsRequestExtenderPluginInterface
+
+### AppPaymentPlatformMarketplacePluginInterface
+
+You can implement this plugin when your PSP App supports Marketplace capabilities.
+
+### AppPaymentPlatformPaymentMethodsPluginInterface
+
+This plugin must be implemented to provide the payment methods that the PSP App supports.
+
+### AppPaymentPlatformPaymentPagePluginInterface
+
+This plugin can be implemented to provide a payment page that the PSP App supports. This is only needed when using the redirect flows after the order was created.
+
+### AppPaymentPlatformPluginInterface
+
+This is the root plugin which must be implemented to provide the PSP App capabilities from the project level.
+
+### AppPaymentPlatformPreOrderPluginInterface
+
+This plugin can be implemented to provide the pre-order capabilities that the PSP App supports.
+
+When using the pre-order payment flow, the InitializePayment API endpoint is used before the order gets persisted and it returns the needed data for an headless approach to add the payment page on project side. Usually, this is done via a provided JavaScript that is send to the frontend in the InitializePayment API call response.
+
+On project side the customer than makes the Payment via the provided JavaScripts and the payment page provided by the PSP provider. After the order is persistzed on the project side a call to the ConfirmPreOrderPayment API endpoint is made to confirm the payment and connect it with the orderReference.
+
+### PaymentTransmissionsRequestExtenderPluginInterface
+
+This plugin can be implemented to extend the request data that is send to the PSP App when doing payouts to Merchants. This is usually only needed when the PSP App supports Marketplace capabilities.
+
+## Configure the MessageBroker
 
 Add this to your project configuration:
 
@@ -89,8 +126,10 @@ $config[MessageBrokerAwsConstants::MESSAGE_TO_CHANNEL_MAP] = [
     CapturePaymentTransfer::class => 'payment-commands',
     RefundPaymentTransfer::class => 'payment-commands',
     AddPaymentMethodTransfer::class => 'payment-method-commands',
+    UpdatePaymentMethodTransfer::class => 'payment-method-commands',
     DeletePaymentMethodTransfer::class => 'payment-method-commands',
     PaymentCreatedTransfer::class => 'payment-events',
+    PaymentUpdatedTransfer::class => 'payment-events',
     // App event
     AppConfigUpdatedTransfer::class => 'app-events',
 ];
