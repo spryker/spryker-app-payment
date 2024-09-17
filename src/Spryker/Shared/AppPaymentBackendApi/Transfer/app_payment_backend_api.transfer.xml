@@ -8,11 +8,26 @@
     </transfer>
 
     <transfer name="ConfirmPreOrderPaymentRequest" strict="true">
+        <property name="transactionId" type="string"/>
+        <property name="tenantIdentifier" type="string"/>
         <property name="orderReference" type="string"/>
         <property name="paymentServiceProviderData" type="array" associative="true" singular="paymentServiceProviderDatum"/>
     </transfer>
 
     <transfer name="ConfirmPreOrderPaymentResponse" strict="true">
+        <property name="isSuccessful" type="bool"/>
+        <property name="message" type="string"/>
+    </transfer>
+
+    <transfer name="CancelPreOrderPaymentRequest" strict="true">
+        <property name="appConfig" type="AppConfig"/>
+        <property name="payment" type="Payment"/>
+        <property name="transactionId" type="string"/>
+        <property name="tenantIdentifier" type="string"/>
+        <property name="paymentServiceProviderData" type="array" associative="true" singular="paymentServiceProviderDatum"/>
+    </transfer>
+
+    <transfer name="CancelPreOrderPaymentResponse" strict="true">
         <property name="isSuccessful" type="bool"/>
         <property name="message" type="string"/>
     </transfer>

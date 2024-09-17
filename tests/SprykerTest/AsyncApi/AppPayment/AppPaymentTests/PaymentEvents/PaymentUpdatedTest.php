@@ -15,7 +15,7 @@ use Generated\Shared\Transfer\ConfirmPreOrderPaymentResponseTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 use Ramsey\Uuid\Uuid;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
-use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPreOrderPluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformConfirmPreOrderPluginInterface;
 use SprykerTest\AsyncApi\AppPayment\AppPaymentAsyncApiTester;
 use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
 
@@ -53,7 +53,7 @@ class PaymentUpdatedTest extends Unit
         $confirmPreOrderPaymentResponseTransfer
             ->setIsSuccessful(true);
 
-        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPreOrderPluginInterface::class, [
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformConfirmPreOrderPluginInterface::class, [
             'confirmPreOrderPayment' => function (ConfirmPreOrderPaymentRequestTransfer $confirmPreOrderPaymentRequestTransfer) use ($confirmPreOrderPaymentResponseTransfer) {
                 // Ensure that the AppConfig is always passed to the platform plugin.
                 $this->assertInstanceOf(AppConfigTransfer::class, $confirmPreOrderPaymentRequestTransfer->getAppConfig());

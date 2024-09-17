@@ -7,6 +7,7 @@
 
 namespace Spryker\Glue\AppPaymentBackendApi\Mapper\Payment;
 
+use Generated\Shared\Transfer\CancelPreOrderPaymentRequestTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentRequestTransfer;
 use Generated\Shared\Transfer\GlueRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
@@ -60,5 +61,20 @@ class GlueRequestPaymentMapper implements GlueRequestPaymentMapperInterface
         $confirmPreOrderPaymentRequestTransfer->setTenantIdentifier($metaData[static::HEADER_TENANT_IDENTIFIER][0] ?? ($metaData['x-store-reference'][0] ?? ''));
 
         return $confirmPreOrderPaymentRequestTransfer;
+    }
+
+    public function mapGlueRequestTransferToCancelPreOrderPaymentRequestTransfer(
+        GlueRequestTransfer $glueRequestTransfer
+    ): CancelPreOrderPaymentRequestTransfer {
+        $metaData = $glueRequestTransfer->getMeta();
+
+        /** @phpstan-var array<string, mixed> */
+        $requestData = json_decode((string)$glueRequestTransfer->getContent(), true);
+
+        $cancelPreOrderPaymentRequestTransfer = new CancelPreOrderPaymentRequestTransfer();
+        $cancelPreOrderPaymentRequestTransfer->fromArray($requestData, true);
+        $cancelPreOrderPaymentRequestTransfer->setTenantIdentifier($metaData[static::HEADER_TENANT_IDENTIFIER][0] ?? ($metaData['x-store-reference'][0] ?? ''));
+
+        return $cancelPreOrderPaymentRequestTransfer;
     }
 }

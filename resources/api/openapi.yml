@@ -93,6 +93,38 @@ paths:
                             schema:
                                 type: string
 
+
+    '/private/cancel-pre-order-payment':
+        post:
+            x-spryker:
+                module: PaymentBackendApi
+                controller: CancelPreOrderPaymentResourceController
+            summary: 'Cancles a Pre-Order Payment. The Payment will be deleted and the third party will be informed about the cancellation.'
+            parameters:
+                - $ref: '#/components/parameters/tenantIdentifier'
+            requestBody:
+                description: 'PSP data object that enables the connection between the payment that currently does not have an orderReference yet.'
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CancelPreOrderPaymentRequest'
+            responses:
+                200:
+                    description: 'Expected response to a valid request.'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CancelPreOrderPaymentResponse'
+                400:
+                    description: 'Bad request.'
+                default:
+                    description: 'Expected response to a bad request.'
+                    content:
+                        text/plain:
+                            schema:
+                                type: string
+
     '/private/payments/transfers':
         post:
             x-spryker:
@@ -298,6 +330,29 @@ components:
                         other: '#061114'
 
         ConfirmPreOrderPaymentResponse:
+            properties:
+                isSuccessful:
+                    type: boolean
+                message:
+                    description: 'Message in case of failure to know the issue on the Tenant side.'
+                    type: string
+                    nullable: true
+
+        CancelPreOrderPaymentRequest:
+            type: object
+            required:
+                - paymentServiceProviderData
+            properties:
+                paymentServiceProviderData:
+                    description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
+                    type: string
+                    additionalProperties:
+                        type: string
+                    example:
+                        paymentId: '#061280'
+                        other: '#061114'
+
+        CancelPreOrderPaymentResponse:
             properties:
                 isSuccessful:
                     type: boolean

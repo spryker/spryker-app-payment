@@ -28,4 +28,9 @@ class AppPaymentToAppWebhookFacadeBridge implements AppPaymentToAppWebhookFacade
     {
         $this->appWebhookFacade->processUnprocessedWebhooks($webhookInboxCriteriaTransfer);
     }
+
+    public function deleteWebhooks(WebhookInboxCriteriaTransfer $webhookInboxCriteriaTransfer): void
+    {
+        $this->appWebhookFacade->deleteWebhooks($webhookInboxCriteriaTransfer);
+    }
 }

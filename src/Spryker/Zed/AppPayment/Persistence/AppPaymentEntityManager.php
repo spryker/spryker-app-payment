@@ -84,9 +84,13 @@ class AppPaymentEntityManager extends AbstractEntityManager implements AppPaymen
     public function deletePaymentCollection(
         PaymentCollectionDeleteCriteriaTransfer $paymentCollectionDeleteCriteriaTransfer
     ): void {
-        $this->getFactory()
-            ->createPaymentQuery()
-            ->filterByTenantIdentifier($paymentCollectionDeleteCriteriaTransfer->getTenantIdentifierOrFail())
-            ->delete();
+        $spyPaymentQuery = $this->getFactory()->createPaymentQuery();
+        $spyPaymentQuery->filterByTenantIdentifier($paymentCollectionDeleteCriteriaTransfer->getTenantIdentifierOrFail());
+
+        if ($paymentCollectionDeleteCriteriaTransfer->getTransactionId() !== null && $paymentCollectionDeleteCriteriaTransfer->getTransactionId() !== '' && $paymentCollectionDeleteCriteriaTransfer->getTransactionId() !== '0') {
+            $spyPaymentQuery->filterByTransactionId($paymentCollectionDeleteCriteriaTransfer->getTransactionIdOrFail());
+        }
+
+        $spyPaymentQuery->delete();
     }
 }

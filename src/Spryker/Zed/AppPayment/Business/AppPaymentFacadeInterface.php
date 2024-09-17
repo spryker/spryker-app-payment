@@ -9,6 +9,8 @@ namespace Spryker\Zed\AppPayment\Business;
 
 use Generated\Shared\Transfer\AppConfigTransfer;
 use Generated\Shared\Transfer\CancelPaymentTransfer;
+use Generated\Shared\Transfer\CancelPreOrderPaymentRequestTransfer;
+use Generated\Shared\Transfer\CancelPreOrderPaymentResponseTransfer;
 use Generated\Shared\Transfer\CapturePaymentTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentRequestTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentResponseTransfer;
@@ -189,6 +191,7 @@ interface AppPaymentFacadeInterface
      * Specification:
      * - Confirm a payment that was made before the order was persisted.
      * - Loads the `AppConfigTransfer` and adds it to the ConfirmPreOrderPaymentRequestTransfer.
+     * - Loads the `PaymentTransfer` and adds it to the ConfirmPreOrderPaymentRequestTransfer.
      * - Returns a ConfirmPreOrderPaymentResponseTransfer.
      *
      * @api
@@ -196,4 +199,17 @@ interface AppPaymentFacadeInterface
     public function confirmPreOrderPayment(
         ConfirmPreOrderPaymentRequestTransfer $confirmPreOrderPaymentRequestTransfer
     ): ConfirmPreOrderPaymentResponseTransfer;
+
+    /**
+     * Specification:
+     * - Cancels a payment that was made before the order was persisted.
+     * - Loads the `AppConfigTransfer` and adds it to the CancePreOrderPaymentRequestTransfer.
+     * - Loads the `PaymentTransfer` and adds it to the CancePreOrderPaymentRequestTransfer.
+     * - Returns a CancelPreOrderPaymentResponseTransfer.
+     *
+     * @api
+     */
+    public function cancelPreOrderPayment(
+        CancelPreOrderPaymentRequestTransfer $cancelPreOrderPaymentRequestTransfer
+    ): CancelPreOrderPaymentResponseTransfer;
 }

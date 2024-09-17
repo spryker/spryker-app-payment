@@ -7,6 +7,8 @@
 
 namespace Spryker\Zed\AppPayment\Business\Payment;
 
+use Generated\Shared\Transfer\CancelPreOrderPaymentRequestTransfer;
+use Generated\Shared\Transfer\CancelPreOrderPaymentResponseTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentRequestTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentResponseTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
@@ -43,6 +45,12 @@ class Payment
         ConfirmPreOrderPaymentRequestTransfer $confirmPreOrderPaymentRequestTransfer
     ): ConfirmPreOrderPaymentResponseTransfer {
         return $this->paymentPreOrder->confirmPreOrderPayment($confirmPreOrderPaymentRequestTransfer);
+    }
+
+    public function cancelPreOrderPayment(
+        CancelPreOrderPaymentRequestTransfer $cancelPreOrderPaymentRequestTransfer
+    ): CancelPreOrderPaymentResponseTransfer {
+        return $this->paymentPreOrder->cancelPreOrderPayment($cancelPreOrderPaymentRequestTransfer);
     }
 
     public function getPaymentPage(PaymentPageRequestTransfer $paymentPageRequestTransfer): PaymentPageResponseTransfer

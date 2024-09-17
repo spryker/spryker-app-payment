@@ -9,6 +9,7 @@ namespace SprykerTest\Shared\AppPayment\Helper;
 
 use Codeception\Module;
 use Generated\Shared\DataBuilder\CancelPaymentRequestBuilder;
+use Generated\Shared\DataBuilder\CancelPreOrderPaymentRequestBuilder;
 use Generated\Shared\DataBuilder\CapturePaymentRequestBuilder;
 use Generated\Shared\DataBuilder\ConfirmPreOrderPaymentRequestBuilder;
 use Generated\Shared\DataBuilder\InitializePaymentRequestBuilder;
@@ -19,6 +20,7 @@ use Generated\Shared\DataBuilder\PaymentTransmissionsRequestBuilder;
 use Generated\Shared\DataBuilder\PaymentTransmissionsResponseBuilder;
 use Generated\Shared\DataBuilder\QuoteBuilder;
 use Generated\Shared\Transfer\CancelPaymentRequestTransfer;
+use Generated\Shared\Transfer\CancelPreOrderPaymentRequestTransfer;
 use Generated\Shared\Transfer\CapturePaymentRequestTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
@@ -177,6 +179,19 @@ class AppPaymentHelper extends Module
             ->setTransactionId($transactionId);
 
         return $confirmPreOrderPaymentRequestTransfer;
+    }
+
+    public function haveCancelPreOrderPaymentRequestTransfer(array $seed = []): CancelPreOrderPaymentRequestTransfer
+    {
+        $tenantIdentifier = $seed[CancelPreOrderPaymentRequestTransfer::TENANT_IDENTIFIER] ?? Uuid::uuid4()->toString();
+        $transactionId = $seed[CancelPreOrderPaymentRequestTransfer::TRANSACTION_ID] ?? Uuid::uuid4()->toString();
+
+        $cancelPreOrderPaymentRequestTransfer = (new CancelPreOrderPaymentRequestBuilder($seed))->build();
+        $cancelPreOrderPaymentRequestTransfer
+            ->setTenantIdentifier($tenantIdentifier)
+            ->setTransactionId($transactionId);
+
+        return $cancelPreOrderPaymentRequestTransfer;
     }
 
     public function havePaymentPageRequestTransfer(array $seed = []): PaymentPageRequestTransfer

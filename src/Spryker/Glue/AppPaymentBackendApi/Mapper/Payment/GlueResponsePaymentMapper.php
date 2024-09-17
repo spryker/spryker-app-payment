@@ -8,6 +8,7 @@
 namespace Spryker\Glue\AppPaymentBackendApi\Mapper\Payment;
 
 use ArrayObject;
+use Generated\Shared\Transfer\CancelPreOrderPaymentResponseTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentResponseTransfer;
 use Generated\Shared\Transfer\GlueErrorTransfer;
 use Generated\Shared\Transfer\GlueResourceTransfer;
@@ -60,6 +61,22 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
             $glueResponseTransfer->setHttpStatus(Response::HTTP_BAD_REQUEST);
             $glueResponseTransfer->addError((new GlueErrorTransfer())->setMessage(
                 $confirmPreOrderPaymentResponseTransfer->getMessageOrFail(),
+            ));
+        }
+
+        return $glueResponseTransfer;
+    }
+
+    public function mapCancelPreOrderPaymentResponseTransferToSingleResourceGlueResponseTransfer(
+        CancelPreOrderPaymentResponseTransfer $cancelPreOrderPaymentResponseTransfer
+    ): GlueResponseTransfer {
+        $glueResponseTransfer = new GlueResponseTransfer();
+        $glueResponseTransfer->setHttpStatus(Response::HTTP_OK);
+
+        if ($cancelPreOrderPaymentResponseTransfer->getIsSuccessful() === false) {
+            $glueResponseTransfer->setHttpStatus(Response::HTTP_BAD_REQUEST);
+            $glueResponseTransfer->addError((new GlueErrorTransfer())->setMessage(
+                $cancelPreOrderPaymentResponseTransfer->getMessageOrFail(),
             ));
         }
 
