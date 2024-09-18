@@ -151,3 +151,46 @@ $config[MessageBrokerAwsConstants::CHANNEL_TO_RECEIVER_TRANSPORT_MAP] = [
     'payment-commands' => MessageBrokerAwsConfig::SQS_TRANSPORT,
 ];
 ```
+
+### Configure Payment Method
+
+Each PSP implementation has different Payment Methods available. Through the `\Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPaymentMethodsPluginInterface` you can provide the available Payment Methods.
+
+Each Payment Method can also have different configuration details.
+
+Implement the plugin interface into your implementation and you can configure the payment methods. A simple example could look like this:
+
+```
+public function configurePaymentMethods(PaymentMethodConfigurationRequestTransfer $paymentMethodConfigurationRequestTransfer): PaymentMethodConfigurationResponseTransfer
+{
+    $paymentMethodConfigurationResponseTransfer = new PaymentMethodConfigurationResponseTransfer();
+
+    $checkoutConfigurationTransfer = new CheckoutConfigurationTransfer();
+    $checkoutConfigurationTransfer->setStrategy('embedded');
+    $checkoutConfigurationTransfer->setScripts([
+        ...
+    ]);
+
+    $paymentMethodAppConfigurationTransfer = new PaymentMethodAppConfigurationTransfer();
+    $paymentMethodAppConfigurationTransfer
+        ->setCheckoutConfiguration($checkoutConfigurationTransfer);
+
+    $paymentMethodTransfer = new PaymentMethodTransfer();
+    $paymentMethodTransfer
+        ->setName('Foo')
+        ->setProviderName('Bar')
+        ->setPaymentMethodAppConfiguration($paymentMethodAppConfigurationTransfer);
+
+    $paymentMethodConfigurationResponseTransfer->addPaymentMethod($paymentMethodTransfer);
+
+    return $paymentMethodConfigurationResponseTransfer; 
+}
+```
+
+Here we configure exactly one payment method. The payment method is named "Foo" and the provider is named "bar". The Payment method also has a configuration that will be persisted on the SCOS side. 
+
+The strategy is set to "embedded" which means that the payment page will be embedded in the SCOS checkout. The scripts are the scripts that are needed to embed and run the payment page in the SCOS checkout.
+
+This code runs when the PSP App gets configured. After this method call the so configured methods will be persisted on the App sides database, enriched with default configurations, and via the AddPaymentMethod message sent to the SCOS side.
+
+When the App gets reconfigured and a different number of payment methods are configured, the DeletePaymentMethod message will be sent to the SCOS side and the previously configured payment methods for the current Tenant will be deleted from the database.

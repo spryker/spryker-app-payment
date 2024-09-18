@@ -13,6 +13,9 @@ use Generated\Shared\Transfer\CapturePaymentRequestTransfer;
 use Generated\Shared\Transfer\CapturePaymentResponseTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
+use Generated\Shared\Transfer\PaymentMethodConfigurationRequestTransfer;
+use Generated\Shared\Transfer\PaymentMethodConfigurationResponseTransfer;
+use Generated\Shared\Transfer\PaymentMethodTransfer;
 use Generated\Shared\Transfer\PaymentPageRequestTransfer;
 use Generated\Shared\Transfer\PaymentPageResponseTransfer;
 use Generated\Shared\Transfer\PaymentStatusRequestTransfer;
@@ -30,6 +33,7 @@ use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToAppWebhookFacadeInterfa
 use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToMessageBrokerFacadeBridge;
 use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToMessageBrokerFacadeInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformMarketplacePluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPaymentMethodsPluginInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPaymentPagePluginInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\Kernel\AbstractBundleDependencyProvider;
@@ -100,7 +104,7 @@ class AppPaymentDependencyProvider extends AbstractBundleDependencyProvider
     protected function getPlatformPlugin(): AppPaymentPlatformPluginInterface
     {
         // @codeCoverageIgnoreStart
-        return new class implements AppPaymentPlatformPluginInterface, AppPaymentPlatformPaymentPagePluginInterface, AppPaymentPlatformMarketplacePluginInterface {
+        return new class implements AppPaymentPlatformPluginInterface, AppPaymentPlatformPaymentPagePluginInterface, AppPaymentPlatformMarketplacePluginInterface, AppPaymentPlatformPaymentMethodsPluginInterface {
             public function initializePayment(InitializePaymentRequestTransfer $initializePaymentRequestTransfer): InitializePaymentResponseTransfer
             {
                 return (new InitializePaymentResponseTransfer())->setIsSuccessful(true);
@@ -141,6 +145,21 @@ class AppPaymentDependencyProvider extends AbstractBundleDependencyProvider
             public function transferPayments(PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer): PaymentTransmissionsResponseTransfer
             {
                 return (new PaymentTransmissionsResponseTransfer())->setIsSuccessful(true);
+            }
+
+            public function configurePaymentMethods(
+                PaymentMethodConfigurationRequestTransfer $paymentMethodConfigurationRequestTransfer
+            ): PaymentMethodConfigurationResponseTransfer {
+                $paymentMethodConfigurationResponseTransfer = new PaymentMethodConfigurationResponseTransfer();
+
+                $paymentMethodTransfer = new PaymentMethodTransfer();
+                $paymentMethodTransfer
+                    ->setProviderName('test-payment-provider-name')
+                    ->setName('test-payment-method-name');
+
+                $paymentMethodConfigurationResponseTransfer->addPaymentMethod($paymentMethodTransfer);
+
+                return $paymentMethodConfigurationResponseTransfer;
             }
         };
         // @codeCoverageIgnoreEnd

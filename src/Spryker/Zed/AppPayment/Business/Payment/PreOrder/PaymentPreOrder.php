@@ -167,7 +167,6 @@ class PaymentPreOrder
 
         $this->messageSender->sendPaymentUpdatedMessage($paymentTransfer);
 
-        // TODO send message based on the status of the returned response of the PSP Implementation
         if ($confirmPreOrderPaymentResponseTransfer->getIsSuccessful() === true) {
             $this->messageSender->sendPaymentCapturedMessage($paymentTransfer);
 

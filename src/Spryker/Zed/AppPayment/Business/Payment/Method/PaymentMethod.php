@@ -35,15 +35,7 @@ class PaymentMethod
     public function configurePaymentMethods(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
     {
         // Do not send the message(s) when App is in state "disconnected" or when the app is marked as inactive.
-        if ($appConfigTransfer->getStatus() === AppKernelConfig::APP_STATUS_DISCONNECTED || $appConfigTransfer->getIsActive() === false) {
-            return $appConfigTransfer;
-        }
-
-        if (!($this->appPaymentPlatformPlugin instanceof AppPaymentPlatformPaymentMethodsPluginInterface)) {
-            $paymentMethodTransfer = $this->getDefaultPaymentMethodTransfer();
-
-            $this->addPaymentMethod($paymentMethodTransfer, $appConfigTransfer);
-
+        if ($appConfigTransfer->getStatus() === AppKernelConfig::APP_STATUS_DISCONNECTED || $appConfigTransfer->getIsActive() === false || !($this->appPaymentPlatformPlugin instanceof AppPaymentPlatformPaymentMethodsPluginInterface)) {
             return $appConfigTransfer;
         }
 
@@ -249,14 +241,6 @@ class PaymentMethod
 
     public function deletePaymentMethods(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
     {
-        if (!($this->appPaymentPlatformPlugin instanceof AppPaymentPlatformPaymentMethodsPluginInterface)) {
-            $paymentMethodTransfer = $this->getDefaultPaymentMethodTransfer();
-
-            $this->deletePaymentMethod($paymentMethodTransfer, $appConfigTransfer);
-
-            return $appConfigTransfer;
-        }
-
         $tenantIdentifier = $appConfigTransfer->getTenantIdentifierOrFail();
 
         // Get current persisted Tenants payment methods
@@ -278,16 +262,6 @@ class PaymentMethod
 
         $this->paymentMethodMessageSender->sendDeletePaymentMethodMessage($deletePaymentMethodTransfer, $appConfigTransfer);
         $this->appPaymentRepository->deletePaymentMethod($paymentMethodTransfer, $appConfigTransfer->getTenantIdentifierOrFail());
-    }
-
-    protected function getDefaultPaymentMethodTransfer(): PaymentMethodTransfer
-    {
-        $paymentMethodTransfer = new PaymentMethodTransfer();
-        $paymentMethodTransfer
-            ->setName($this->appPaymentConfig->getPaymentMethodName())
-            ->setProviderName($this->appPaymentConfig->getPaymentProviderName());
-
-        return $paymentMethodTransfer;
     }
 
     protected function getDefaultPaymentMethodAppConfiguration(): PaymentMethodAppConfigurationTransfer

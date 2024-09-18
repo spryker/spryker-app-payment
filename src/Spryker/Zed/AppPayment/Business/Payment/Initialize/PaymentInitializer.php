@@ -65,6 +65,7 @@ class PaymentInitializer
             return $initializePaymentResponseTransfer;
         }
 
+        // Only add the redirect information when we are not doing a pre-order payment
         if ($initializePaymentRequestTransfer->getOrderDataOrFail()->getOrderReference()) {
             $initializePaymentResponseTransfer = $this->addRedirectUrl($initializePaymentRequestTransfer, $initializePaymentResponseTransfer);
         }
