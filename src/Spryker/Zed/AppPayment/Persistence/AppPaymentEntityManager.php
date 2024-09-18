@@ -12,6 +12,7 @@ use Generated\Shared\Transfer\PaymentRefundTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 use Orm\Zed\AppPayment\Persistence\SpyPayment;
+use Orm\Zed\AppPayment\Persistence\SpyPaymentQuery;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentRefund;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentTransfer;
 use Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTransactionIdNotFoundException;
@@ -92,5 +93,16 @@ class AppPaymentEntityManager extends AbstractEntityManager implements AppPaymen
         }
 
         $spyPaymentQuery->delete();
+    }
+
+    public function updatePaymentTransactionId(PaymentTransfer $paymentTransfer, string $transactionId): void
+    {
+        $spyPaymentEntity = SpyPaymentQuery::create()
+            ->filterByTransactionId($paymentTransfer->getTransactionIdOrFail())
+            ->findOne();
+
+        $spyPaymentEntity
+            ?->setTransactionId($transactionId)
+            ?->save();
     }
 }

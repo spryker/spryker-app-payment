@@ -31,12 +31,14 @@ interface AppPaymentFacadeInterface
 {
     /**
      * Specification:
+     * - When `PaymentPlatformPluginInterface::initializePayment()` was already executed and the paymentProviderData contains a transaction id (PreOrder payment) the original payment will be added to `InitializePaymentRequestTransfer::payment`.
      * - Calls the `PaymentPlatformPluginInterface::initializePayment()` method.
      * - When `PaymentPlatformPluginInterface::initializePayment()` throws an exception, the exception is logged.
      * - When `PaymentPlatformPluginInterface::initializePayment()` throws an exception, a `InitializePaymentResponseTransfer` with a failed response is returned.
-     * - When `PaymentPlatformPluginInterface::initializePayment()` is successful, the `InitializePaymentResponseTransfer::redirectUrl` will be set to the current application.
+     * - When `PaymentPlatformPluginInterface::initializePayment()` is successful, the `InitializePaymentResponseTransfer::redirectUrl` will be set to the current application only for non pre-order payments.
      * - When `PaymentPlatformPluginInterface::initializePayment()` is successful, a `SpyPayment` entity will be persisted.
      * - When `PaymentPlatformPluginInterface::initializePayment()` is successful, a `InitializePaymentResponseTransfer` with a successful response is returned.
+     * - When `PaymentPlatformPluginInterface::initializePayment()` is successful and the PSP updated the transaction id, the `SpyPayment` entity will be updated with the new transaction id.
      *
      * @api
      */

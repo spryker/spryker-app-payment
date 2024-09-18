@@ -72,8 +72,20 @@ class PaymentInitializer
 
         /** @phpstan-var \Generated\Shared\Transfer\InitializePaymentResponseTransfer */
         return $this->getTransactionHandler()->handleTransaction(function () use ($initializePaymentRequestTransfer, $initializePaymentResponseTransfer) {
-            // We only persist and only send the message with the initial request once.
+            // When we have already persisted a payment in the database and this method is called a second time the payment will be set in the request transfer
+            // In this case we are in the pre-order payment process and we don't want to save the payment again.
+            // When the grandTotal has changed the response will contain a different transactionId as we have persisted in the database because so we need to update
             if ($initializePaymentRequestTransfer->getPayment() instanceof PaymentTransfer) {
+                // Nothing has changed so we can step out here
+                if ($initializePaymentRequestTransfer->getPayment()->getTransactionId() === $initializePaymentResponseTransfer->getTransactionId()) {
+                    return $initializePaymentResponseTransfer;
+                }
+
+                $this->appPaymentEntityManager->updatePaymentTransactionId(
+                    $initializePaymentRequestTransfer->getPaymentOrFail(),
+                    $initializePaymentResponseTransfer->getTransactionIdOrFail(),
+                );
+
                 return $initializePaymentResponseTransfer;
             }
 

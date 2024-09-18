@@ -283,6 +283,24 @@ class AppPaymentHelper extends Module
         $this->assertGreaterThan(0, $paymentQuery->find()->count(), 'Did not find payment by tenant identifier');
     }
 
+    public function seePaymentWithTransactionId(string $transactionId): void
+    {
+        $spyPaymentEntity = SpyPaymentQuery::create()
+            ->filterByTransactionId($transactionId)
+            ->findOne();
+
+        $this->assertNotNull($spyPaymentEntity, 'Expected to see a Payment with transaction id but it was not found');
+    }
+
+    public function dontSeePaymentWithTransactionId(string $transactionId): void
+    {
+        $spyPaymentEntity = SpyPaymentQuery::create()
+            ->filterByTransactionId($transactionId)
+            ->findOne();
+
+        $this->assertNull($spyPaymentEntity, 'Expected not to see a Payment with transaction id but it was found');
+    }
+
     // Transfer related code
 
     public function havePaymentTransmissionsRequestTransfer(array $seed = [], array $paymentTransmissionsSeed = []): PaymentTransmissionsRequestTransfer
