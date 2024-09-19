@@ -5,7 +5,7 @@
     "license": "proprietary",
     "require": {
         "php": ">=8.1",
-        "spryker/app-kernel": "^1.0.0",
+        "spryker/app-kernel": "^2.0.0",
         "spryker/app-webhook": "dev-feature/acp-3507/acp-3746-persist-webhooks-and-allow-to-run-them-later as 1.1.0",
         "spryker/event-dispatcher": "^1.6.0",
         "spryker/glue-application-extension": "^1.0.0",

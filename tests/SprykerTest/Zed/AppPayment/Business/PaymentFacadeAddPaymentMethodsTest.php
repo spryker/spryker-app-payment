@@ -49,6 +49,7 @@ class PaymentFacadeAddPaymentMethodsTest extends Unit
                 $paymentMethodNameBar,
             ],
         ]);
+        $appConfigTransfer->setIsActive(true);
 
         $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPaymentMethodsPluginInterface::class, [
             'configurePaymentMethods' => function () use ($paymentMethodNameFoo, $paymentMethodNameBar) {
