@@ -7,7 +7,6 @@
 
 namespace Spryker\Glue\AppPaymentBackendApi\Plugin\GlueApplication;
 
-use Generated\Shared\Transfer\GlueErrorTransfer;
 use Generated\Shared\Transfer\GlueRequestTransfer;
 use Generated\Shared\Transfer\GlueRequestValidationTransfer;
 use Generated\Shared\Transfer\PaymentConditionsTransfer;
@@ -39,15 +38,10 @@ class PaymentConfirmDisconnectionRequestValidatorPlugin extends AbstractConfirmD
                 ->setIsValid(true);
         }
 
-        return (new GlueRequestValidationTransfer())
-            ->setIsValid(false)
-            ->addError(
-                (new GlueErrorTransfer())
-                    ->setCode(AppPaymentBackendApiConfig::ERROR_CODE_PAYMENT_DISCONNECTION_CANNOT_BE_PROCEEDED)
-                    ->setMessage(
-                        $this->getFactory()->getTranslatorFacade()->trans('The payment App cannot be disconnected when there are open orders. Open orders won’t be proceed automatically if you delete the App. Close the open orders to continue.'),
-                    ),
-            );
+        return $this->getFailedGlueRequestValidationTransfer(
+            AppPaymentBackendApiConfig::ERROR_CODE_PAYMENT_DISCONNECTION_CANNOT_BE_PROCEEDED,
+            $this->getFactory()->getTranslatorFacade()->trans('The payment App cannot be disconnected when there are open orders. Open orders won’t be proceed automatically if you delete the App. Close the open orders to continue.'),
+        );
     }
 
     protected function getCancellationErrorCode(): string
