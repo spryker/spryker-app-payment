@@ -258,7 +258,7 @@
     </transfer>
 
     <transfer name="WebhookInboxCriteria" strict="true">
-        <property name="identifier" type="array" singular="identifier"/>
+        <property name="identifiers" type="array" singular="identifier"/>
     </transfer>
 
     <transfer name="MessageAttributes"/>

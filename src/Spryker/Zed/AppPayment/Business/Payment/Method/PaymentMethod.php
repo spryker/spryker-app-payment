@@ -74,9 +74,9 @@ class PaymentMethod
 
     protected function addPaymentMethod(PaymentMethodTransfer $paymentMethodTransfer, AppConfigTransfer $appConfigTransfer): void
     {
-        // Add the passed configuration to the default configuration.
         $paymentMethodAppConfigurationTransfer = $this->getDefaultPaymentMethodAppConfiguration();
 
+        // In case of the PSP App configured a custom checkout configuration, we will use it here and pass it as such to the configuration.
         if ($paymentMethodTransfer->getPaymentMethodAppConfiguration() instanceof PaymentMethodAppConfigurationTransfer) {
             $paymentMethodAppConfigurationTransfer->setCheckoutConfiguration($paymentMethodTransfer->getPaymentMethodAppConfiguration()->getCheckoutConfiguration());
         }
@@ -85,6 +85,7 @@ class PaymentMethod
         $addPaymentMethodTransfer
             ->setName($paymentMethodTransfer->getNameOrFail())
             ->setProviderName($paymentMethodTransfer->getProviderNameOrFail())
+            // @deprecated This line can be removed when all PSP Apps are updated.
             ->setPaymentAuthorizationEndpoint(sprintf('%s/private/initialize-payment', $this->appPaymentConfig->getGlueBaseUrl()))
             ->setPaymentMethodAppConfiguration($paymentMethodAppConfigurationTransfer);
 
@@ -264,6 +265,10 @@ class PaymentMethod
         $this->appPaymentRepository->deletePaymentMethod($paymentMethodTransfer, $appConfigTransfer->getTenantIdentifierOrFail());
     }
 
+    /**
+     * Returns the default payment method app configuration which contains known endpoints for each PSP.
+     * These defaults will not be needed to be configured by the PSP App itself
+     */
     protected function getDefaultPaymentMethodAppConfiguration(): PaymentMethodAppConfigurationTransfer
     {
         $paymentMethodAppConfigurationTransfer = new PaymentMethodAppConfigurationTransfer();
@@ -278,7 +283,7 @@ class PaymentMethod
 
         $authorizationEndpointTransfer = new EndpointTransfer();
         $authorizationEndpointTransfer
-            ->setName('pre-order')
+            ->setName('pre-order-confirmation')
             ->setPath('/private/confirm-pre-order-payment'); // Defined in app_payment_openapi.yml
 
         $paymentMethodAppConfigurationTransfer->addEndpoint($authorizationEndpointTransfer);

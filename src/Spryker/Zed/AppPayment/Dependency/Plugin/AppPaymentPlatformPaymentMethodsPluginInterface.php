@@ -15,10 +15,13 @@ interface AppPaymentPlatformPaymentMethodsPluginInterface extends AppPaymentPlat
     /**
      * Specification:
      * - Receives a `PaymentMethodConfigurationRequestTransfer` with:
-     *   - `PaymentMethodConfigurationRequestTransfer::appConfig`
-     * - Returns a `PaymentMethodConfigurationRequestTransfer`.
-     * - Each PaymentMethod which is listed in PaymentMethodConfigurationRequestTransfer::paymentMethodsToAdd will trigger a `AddPaymentMethod` message.
-     * - Each PaymentMethod which is listed in PaymentMethodConfigurationRequestTransfer::paymentMethodsToDelete will trigger a `DeletePaymentMethod` message.
+     *   - `appConfig`
+     * - Returns a `PaymentMethodConfigurationRequestTransfer` with.
+     *   - `paymentMethods` filled with the payment methods available for the app.
+     *   - Each `PaymentMethodTransfer` contains the
+     *      - `name` which is the name of the Payment Method e.g. PayPal.
+     *      - `providerName` which is the name of the Payment Service Provider e.g. PayOne.
+     *      - `paymentMethodAppConfiguration` with the configuration for the app.
      *
      * @api
      */

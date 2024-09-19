@@ -86,11 +86,15 @@ interface AppPaymentFacadeInterface
 
     /**
      * Specification:
-     * - Requests the `AppPaymentPlatformPaymentMethodsPluginInterface::configurePaymentMethods()` method to return a list PaymentMethods to be added.
+     * - Requests the `AppPaymentPlatformPaymentMethodsPluginInterface::configurePaymentMethods()` method to return a list PaymentMethods to be activated.
+     * - The `AppPaymentPlatformPaymentMethodsPluginInterface::configurePaymentMethods()` is responsible to make a decision which of which Payment methods should be returned via the passed AppConfig transfer
      * - When the passed `AppPaymentPlatformPluginInterface` is not an instance of `AppPaymentPlatformPaymentMethodsPluginInterface` it will return early.
+     * - The `AppPaymentPlatformPaymentMethodsPluginInterface::configurePaymentMethods()` get the `PaymentMethodConfigurationRequestTransfer` passed which contains the `AppConfigTransfer`.
+     * - Each PaymentMethod will enriched with PSP App defaults such as known endpoints from this package.
+     * - PaymentMethods that were already added will trigger a `AddPaymentMethod` message.
      * - PaymentMethods that were already added will not be added again.
      * - PaymentMethods that were already persisted and are no longer returned from `AppPaymentPlatformPaymentMethodsPluginInterface::configurePaymentMethods()` method will be deleted and trigger a `DeletePaymentMethod` message.
-     * - PaymentMethods that were already persisted and require an update (payment method data has changed) will trigger a `UpdatePaymentMethod` message.
+     * - PaymentMethods that were already persisted and require an update (payment method data has changed, configuration has changed) will trigger a `UpdatePaymentMethod` message.
      *
      * @api
      */

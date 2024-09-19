@@ -152,13 +152,30 @@ $config[MessageBrokerAwsConstants::CHANNEL_TO_RECEIVER_TRANSPORT_MAP] = [
 ];
 ```
 
-### Configure Payment Method
+### Configure Payment Methods
 
 Each PSP implementation has different Payment Methods available. Through the `\Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPaymentMethodsPluginInterface` you can provide the available Payment Methods.
 
 Each Payment Method can also have different configuration details.
 
-Implement the plugin interface into your implementation and you can configure the payment methods. A simple example could look like this:
+Add the plugin interface to your implementation and you can configure the payment methods.
+
+#### Payment Method default configuration
+
+This package adds endpoints to be used from the SCOS side to each of the configured Payment Methods. The default configuration for each Payment Method is:
+
+- The base URL - This is the URL that the SCOS side will use to call the PSP App.
+- Endpoints - The endpoints that the SCOS side will call on the PSP App.
+  - `authorization` - The endpoint to initialize a Payment, `/private/initialize-payment`
+  - `pre-order-confirmation` - The endpint to confirm a PreOrder payment,  `/private/confirm-pre-order-payment`
+  - `pre-order-cancellation` - The endpint to cancel a PreOrder payment,  `/private/cancel-pre-order-payment`
+  - `transfer` - The endpoint to transfer money to a Merchant, `/private/transfers`
+
+These are used on the SCOS side by their names. F.e. when the SCOS side wants to initialize a payment it will call the `authorization` endpoint on the PSP App.
+
+#### Payment Service Provider with only one Payment Method
+
+A simple example for a PSP with only one Payment Method could look like this:
 
 ```
 public function configurePaymentMethods(PaymentMethodConfigurationRequestTransfer $paymentMethodConfigurationRequestTransfer): PaymentMethodConfigurationResponseTransfer
@@ -183,14 +200,56 @@ public function configurePaymentMethods(PaymentMethodConfigurationRequestTransfe
 
     $paymentMethodConfigurationResponseTransfer->addPaymentMethod($paymentMethodTransfer);
 
-    return $paymentMethodConfigurationResponseTransfer; 
+    return $paymentMethodConfigurationResponseTransfer;
 }
 ```
 
-Here we configure exactly one payment method. The payment method is named "Foo" and the provider is named "bar". The Payment method also has a configuration that will be persisted on the SCOS side. 
+Here we configure exactly one payment method. The payment method is named "Foo" and the provider is named "Bar". The Payment method also has a configuration that will be persisted on the SCOS side.
 
 The strategy is set to "embedded" which means that the payment page will be embedded in the SCOS checkout. The scripts are the scripts that are needed to embed and run the payment page in the SCOS checkout.
 
 This code runs when the PSP App gets configured. After this method call the so configured methods will be persisted on the App sides database, enriched with default configurations, and via the AddPaymentMethod message sent to the SCOS side.
 
-When the App gets reconfigured and a different number of payment methods are configured, the DeletePaymentMethod message will be sent to the SCOS side and the previously configured payment methods for the current Tenant will be deleted from the database.
+When the App gets reconfigured and a different number of Payment Methods are configured, the DeletePaymentMethod message will be sent to the SCOS side and the previously configured Payment Methods for the current Tenant will be deleted from the database.
+
+When the PaymentMethod configuration has changed the UpdatePaymentMethod message will be sent to the SCOS side.
+
+#### Payment Service Provider with multiple Payment Methods
+
+In case you have multiple payment methods, you can add multiple PaymentMethodTransfer objects to the PaymentMethodConfigurationResponseTransfer object. For this, you can get the AppConfigTransfer from the PaymentMethodConfigurationRequestTransfer. An example could look like this:
+
+```
+public function configurePaymentMethods(PaymentMethodConfigurationRequestTransfer $paymentMethodConfigurationRequestTransfer): PaymentMethodConfigurationResponseTransfer
+{
+    $appConfigTransfer = $paymentMethodConfigurationRequestTransfer->getAppConfig();
+
+    // Contains ['bar'] which was the only one selected through the configuration page
+    $configuredPaymentMethods = $appConfigTransfer->getPaymentMethods();
+
+    // These are all methods you can provide which are configurable through the AppStore Catalogs App configuration page
+    $availablePaymentMethods = [
+        'foo',
+        'bar',
+        'baz',
+    ];
+
+    $paymentMethodConfigurationResponseTransfer = new PaymentMethodConfigurationResponseTransfer();
+
+    foreeach ($availablePaymentMethods as $paymentMethodName) {
+        if (!isset($configuredPaymentMethods[$paymentMethodName])) {
+            continue;
+        }
+
+        $paymentMethodTransfer = new PaymentMethodTransfer();
+        $paymentMethodTransfer
+            ->setName($paymentMethodName)
+            ->setProviderName('PaymentProviderName');
+
+        $paymentMethodConfigurationResponseTransfer->addPaymentMethod($paymentMethodTransfer);
+    }
+
+    return $paymentMethodConfigurationResponseTransfer;
+}
+```
+
+In thie example you would get one PaymentMethod added to SCOS via the AddPaymentMethod message. The PaymentMethod is named "bar" and the provider is named "PaymentProviderName".
