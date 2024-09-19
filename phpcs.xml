@@ -24,6 +24,7 @@
         <exclude name="Spryker.Commenting.DocBlockParam"/>
         <exclude name="Spryker.Commenting.DocBlockReturnVoid"/>
         <exclude name="Spryker.Commenting.DocBlockParamAllowDefaultValue"/>
+        <exclude name="Spryker.Internal.SprykerBridge"/>
     </rule>
 
     <rule ref="vendor/spryker/code-sniffer/SprykerStrict/ruleset.xml">

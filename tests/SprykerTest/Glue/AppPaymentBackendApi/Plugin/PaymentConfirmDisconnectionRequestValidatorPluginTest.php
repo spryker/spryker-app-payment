@@ -11,6 +11,7 @@ use Codeception\Test\Unit;
 use Generated\Shared\Transfer\GlueErrorConfirmTransfer;
 use Generated\Shared\Transfer\GlueRequestTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
+use Spryker\Glue\AppKernel\AppKernelConfig;
 use Spryker\Glue\AppPaymentBackendApi\AppPaymentBackendApiConfig;
 use Spryker\Glue\AppPaymentBackendApi\AppPaymentBackendApiDependencyProvider;
 use Spryker\Glue\AppPaymentBackendApi\Dependency\Facade\AppPaymentBackendApiToTranslatorFacadeInterface;
@@ -44,7 +45,7 @@ class PaymentConfirmDisconnectionRequestValidatorPluginTest extends Unit
 
     protected AppPaymentBackendApiPluginTester $tester;
 
-    public function testPaymentConfirmDisconnectionRequestValidatorPluginReturnsErrorIfThereIsNoTenantIdentifierGivenInTheRequest(): void
+    public function testPaymentConfirmDisconnectionRequestValidatorPluginReturnsErrorIfThereIsNoExistingTenant(): void
     {
         // Arrange
         $this->tester->setDependency(AppPaymentBackendApiDependencyProvider::FACADE_TRANSLATOR, $this->getTranslatorFacadeMock());
@@ -59,12 +60,12 @@ class PaymentConfirmDisconnectionRequestValidatorPluginTest extends Unit
         $this->assertFalse($glueRequestValidationTransfer->getIsValid());
         $this->assertCount(1, $glueRequestValidationTransfer->getErrors());
         $this->assertSame(
-            AppPaymentBackendApiConfig::ERROR_CODE_PAYMENT_DISCONNECTION_TENANT_IDENTIFIER_MISSING,
+            AppKernelConfig::ERROR_CODE_PAYMENT_DISCONNECTION_TENANT_IDENTIFIER_MISSING,
             $glueRequestValidationTransfer->getErrors()[0]->getCode(),
         );
     }
 
-    public function testPaymentConfirmDisconnectionRequestValidatorPluginReturnsSuccessIfThereAreNoPaymentsForTenantIdentifierGivenInTheRequest(): void
+    public function testPaymentConfirmDisconnectionRequestValidatorPluginReturnsSuccessIfThereAreNoPaymentsForExistingTenant(): void
     {
         // Arrange
         $this->tester->setDependency(AppPaymentBackendApiDependencyProvider::FACADE_TRANSLATOR, $this->getTranslatorFacadeMock());
@@ -83,7 +84,7 @@ class PaymentConfirmDisconnectionRequestValidatorPluginTest extends Unit
         $this->assertTrue($glueRequestValidationTransfer->getIsValid());
     }
 
-    public function testPaymentConfirmDisconnectionRequestValidatorPluginReturnsErrorIfThereArePaymentsForTenantIdentifierGivenInTheRequest(): void
+    public function testPaymentConfirmDisconnectionRequestValidatorPluginReturnsErrorIfThereArePaymentsForExistingTenant(): void
     {
         // Arrange
         $this->tester->setDependency(AppPaymentBackendApiDependencyProvider::FACADE_TRANSLATOR, $this->getTranslatorFacadeMock());
@@ -119,7 +120,7 @@ class PaymentConfirmDisconnectionRequestValidatorPluginTest extends Unit
      *
      * @return void
      */
-    public function testPaymentConfirmDisconnectionRequestValidatorPluginReturnsErrorIfThereArePaymentsForTenantIdentifierGivenInTheRequestAndTheRequestContainsConfirmationCanceledResponse(
+    public function testPaymentConfirmDisconnectionRequestValidatorPluginReturnsErrorIfThereArePaymentsForExistingTenantAndTheRequestContainsConfirmationCanceledResponse(
         string $confirmationStatus
     ): void {
         // Arrange
@@ -149,7 +150,7 @@ class PaymentConfirmDisconnectionRequestValidatorPluginTest extends Unit
         );
     }
 
-    public function testPaymentConfirmDisconnectionRequestValidatorPluginReturnsSuccessIfThereArePaymentsForTenantIdentifierGivenInTheRequestAndTheRequestContainsConfirmationSuccessfulResponse(): void
+    public function testPaymentConfirmDisconnectionRequestValidatorPluginReturnsSuccessIfThereArePaymentsForExistingTenantAndTheRequestContainsConfirmationSuccessfulResponse(): void
     {
         // Arrange
         $this->tester->setDependency(AppPaymentBackendApiDependencyProvider::FACADE_TRANSLATOR, $this->getTranslatorFacadeMock());
