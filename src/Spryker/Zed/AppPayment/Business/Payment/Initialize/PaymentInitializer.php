@@ -42,9 +42,9 @@ class PaymentInitializer
             $initializePaymentRequestTransfer->setAppConfigOrFail($this->appConfigLoader->loadAppConfig($initializePaymentRequestTransfer->getTenantIdentifierOrFail()));
 
             // In case of a pre-order payment, the payment provider data is already set, and we have to load the previously made payment and pass it to the platform implementation.
-            if ($initializePaymentRequestTransfer->getPaymentProviderData() !== [] && isset($initializePaymentRequestTransfer->getPaymentProviderData()[PaymentTransfer::TRANSACTION_ID])) {
+            if ($initializePaymentRequestTransfer->getPreOrderPaymentData() !== [] && isset($initializePaymentRequestTransfer->getPreOrderPaymentData()[PaymentTransfer::TRANSACTION_ID])) {
                 $initializePaymentRequestTransfer->setPayment(
-                    $this->appPaymentRepository->getPaymentByTransactionId($initializePaymentRequestTransfer->getPaymentProviderData()[PaymentTransfer::TRANSACTION_ID]),
+                    $this->appPaymentRepository->getPaymentByTransactionId($initializePaymentRequestTransfer->getPreOrderPaymentData()[PaymentTransfer::TRANSACTION_ID]),
                 );
             }
 

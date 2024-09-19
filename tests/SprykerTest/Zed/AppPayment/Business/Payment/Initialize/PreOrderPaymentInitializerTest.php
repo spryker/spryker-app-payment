@@ -53,7 +53,7 @@ class PreOrderPaymentInitializerTest extends Unit
 
         $initializePaymentRequestTransfer->setOrderData($orderTransfer);
 
-        $initializePaymentRequestTransfer->setPaymentProviderData([
+        $initializePaymentRequestTransfer->setPreOrderPaymentData([
             PaymentTransfer::TRANSACTION_ID => $transactionId, // required field to always be set in pre-order payments.
         ]);
 
@@ -63,7 +63,7 @@ class PreOrderPaymentInitializerTest extends Unit
         $initializePaymentResponseTransfer
             ->setIsSuccessful(true)
             ->setTransactionId($newTransactionId)
-            ->setPaymentProviderData([
+            ->setPreOrderPaymentData([
                 PaymentTransfer::TRANSACTION_ID => $newTransactionId,
             ]);
 

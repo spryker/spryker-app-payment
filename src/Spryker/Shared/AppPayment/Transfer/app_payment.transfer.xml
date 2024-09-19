@@ -42,7 +42,7 @@
         <property name="orderData" type="Quote"/>
         <property name="appConfig" type="AppConfig"/>
         <property name="payment" type="Payment"/>
-        <property name="paymentProviderData" type="array" singular="paymentProviderDatum"/>
+        <property name="preOrderPaymentData" type="array" singular="preOrderPaymentDatum"/>
         <property name="redirectSuccessUrl" type="string"/>
         <property name="redirectCancelUrl" type="string"/>
         <property name="checkoutSummaryPageUrl" type="string"/>
@@ -52,7 +52,7 @@
     <transfer name="InitializePaymentResponse" strict="true">
         <property name="isSuccessful" type="bool"/>
         <property name="transactionId" type="string"/>
-        <property name="paymentProviderData" type="array" singular="paymentProviderDatum"/>
+        <property name="preOrderPaymentData" type="array" singular="preOrderPaymentDatum"/>
         <property name="redirectUrl" type="string"/>
         <property name="message" type="string"/>
     </transfer>

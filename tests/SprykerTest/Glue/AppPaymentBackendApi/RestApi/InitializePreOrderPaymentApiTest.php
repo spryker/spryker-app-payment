@@ -54,7 +54,7 @@ class InitializePreOrderPaymentApiTest extends Unit
 
         $initializePaymentRequestTransfer->setOrderData($orderTransfer);
 
-        $initializePaymentRequestTransfer->setPaymentProviderData([
+        $initializePaymentRequestTransfer->setPreOrderPaymentData([
             PaymentTransfer::TRANSACTION_ID => $transactionId, // required field to always be set in pre-order payments.
             'foo' => $paymentProviderDatum,
         ]);
@@ -65,7 +65,7 @@ class InitializePreOrderPaymentApiTest extends Unit
         $initializePaymentResponseTransfer
             ->setIsSuccessful(true)
             ->setTransactionId($transactionId)
-            ->setPaymentProviderData([
+            ->setPreOrderPaymentData([
                 PaymentTransfer::TRANSACTION_ID => $transactionId, // required field to always be set in pre-order payments.
                 'foo' => $paymentProviderDatum,
             ]);
@@ -94,6 +94,6 @@ class InitializePreOrderPaymentApiTest extends Unit
         $this->tester->seeResponseCodeIs(Response::HTTP_OK);
         $this->tester->seeResponseIsJson();
         $this->tester->seeResponseJsonContainsPayment($response);
-        $this->tester->seeResponseJsonContainsPaymentProviderData($response, $initializePaymentRequestTransfer->getPaymentProviderData());
+        $this->tester->seeResponseJsonContainsPreOrderPaymentData($response, $initializePaymentRequestTransfer->getPreOrderPaymentData());
     }
 }

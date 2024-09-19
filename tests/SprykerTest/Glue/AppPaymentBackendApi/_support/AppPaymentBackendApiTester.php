@@ -45,13 +45,13 @@ class AppPaymentBackendApiTester extends Actor
         $this->assertTrue($initializePaymentResponseTransfer->getIsSuccessful());
     }
 
-    public function seeResponseJsonContainsPaymentProviderData(Response $response, array $paymentProviderData): void
+    public function seeResponseJsonContainsPreOrderPaymentData(Response $response, array $paymentProviderData): void
     {
         $response = json_decode($response->getContent(), true);
 
         $initializePaymentResponseTransfer = (new InitializePaymentResponseTransfer())->fromArray($response);
 
-        $this->assertSame($initializePaymentResponseTransfer->getPaymentProviderData(), $paymentProviderData);
+        $this->assertSame($initializePaymentResponseTransfer->getPreOrderPaymentData(), $paymentProviderData);
     }
 
     public function haveTransferDefaults(string $tenantIdentifier, string $merchantReference, string $transactionId, string $orderReference): void
