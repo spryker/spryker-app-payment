@@ -158,25 +158,6 @@ paths:
 
 components:
     schemas:
-        InitializePaymentResponse:
-            properties:
-                isSuccessful:
-                    type: boolean
-                redirectUrl:
-                    type: string
-                    description: 'URL for payment authorization'
-                message:
-                    type: string
-                    nullable: true
-                paymentProviderData:
-                    type: object
-                    additionalProperties:
-                        type: string
-                    description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
-                    example:
-                        clientId: '#061280'
-                        publishableKey: '#061114'
-
         InitializePaymentRequest:
             type: object
             required:
@@ -252,13 +233,32 @@ components:
                     description: 'Provides checkout summary page URL.'
                     type: string
                     example: 'https://example.com/summary'
+        
+        InitializePaymentResponse:
+            properties:
+                isSuccessful:
+                    type: boolean
+                redirectUrl:
+                    type: string
+                    description: 'URL for payment authorization'
+                message:
+                    type: string
+                    nullable: true
+                paymentProviderData:
+                    type: object
+                    additionalProperties:
+                        type: string
+                    description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
+                    example:
+                        clientId: '#061280'
+                        publishableKey: '#061114'
 
         ConfirmPreOrderPaymentRequest:
             type: object
             required:
                 - orderData
                 - orderReference
-                - paymentServiceProviderData
+                - preOrderPaymentData
             properties:
                 orderData:
                     description: 'Order data.'
@@ -320,7 +320,7 @@ components:
                 orderReference:
                     type: string
                     example: 'DE-123456'
-                paymentServiceProviderData:
+                preOrderPaymentData:
                     description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
                     type: string
                     additionalProperties:
@@ -341,9 +341,9 @@ components:
         CancelPreOrderPaymentRequest:
             type: object
             required:
-                - paymentServiceProviderData
+                - preOrderPaymentData
             properties:
-                paymentServiceProviderData:
+                preOrderPaymentData:
                     description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
                     type: string
                     additionalProperties:

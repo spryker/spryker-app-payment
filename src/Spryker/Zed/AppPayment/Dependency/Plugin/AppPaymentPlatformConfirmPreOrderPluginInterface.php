@@ -18,7 +18,7 @@ interface AppPaymentPlatformConfirmPreOrderPluginInterface extends AppPaymentPla
      *   - `appConfig`
      *   - `payment`
      *   - `orderReference`
-     *   - `paymentServiceProviderData`
+     *   - `preOrderPaymentData`
      * - Returns a `ConfirmPreOrderPaymentResponseTransfer`.
      * - Requires `ConfirmPreOrderPaymentResponseTransfer::isSuccessful`to be set.
      * - Requires `ConfirmPreOrderPaymentResponseTransfer::message` to be set when the 3rd party provider could not process the request or any other issue occurs.

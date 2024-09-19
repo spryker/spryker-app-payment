@@ -64,7 +64,7 @@
         <property name="transactionId" type="string"/>
         <property name="tenantIdentifier" type="string"/>
         <property name="orderReference" type="string"/>
-        <property name="paymentServiceProviderData" type="array" associative="true" singular="paymentServiceProviderDatum"/>
+        <property name="preOrderPaymentData" type="array" associative="true" singular="preOrderPaymentDatum"/>
     </transfer>
 
     <transfer name="ConfirmPreOrderPaymentResponse" strict="true">
@@ -78,7 +78,7 @@
         <property name="payment" type="Payment"/>
         <property name="transactionId" type="string"/>
         <property name="tenantIdentifier" type="string"/>
-        <property name="paymentServiceProviderData" type="array" associative="true" singular="paymentServiceProviderDatum"/>
+        <property name="preOrderPaymentData" type="array" associative="true" singular="preOrderPaymentDatum"/>
     </transfer>
 
     <transfer name="CancelPreOrderPaymentResponse" strict="true">

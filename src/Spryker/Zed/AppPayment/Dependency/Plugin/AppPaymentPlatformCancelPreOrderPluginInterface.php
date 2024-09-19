@@ -17,7 +17,7 @@ interface AppPaymentPlatformCancelPreOrderPluginInterface extends AppPaymentPlat
   * - Receives a `CancelPreOrderPaymentRequestTransfer` with:
   *   - `appConfig`
   *   - `payment`
-  *   - `paymentServiceProviderData`
+  *   - `preOrderPaymentData`
   * - Returns a `CancelPreOrderPaymentResponseTransfer`.
   * - Requires `CancelPreOrderPaymentResponseTransfer::isSuccessful`to be set.
   * - Requires `CancelPreOrderPaymentResponseTransfer::message` to be set when the 3rd party provider could not process the request or any other issue occurs.
