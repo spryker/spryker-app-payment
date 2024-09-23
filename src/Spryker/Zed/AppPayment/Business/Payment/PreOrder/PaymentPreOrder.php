@@ -49,14 +49,18 @@ class PaymentPreOrder
     ): ConfirmPreOrderPaymentResponseTransfer {
         try {
             $confirmPreOrderPaymentRequestTransfer->setAppConfigOrFail($this->appConfigLoader->loadAppConfig($confirmPreOrderPaymentRequestTransfer->getTenantIdentifierOrFail()));
-            $confirmPreOrderPaymentRequestTransfer->setPayment($this->appPaymentRepository->getPaymentByTransactionId($confirmPreOrderPaymentRequestTransfer->getTransactionIdOrFail()));
+
+            $paymentTransfer = $this->appPaymentRepository->getPaymentByTransactionId($confirmPreOrderPaymentRequestTransfer->getTransactionIdOrFail());
+            $paymentTransfer->setOrderReference($confirmPreOrderPaymentRequestTransfer->getOrderReference());
+
+            $confirmPreOrderPaymentRequestTransfer->setPayment($paymentTransfer);
 
             // When the payment platform plugin does not implement the `AppPreOrderPaymentPlatformPluginInterface` we assume there is no further action from the PSP implementation
             // needed, and we can simply update the Payment with the missing orderReference.
             $confirmPreOrderPaymentResponseTransfer = new ConfirmPreOrderPaymentResponseTransfer();
             $confirmPreOrderPaymentResponseTransfer
                 ->setIsSuccessful(true)
-                ->setStatus(PaymentStatus::STATUS_CAPTURED);
+                ->setStatus(PaymentStatus::STATUS_AUTHORIZED);
 
             if ($this->appPaymentPlatformPlugin instanceof AppPaymentPlatformConfirmPreOrderPluginInterface) {
                 $confirmPreOrderPaymentResponseTransfer = $this->appPaymentPlatformPlugin->confirmPreOrderPayment($confirmPreOrderPaymentRequestTransfer);
@@ -168,11 +172,11 @@ class PaymentPreOrder
         $this->messageSender->sendPaymentUpdatedMessage($paymentTransfer);
 
         if ($confirmPreOrderPaymentResponseTransfer->getIsSuccessful() === true) {
-            $this->messageSender->sendPaymentCapturedMessage($paymentTransfer);
+            $this->messageSender->sendPaymentAuthorizedMessage($paymentTransfer);
 
             return;
         }
 
-        $this->messageSender->sendPaymentCaptureFailedMessage($paymentTransfer);
+        $this->messageSender->sendPaymentAuthorizationFailedMessage($paymentTransfer);
     }
 }
