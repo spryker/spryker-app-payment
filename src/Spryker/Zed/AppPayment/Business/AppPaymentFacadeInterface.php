@@ -102,7 +102,7 @@ interface AppPaymentFacadeInterface
 
     /**
      * Specification:
-     * - Requests the `AppPaymentPlatformPaymentMethodsPluginInterface::configurePaymentMethods()` method to return a list PaymentMethods to add and to delete.
+     * - Requests the `AppPaymentPlatformPaymentMethodsPluginInterface::configurePaymentMethods()` method to return a list of PaymentMethods to delete.
      * - When the passed `AppPaymentPlatformPluginInterface` is not an instance of `AppPaymentPlatformPaymentMethodsPluginInterface` it will return early.
      *
      * @api
