@@ -288,6 +288,13 @@ class PaymentMethod
 
         $paymentMethodAppConfigurationTransfer->addEndpoint($authorizationEndpointTransfer);
 
+        $authorizationEndpointTransfer = new EndpointTransfer();
+        $authorizationEndpointTransfer
+            ->setName('pre-order-cancellation')
+            ->setPath('/private/cancel-pre-order-payment'); // Defined in app_payment_openapi.yml
+
+        $paymentMethodAppConfigurationTransfer->addEndpoint($authorizationEndpointTransfer);
+
         $transferEndpointTransfer = new EndpointTransfer();
         $transferEndpointTransfer
             ->setName('transfer')
