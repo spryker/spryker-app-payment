@@ -88,7 +88,7 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
         GlueResponseTransfer $glueResponseTransfer
     ): GlueResponseTransfer {
         $glueResponseTransfer->setContent(
-            (string)json_encode($initializePaymentResponseTransfer->toArray()),
+            (string)json_encode($initializePaymentResponseTransfer->toArray(true, true)),
         );
 
         // SCOS Checkout expects a 200 response code and check isSuccessful property to show error message.
