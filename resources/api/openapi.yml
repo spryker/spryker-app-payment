@@ -99,7 +99,7 @@ paths:
             x-spryker:
                 module: PaymentBackendApi
                 controller: CancelPreOrderPaymentResourceController
-            summary: 'Cancles a Pre-Order Payment. The Payment will be deleted and the third party will be informed about the cancellation.'
+            summary: 'Cancels a Pre-Order Payment. The Payment will be deleted and the third party will be informed about the cancellation.'
             parameters:
                 - $ref: '#/components/parameters/tenantIdentifier'
             requestBody:
@@ -233,7 +233,7 @@ components:
                     description: 'Provides checkout summary page URL.'
                     type: string
                     example: 'https://example.com/summary'
-        
+
         InitializePaymentResponse:
             properties:
                 isSuccessful:
