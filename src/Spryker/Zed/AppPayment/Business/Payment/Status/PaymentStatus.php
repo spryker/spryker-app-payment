@@ -50,11 +50,6 @@ enum PaymentStatus
     public const STATUS_AUTHORIZATION_FAILED = 'authorization_failed';
 
     /**
-     * @var string
-     */
-    public const STATUS_SUCCEEDED = 'succeeded';
-
-    /**
      * @var array<string, array<string>>
      */
     public const ALLOWED_TRANSITIONS = [
