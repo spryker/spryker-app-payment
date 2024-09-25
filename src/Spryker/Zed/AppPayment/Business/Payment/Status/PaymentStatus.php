@@ -79,9 +79,6 @@ enum PaymentStatus
             PaymentStatus::STATUS_CANCELED,
             PaymentStatus::STATUS_CANCELLATION_FAILED,
         ],
-        PaymentStatus::STATUS_CAPTURED => [
-            PaymentStatus::STATUS_SUCCEEDED,
-        ],
         PaymentStatus::STATUS_CAPTURE_FAILED => [
             PaymentStatus::STATUS_CAPTURED,
             PaymentStatus::STATUS_CAPTURE_REQUESTED,
