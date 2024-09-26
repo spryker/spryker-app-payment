@@ -57,7 +57,7 @@ class CapturePaymentMessageHandler implements CapturePaymentMessageHandlerInterf
         $messageContextTransfer = $this->buildMessageContextTransfer($capturePaymentTransfer);
 
         match ($paymentStatus) {
-            PaymentStatus::STATUS_CAPTURED, PaymentStatus::STATUS_SUCCEEDED => $this->messageSender->sendPaymentCapturedMessage($paymentTransfer, $messageContextTransfer),
+            PaymentStatus::STATUS_CAPTURED => $this->messageSender->sendPaymentCapturedMessage($paymentTransfer, $messageContextTransfer),
             PaymentStatus::STATUS_CAPTURE_FAILED => $this->messageSender->sendPaymentCaptureFailedMessage($paymentTransfer, $messageContextTransfer),
             default => 'do nothing and wait for webhooks',
         };

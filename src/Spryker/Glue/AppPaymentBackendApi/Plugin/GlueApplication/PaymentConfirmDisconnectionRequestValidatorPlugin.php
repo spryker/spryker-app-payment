@@ -28,7 +28,7 @@ class PaymentConfirmDisconnectionRequestValidatorPlugin extends AbstractConfirmD
                     ->setTenantIdentifier($tenantIdentifier)
                     ->setExcludingStatuses([
                         PaymentStatus::STATUS_CANCELED,
-                        PaymentStatus::STATUS_SUCCEEDED,
+                        PaymentStatus::STATUS_CAPTURED,
                     ]),
             ),
         );
