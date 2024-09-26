@@ -89,6 +89,8 @@ class PaymentMethod
             ->setPaymentAuthorizationEndpoint(sprintf('%s/private/initialize-payment', $this->appPaymentConfig->getGlueBaseUrl()))
             ->setPaymentMethodAppConfiguration($paymentMethodAppConfigurationTransfer);
 
+        $paymentMethodTransfer->setPaymentMethodAppConfiguration($paymentMethodAppConfigurationTransfer);
+
         $this->appPaymentRepository->savePaymentMethod($paymentMethodTransfer, $appConfigTransfer->getTenantIdentifierOrFail());
 
         $this->paymentMethodMessageSender->sendAddPaymentMethodMessage($addPaymentMethodTransfer, $appConfigTransfer);
@@ -109,6 +111,8 @@ class PaymentMethod
             ->setProviderName($paymentMethodTransfer->getProviderNameOrFail())
             ->setPaymentAuthorizationEndpoint(sprintf('%s/private/initialize-payment', $this->appPaymentConfig->getGlueBaseUrl()))
             ->setPaymentMethodAppConfiguration($paymentMethodAppConfigurationTransfer);
+
+        $paymentMethodTransfer->setPaymentMethodAppConfiguration($paymentMethodAppConfigurationTransfer);
 
         $this->appPaymentRepository->savePaymentMethod($paymentMethodTransfer, $appConfigTransfer->getTenantIdentifierOrFail());
 
