@@ -42,7 +42,7 @@
         <property name="orderData" type="Quote"/>
         <property name="appConfig" type="AppConfig"/>
         <property name="payment" type="Payment"/>
-        <property name="paymentProviderData" type="array" singular="paymentProviderDatum"/>
+        <property name="preOrderPaymentData" type="array" singular="preOrderPaymentDatum"/>
         <property name="redirectSuccessUrl" type="string"/>
         <property name="redirectCancelUrl" type="string"/>
         <property name="checkoutSummaryPageUrl" type="string"/>
@@ -52,7 +52,7 @@
     <transfer name="InitializePaymentResponse" strict="true">
         <property name="isSuccessful" type="bool"/>
         <property name="transactionId" type="string"/>
-        <property name="paymentProviderData" type="array" singular="paymentProviderDatum"/>
+        <property name="preOrderPaymentData" type="array" singular="preOrderPaymentDatum"/>
         <property name="redirectUrl" type="string"/>
         <property name="message" type="string"/>
     </transfer>
@@ -64,13 +64,26 @@
         <property name="transactionId" type="string"/>
         <property name="tenantIdentifier" type="string"/>
         <property name="orderReference" type="string"/>
-        <property name="paymentServiceProviderData" type="array" associative="true" singular="paymentServiceProviderDatum"/>
+        <property name="preOrderPaymentData" type="array" associative="true" singular="preOrderPaymentDatum"/>
     </transfer>
 
     <transfer name="ConfirmPreOrderPaymentResponse" strict="true">
         <property name="isSuccessful" type="bool"/>
         <property name="message" type="string"/>
         <property name="status" type="string" description="This will be set by the PSP implementation and is used to determine the Payment Status"/>
+    </transfer>
+
+    <transfer name="CancelPreOrderPaymentRequest" strict="true">
+        <property name="appConfig" type="AppConfig"/>
+        <property name="payment" type="Payment"/>
+        <property name="transactionId" type="string"/>
+        <property name="tenantIdentifier" type="string"/>
+        <property name="preOrderPaymentData" type="array" associative="true" singular="preOrderPaymentDatum"/>
+    </transfer>
+
+    <transfer name="CancelPreOrderPaymentResponse" strict="true">
+        <property name="isSuccessful" type="bool"/>
+        <property name="message" type="string"/>
     </transfer>
 
     <transfer name="CapturePaymentRequest" strict="true">
@@ -245,7 +258,7 @@
     </transfer>
 
     <transfer name="WebhookInboxCriteria" strict="true">
-        <property name="identifier" type="array" singular="identifier"/>
+        <property name="identifiers" type="array" singular="identifier"/>
     </transfer>
 
     <transfer name="MessageAttributes"/>
@@ -399,6 +412,7 @@
 
     <transfer name="PaymentCollectionDeleteCriteria" strict="true">
         <property name="tenantIdentifier" type="string"/>
+        <property name="transactionId" type="string"/>
     </transfer>
 
     <transfer name="PaymentTransmissionsRequest" strict="true">

@@ -9,6 +9,7 @@ namespace SprykerTest\Shared\AppPayment\Helper;
 
 use Codeception\Module;
 use Generated\Shared\DataBuilder\CancelPaymentRequestBuilder;
+use Generated\Shared\DataBuilder\CancelPreOrderPaymentRequestBuilder;
 use Generated\Shared\DataBuilder\CapturePaymentRequestBuilder;
 use Generated\Shared\DataBuilder\ConfirmPreOrderPaymentRequestBuilder;
 use Generated\Shared\DataBuilder\InitializePaymentRequestBuilder;
@@ -19,6 +20,7 @@ use Generated\Shared\DataBuilder\PaymentTransmissionsRequestBuilder;
 use Generated\Shared\DataBuilder\PaymentTransmissionsResponseBuilder;
 use Generated\Shared\DataBuilder\QuoteBuilder;
 use Generated\Shared\Transfer\CancelPaymentRequestTransfer;
+use Generated\Shared\Transfer\CancelPreOrderPaymentRequestTransfer;
 use Generated\Shared\Transfer\CapturePaymentRequestTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
@@ -179,6 +181,19 @@ class AppPaymentHelper extends Module
         return $confirmPreOrderPaymentRequestTransfer;
     }
 
+    public function haveCancelPreOrderPaymentRequestTransfer(array $seed = []): CancelPreOrderPaymentRequestTransfer
+    {
+        $tenantIdentifier = $seed[CancelPreOrderPaymentRequestTransfer::TENANT_IDENTIFIER] ?? Uuid::uuid4()->toString();
+        $transactionId = $seed[CancelPreOrderPaymentRequestTransfer::TRANSACTION_ID] ?? Uuid::uuid4()->toString();
+
+        $cancelPreOrderPaymentRequestTransfer = (new CancelPreOrderPaymentRequestBuilder($seed))->build();
+        $cancelPreOrderPaymentRequestTransfer
+            ->setTenantIdentifier($tenantIdentifier)
+            ->setTransactionId($transactionId);
+
+        return $cancelPreOrderPaymentRequestTransfer;
+    }
+
     public function havePaymentPageRequestTransfer(array $seed = []): PaymentPageRequestTransfer
     {
         $tenantIdentifier = Uuid::uuid4()->toString();
@@ -266,6 +281,24 @@ class AppPaymentHelper extends Module
         $paymentQuery->filterByTenantIdentifier($tenantIdentifier);
 
         $this->assertGreaterThan(0, $paymentQuery->find()->count(), 'Did not find payment by tenant identifier');
+    }
+
+    public function seePaymentWithTransactionId(string $transactionId): void
+    {
+        $spyPaymentEntity = SpyPaymentQuery::create()
+            ->filterByTransactionId($transactionId)
+            ->findOne();
+
+        $this->assertNotNull($spyPaymentEntity, 'Expected to see a Payment with transaction id but it was not found');
+    }
+
+    public function dontSeePaymentWithTransactionId(string $transactionId): void
+    {
+        $spyPaymentEntity = SpyPaymentQuery::create()
+            ->filterByTransactionId($transactionId)
+            ->findOne();
+
+        $this->assertNull($spyPaymentEntity, 'Expected not to see a Payment with transaction id but it was found');
     }
 
     // Transfer related code

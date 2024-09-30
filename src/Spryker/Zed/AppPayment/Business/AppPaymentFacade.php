@@ -9,6 +9,8 @@ namespace Spryker\Zed\AppPayment\Business;
 
 use Generated\Shared\Transfer\AppConfigTransfer;
 use Generated\Shared\Transfer\CancelPaymentTransfer;
+use Generated\Shared\Transfer\CancelPreOrderPaymentRequestTransfer;
+use Generated\Shared\Transfer\CancelPreOrderPaymentResponseTransfer;
 use Generated\Shared\Transfer\CapturePaymentTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentRequestTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentResponseTransfer;
@@ -168,5 +170,11 @@ class AppPaymentFacade extends AbstractFacade implements AppPaymentFacadeInterfa
         ConfirmPreOrderPaymentRequestTransfer $confirmPreOrderPaymentRequestTransfer
     ): ConfirmPreOrderPaymentResponseTransfer {
         return $this->getFactory()->createPayment()->confirmPreOrderPayment($confirmPreOrderPaymentRequestTransfer);
+    }
+
+    public function cancelPreOrderPayment(
+        CancelPreOrderPaymentRequestTransfer $cancelPreOrderPaymentRequestTransfer
+    ): CancelPreOrderPaymentResponseTransfer {
+        return $this->getFactory()->createPayment()->cancelPreOrderPayment($cancelPreOrderPaymentRequestTransfer);
     }
 }

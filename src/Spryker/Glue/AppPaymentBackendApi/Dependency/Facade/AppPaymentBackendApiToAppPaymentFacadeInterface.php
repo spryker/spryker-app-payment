@@ -7,6 +7,8 @@
 
 namespace Spryker\Glue\AppPaymentBackendApi\Dependency\Facade;
 
+use Generated\Shared\Transfer\CancelPreOrderPaymentRequestTransfer;
+use Generated\Shared\Transfer\CancelPreOrderPaymentResponseTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentRequestTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentResponseTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
@@ -23,4 +25,8 @@ interface AppPaymentBackendApiToAppPaymentFacadeInterface
     public function confirmPreOrderPayment(
         ConfirmPreOrderPaymentRequestTransfer $confirmPreOrderPaymentRequestTransfer
     ): ConfirmPreOrderPaymentResponseTransfer;
+
+    public function cancelPreOrderPayment(
+        CancelPreOrderPaymentRequestTransfer $cancelPreOrderPaymentRequestTransfer
+    ): CancelPreOrderPaymentResponseTransfer;
 }

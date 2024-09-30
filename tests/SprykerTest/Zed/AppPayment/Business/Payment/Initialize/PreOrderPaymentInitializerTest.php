@@ -5,7 +5,7 @@
  * For full license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace SprykerTest\Glue\AppPaymentBackendApi\RestApi;
+namespace SprykerTest\Zed\AppPayment\Business\Payment\Initialize;
 
 use Codeception\Stub;
 use Codeception\Test\Unit;
@@ -13,36 +13,35 @@ use Generated\Shared\Transfer\AppConfigTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
-use GuzzleHttp\RequestOptions;
 use Ramsey\Uuid\Uuid;
-use Spryker\Glue\AppPaymentBackendApi\Mapper\Payment\GlueRequestPaymentMapper;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
-use SprykerTest\Glue\AppPaymentBackendApi\AppPaymentBackendApiTester;
 use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
-use Symfony\Component\HttpFoundation\Response;
+use SprykerTest\Zed\AppPayment\AppPaymentBusinessTester;
 
 /**
  * Auto-generated group annotations
  *
  * @group SprykerTest
- * @group Glue
- * @group AppPaymentBackendApi
- * @group RestApi
- * @group InitializePreOrderPaymentApiTest
+ * @group Zed
+ * @group AppPayment
+ * @group Business
+ * @group Payment
+ * @group Initialize
+ * @group PreOrderPaymentInitializerTest
  * Add your own group annotations below this line
  */
-class InitializePreOrderPaymentApiTest extends Unit
+class PreOrderPaymentInitializerTest extends Unit
 {
     use DependencyHelperTrait;
 
-    protected AppPaymentBackendApiTester $tester;
+    protected AppPaymentBusinessTester $tester;
 
-    public function testGivenPreOrderPaymentWasAlreadyDoneWhenInitializePaymentPostRequestIsMadeAgainThenThePaymentIsLoadedAndPassedToThePlatformImplementationAndTheOriginalPaymentProviderDataIsReturnedInTheResponse(): void
+    public function testGivenPreOrderPaymentWasAlreadyDoneWhenInitializePaymentIsCalledAgainAndGrandTotalHasChangedAndTheTransactionIdChangesThenThePaymentsTransactionIdIsUpdated(): void
     {
         // Arrange
         $transactionId = Uuid::uuid4()->toString();
-        $paymentProviderDatum = Uuid::uuid4()->toString();
+        $newTransactionId = Uuid::uuid4()->toString();
 
         $this->tester->havePayment([
             PaymentTransfer::TRANSACTION_ID => $transactionId,
@@ -56,7 +55,6 @@ class InitializePreOrderPaymentApiTest extends Unit
 
         $initializePaymentRequestTransfer->setPreOrderPaymentData([
             PaymentTransfer::TRANSACTION_ID => $transactionId, // required field to always be set in pre-order payments.
-            'foo' => $paymentProviderDatum,
         ]);
 
         $this->tester->haveAppConfigForTenant($initializePaymentRequestTransfer->getTenantIdentifier());
@@ -64,10 +62,9 @@ class InitializePreOrderPaymentApiTest extends Unit
         $initializePaymentResponseTransfer = new InitializePaymentResponseTransfer();
         $initializePaymentResponseTransfer
             ->setIsSuccessful(true)
-            ->setTransactionId($transactionId)
+            ->setTransactionId($newTransactionId)
             ->setPreOrderPaymentData([
-                PaymentTransfer::TRANSACTION_ID => $transactionId, // required field to always be set in pre-order payments.
-                'foo' => $paymentProviderDatum,
+                PaymentTransfer::TRANSACTION_ID => $newTransactionId,
             ]);
 
         $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
@@ -85,15 +82,10 @@ class InitializePreOrderPaymentApiTest extends Unit
         $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
 
         // Act
-        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $initializePaymentRequestTransfer->getTenantIdentifier());
-        $this->tester->addHeader('Content-Type', 'application/json');
-
-        $response = $this->tester->sendPost($this->tester->buildPaymentUrl(), [RequestOptions::FORM_PARAMS => $initializePaymentRequestTransfer->toArray()]);
+        $this->tester->getFacade()->initializePayment($initializePaymentRequestTransfer);
 
         // Assert
-        $this->tester->seeResponseCodeIs(Response::HTTP_OK);
-        $this->tester->seeResponseIsJson();
-        $this->tester->seeResponseJsonContainsPayment($response);
-        $this->tester->seeResponseJsonContainsPreOrderPaymentData($response, $initializePaymentRequestTransfer->getPreOrderPaymentData());
+        $this->tester->dontSeePaymentWithTransactionId($transactionId);
+        $this->tester->seePaymentWithTransactionId($newTransactionId);
     }
 }

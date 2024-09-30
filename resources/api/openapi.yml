@@ -93,6 +93,38 @@ paths:
                             schema:
                                 type: string
 
+
+    '/private/cancel-pre-order-payment':
+        post:
+            x-spryker:
+                module: PaymentBackendApi
+                controller: CancelPreOrderPaymentResourceController
+            summary: 'Cancels a Pre-Order Payment. The Payment will be deleted and the third party will be informed about the cancellation.'
+            parameters:
+                - $ref: '#/components/parameters/tenantIdentifier'
+            requestBody:
+                description: 'PSP data object that enables the connection between the payment that currently does not have an orderReference yet.'
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CancelPreOrderPaymentRequest'
+            responses:
+                200:
+                    description: 'Expected response to a valid request.'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CancelPreOrderPaymentResponse'
+                400:
+                    description: 'Bad request.'
+                default:
+                    description: 'Expected response to a bad request.'
+                    content:
+                        text/plain:
+                            schema:
+                                type: string
+
     '/private/payments/transfers':
         post:
             x-spryker:
@@ -126,25 +158,6 @@ paths:
 
 components:
     schemas:
-        InitializePaymentResponse:
-            properties:
-                isSuccessful:
-                    type: boolean
-                redirectUrl:
-                    type: string
-                    description: 'URL for payment authorization'
-                message:
-                    type: string
-                    nullable: true
-                paymentProviderData:
-                    type: object
-                    additionalProperties:
-                        type: string
-                    description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
-                    example:
-                        clientId: '#061280'
-                        publishableKey: '#061114'
-
         InitializePaymentRequest:
             type: object
             required:
@@ -207,6 +220,15 @@ components:
                             example:
                                 paymentId: '#061280'
                                 other: '#061114'
+                                
+                preOrderPaymentData:
+                    description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
+                    type: string
+                    additionalProperties:
+                        type: string
+                    example:
+                        paymentId: '#061280'
+                        other: '#061114'
 
                 redirectSuccessUrl:
                     description: 'Provides redirect success URL.'
@@ -221,12 +243,31 @@ components:
                     type: string
                     example: 'https://example.com/summary'
 
+        InitializePaymentResponse:
+            properties:
+                isSuccessful:
+                    type: boolean
+                redirectUrl:
+                    type: string
+                    description: 'URL for payment authorization'
+                message:
+                    type: string
+                    nullable: true
+                preOrderPaymentData:
+                    description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
+                    type: string
+                    additionalProperties:
+                        type: string
+                    example:
+                        paymentId: '#061280'
+                        other: '#061114'
+
         ConfirmPreOrderPaymentRequest:
             type: object
             required:
                 - orderData
                 - orderReference
-                - paymentServiceProviderData
+                - preOrderPaymentData
             properties:
                 orderData:
                     description: 'Order data.'
@@ -288,7 +329,7 @@ components:
                 orderReference:
                     type: string
                     example: 'DE-123456'
-                paymentServiceProviderData:
+                preOrderPaymentData:
                     description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
                     type: string
                     additionalProperties:
@@ -298,6 +339,29 @@ components:
                         other: '#061114'
 
         ConfirmPreOrderPaymentResponse:
+            properties:
+                isSuccessful:
+                    type: boolean
+                message:
+                    description: 'Message in case of failure to know the issue on the Tenant side.'
+                    type: string
+                    nullable: true
+
+        CancelPreOrderPaymentRequest:
+            type: object
+            required:
+                - preOrderPaymentData
+            properties:
+                preOrderPaymentData:
+                    description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
+                    type: string
+                    additionalProperties:
+                        type: string
+                    example:
+                        paymentId: '#061280'
+                        other: '#061114'
+
+        CancelPreOrderPaymentResponse:
             properties:
                 isSuccessful:
                     type: boolean

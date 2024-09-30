@@ -35,15 +35,7 @@ class PaymentMethod
     public function configurePaymentMethods(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
     {
         // Do not send the message(s) when App is in state "disconnected" or when the app is marked as inactive.
-        if ($appConfigTransfer->getStatus() === AppKernelConfig::APP_STATUS_DISCONNECTED || $appConfigTransfer->getIsActive() === false) {
-            return $appConfigTransfer;
-        }
-
-        if (!($this->appPaymentPlatformPlugin instanceof AppPaymentPlatformPaymentMethodsPluginInterface)) {
-            $paymentMethodTransfer = $this->getDefaultPaymentMethodTransfer();
-
-            $this->addPaymentMethod($paymentMethodTransfer, $appConfigTransfer);
-
+        if ($appConfigTransfer->getStatus() === AppKernelConfig::APP_STATUS_DISCONNECTED || $appConfigTransfer->getIsActive() === false || !($this->appPaymentPlatformPlugin instanceof AppPaymentPlatformPaymentMethodsPluginInterface)) {
             return $appConfigTransfer;
         }
 
@@ -82,9 +74,9 @@ class PaymentMethod
 
     protected function addPaymentMethod(PaymentMethodTransfer $paymentMethodTransfer, AppConfigTransfer $appConfigTransfer): void
     {
-        // Add the passed configuration to the default configuration.
         $paymentMethodAppConfigurationTransfer = $this->getDefaultPaymentMethodAppConfiguration();
 
+        // In case of the PSP App configured a custom checkout configuration, we will use it here and pass it as such to the configuration.
         if ($paymentMethodTransfer->getPaymentMethodAppConfiguration() instanceof PaymentMethodAppConfigurationTransfer) {
             $paymentMethodAppConfigurationTransfer->setCheckoutConfiguration($paymentMethodTransfer->getPaymentMethodAppConfiguration()->getCheckoutConfiguration());
         }
@@ -93,8 +85,11 @@ class PaymentMethod
         $addPaymentMethodTransfer
             ->setName($paymentMethodTransfer->getNameOrFail())
             ->setProviderName($paymentMethodTransfer->getProviderNameOrFail())
+            // @deprecated This line can be removed when all PSP Apps are updated.
             ->setPaymentAuthorizationEndpoint(sprintf('%s/private/initialize-payment', $this->appPaymentConfig->getGlueBaseUrl()))
             ->setPaymentMethodAppConfiguration($paymentMethodAppConfigurationTransfer);
+
+        $paymentMethodTransfer->setPaymentMethodAppConfiguration($paymentMethodAppConfigurationTransfer);
 
         $this->appPaymentRepository->savePaymentMethod($paymentMethodTransfer, $appConfigTransfer->getTenantIdentifierOrFail());
 
@@ -116,6 +111,8 @@ class PaymentMethod
             ->setProviderName($paymentMethodTransfer->getProviderNameOrFail())
             ->setPaymentAuthorizationEndpoint(sprintf('%s/private/initialize-payment', $this->appPaymentConfig->getGlueBaseUrl()))
             ->setPaymentMethodAppConfiguration($paymentMethodAppConfigurationTransfer);
+
+        $paymentMethodTransfer->setPaymentMethodAppConfiguration($paymentMethodAppConfigurationTransfer);
 
         $this->appPaymentRepository->savePaymentMethod($paymentMethodTransfer, $appConfigTransfer->getTenantIdentifierOrFail());
 
@@ -249,14 +246,6 @@ class PaymentMethod
 
     public function deletePaymentMethods(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
     {
-        if (!($this->appPaymentPlatformPlugin instanceof AppPaymentPlatformPaymentMethodsPluginInterface)) {
-            $paymentMethodTransfer = $this->getDefaultPaymentMethodTransfer();
-
-            $this->deletePaymentMethod($paymentMethodTransfer, $appConfigTransfer);
-
-            return $appConfigTransfer;
-        }
-
         $tenantIdentifier = $appConfigTransfer->getTenantIdentifierOrFail();
 
         // Get current persisted Tenants payment methods
@@ -280,16 +269,10 @@ class PaymentMethod
         $this->appPaymentRepository->deletePaymentMethod($paymentMethodTransfer, $appConfigTransfer->getTenantIdentifierOrFail());
     }
 
-    protected function getDefaultPaymentMethodTransfer(): PaymentMethodTransfer
-    {
-        $paymentMethodTransfer = new PaymentMethodTransfer();
-        $paymentMethodTransfer
-            ->setName($this->appPaymentConfig->getPaymentMethodName())
-            ->setProviderName($this->appPaymentConfig->getPaymentProviderName());
-
-        return $paymentMethodTransfer;
-    }
-
+    /**
+     * Returns the default payment method app configuration which contains known endpoints for each PSP.
+     * These defaults will not be needed to be configured by the PSP App itself
+     */
     protected function getDefaultPaymentMethodAppConfiguration(): PaymentMethodAppConfigurationTransfer
     {
         $paymentMethodAppConfigurationTransfer = new PaymentMethodAppConfigurationTransfer();
@@ -304,8 +287,15 @@ class PaymentMethod
 
         $authorizationEndpointTransfer = new EndpointTransfer();
         $authorizationEndpointTransfer
-            ->setName('pre-order')
+            ->setName('pre-order-confirmation')
             ->setPath('/private/confirm-pre-order-payment'); // Defined in app_payment_openapi.yml
+
+        $paymentMethodAppConfigurationTransfer->addEndpoint($authorizationEndpointTransfer);
+
+        $authorizationEndpointTransfer = new EndpointTransfer();
+        $authorizationEndpointTransfer
+            ->setName('pre-order-cancellation')
+            ->setPath('/private/cancel-pre-order-payment'); // Defined in app_payment_openapi.yml
 
         $paymentMethodAppConfigurationTransfer->addEndpoint($authorizationEndpointTransfer);
 

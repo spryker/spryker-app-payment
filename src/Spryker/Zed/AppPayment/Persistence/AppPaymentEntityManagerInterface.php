@@ -27,4 +27,6 @@ interface AppPaymentEntityManagerInterface
     public function deletePaymentCollection(
         PaymentCollectionDeleteCriteriaTransfer $paymentCollectionDeleteCriteriaTransfer
     ): void;
+
+    public function updatePaymentTransactionId(PaymentTransfer $paymentTransfer, string $transactionId): void;
 }

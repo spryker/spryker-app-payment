@@ -26,7 +26,7 @@
         </behavior>
     </table>
 
-    <table name="spy_payment_transfer" idMethod="native" class="SpyPayment">
+    <table name="spy_payment_transfer" idMethod="native" class="SpyPaymentTransfer">
         <column name="id_payment_transfer" type="INTEGER" required="true" autoIncrement="true" primaryKey="true"/>
         <column name="tenant_identifier" type="CHAR" size="60"/>
         <column name="transaction_id" type="CHAR" size="36"/>
@@ -73,7 +73,7 @@
         </index>
     </table>
 
-    <table name="spy_payment_method" idMethod="native" class="SpyPaymentRefund">
+    <table name="spy_payment_method" idMethod="native" class="SpyPaymentMethod">
         <column name="id_payment_method" required="true" type="INTEGER" autoIncrement="true" primaryKey="true"/>
         <column name="tenant_identifier" type="CHAR" size="60"/>
         <column name="name" required="true" type="VARCHAR" size="128"/>

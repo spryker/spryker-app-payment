@@ -8,6 +8,7 @@
 namespace Spryker\Glue\AppPaymentBackendApi\Mapper\Payment;
 
 use ArrayObject;
+use Generated\Shared\Transfer\CancelPreOrderPaymentResponseTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentResponseTransfer;
 use Generated\Shared\Transfer\GlueErrorTransfer;
 use Generated\Shared\Transfer\GlueResourceTransfer;
@@ -66,12 +67,28 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
         return $glueResponseTransfer;
     }
 
+    public function mapCancelPreOrderPaymentResponseTransferToSingleResourceGlueResponseTransfer(
+        CancelPreOrderPaymentResponseTransfer $cancelPreOrderPaymentResponseTransfer
+    ): GlueResponseTransfer {
+        $glueResponseTransfer = new GlueResponseTransfer();
+        $glueResponseTransfer->setHttpStatus(Response::HTTP_OK);
+
+        if ($cancelPreOrderPaymentResponseTransfer->getIsSuccessful() === false) {
+            $glueResponseTransfer->setHttpStatus(Response::HTTP_BAD_REQUEST);
+            $glueResponseTransfer->addError((new GlueErrorTransfer())->setMessage(
+                $cancelPreOrderPaymentResponseTransfer->getMessageOrFail(),
+            ));
+        }
+
+        return $glueResponseTransfer;
+    }
+
     protected function addInitializePaymentResponseTransferToGlueResponse(
         InitializePaymentResponseTransfer $initializePaymentResponseTransfer,
         GlueResponseTransfer $glueResponseTransfer
     ): GlueResponseTransfer {
         $glueResponseTransfer->setContent(
-            (string)json_encode($initializePaymentResponseTransfer->toArray()),
+            (string)json_encode($initializePaymentResponseTransfer->toArray(true, true)),
         );
 
         // SCOS Checkout expects a 200 response code and check isSuccessful property to show error message.

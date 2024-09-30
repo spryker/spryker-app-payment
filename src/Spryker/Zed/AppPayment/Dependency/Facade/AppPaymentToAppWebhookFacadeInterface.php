@@ -12,4 +12,6 @@ use Generated\Shared\Transfer\WebhookInboxCriteriaTransfer;
 interface AppPaymentToAppWebhookFacadeInterface
 {
     public function processUnprocessedWebhooks(WebhookInboxCriteriaTransfer $webhookInboxCriteriaTransfer): void;
+
+    public function deleteWebhooks(WebhookInboxCriteriaTransfer $webhookInboxCriteriaTransfer): void;
 }

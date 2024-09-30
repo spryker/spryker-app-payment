@@ -44,6 +44,11 @@ class AppPaymentBackendApiHelper extends Module
         return $this->buildBackendApiUrl('private/confirm-pre-order-payment');
     }
 
+    public function buildCancelPreOrderPaymentUrl(): string
+    {
+        return $this->buildBackendApiUrl('private/cancel-pre-order-payment');
+    }
+
     /**
      * @param array<mixed>|string $params
      */
@@ -73,6 +78,14 @@ class AppPaymentBackendApiHelper extends Module
         $paymentEntity = $spyPaymentQuery->findOneByTransactionId($transactionId);
 
         $this->assertNotNull($paymentEntity, sprintf('Expected to find a persisted payment with transaction id "%s" but it was not found in the database', $transactionId));
+    }
+
+    public function assertPaymentWithTransactionIdDoesNotExists(string $transactionId): void
+    {
+        $spyPaymentQuery = new SpyPaymentQuery();
+        $paymentEntity = $spyPaymentQuery->findOneByTransactionId($transactionId);
+
+        $this->assertNull($paymentEntity, sprintf('Expected not to find a persisted payment with transaction id "%s" but it was found in the database', $transactionId));
     }
 
     public function assertSamePaymentQuoteAndRequestQuote(string $transactionId, QuoteTransfer $quoteTransfer): void
