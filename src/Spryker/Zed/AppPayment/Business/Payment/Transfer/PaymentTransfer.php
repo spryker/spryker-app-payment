@@ -17,6 +17,7 @@ use Spryker\Zed\AppPayment\AppPaymentConfig;
 use Spryker\Zed\AppPayment\Business\Exception\PaymentByTenantIdentifierAndOrderReferenceNotFoundException;
 use Spryker\Zed\AppPayment\Business\Message\MessageBuilder;
 use Spryker\Zed\AppPayment\Business\Payment\AppConfig\AppConfigLoader;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformMarketplacePluginInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentEntityManagerInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface;
@@ -27,11 +28,6 @@ class PaymentTransfer
 {
     use TransactionTrait;
     use LoggerTrait;
-
-    /**
-     * @var array<\Generated\Shared\Transfer\PaymentTransmissionTransfer>
-     */
-    protected array $failedPaymentTransmissionTransfers = [];
 
     /**
      * @param array<\Spryker\Zed\AppPayment\Dependency\Plugin\PaymentTransmissionsRequestExtenderPluginInterface> $paymentTransmissionsRequestExpanderPlugins
@@ -49,6 +45,20 @@ class PaymentTransfer
     public function transferPayments(
         PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer
     ): PaymentTransmissionsResponseTransfer {
+        if (!$this->appPaymentPlatformPlugin instanceof AppPaymentPlatformMarketplacePluginInterface) {
+            $this->getLogger()->error(MessageBuilder::getPlatformPluginDoesNotProvideMarketplaceFeatures(), [
+                PaymentTransmissionsRequestTransfer::TENANT_IDENTIFIER => $paymentTransmissionsRequestTransfer->getTenantIdentifier(),
+                PaymentTransmissionsRequestTransfer::TRANSACTION_ID => $paymentTransmissionsRequestTransfer->getTransactionId(),
+            ]);
+
+            $paymentTransmissionsResponseTransfer = new PaymentTransmissionsResponseTransfer();
+            $paymentTransmissionsResponseTransfer
+                ->setIsSuccessful(false)
+                ->setMessage(MessageBuilder::getPlatformPluginDoesNotProvideMarketplaceFeatures());
+
+            return $paymentTransmissionsResponseTransfer;
+        }
+
         // In case all payment transmissions fail, we do not request the platform to do something, and we need to return a response with the failed ones.
         $paymentTransmissionsResponseTransfer = new PaymentTransmissionsResponseTransfer();
 

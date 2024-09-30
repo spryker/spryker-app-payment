@@ -13,6 +13,9 @@ use Generated\Shared\Transfer\CapturePaymentRequestTransfer;
 use Generated\Shared\Transfer\CapturePaymentResponseTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
+use Generated\Shared\Transfer\PaymentMethodConfigurationRequestTransfer;
+use Generated\Shared\Transfer\PaymentMethodConfigurationResponseTransfer;
+use Generated\Shared\Transfer\PaymentMethodTransfer;
 use Generated\Shared\Transfer\PaymentPageRequestTransfer;
 use Generated\Shared\Transfer\PaymentPageResponseTransfer;
 use Generated\Shared\Transfer\PaymentStatusRequestTransfer;
@@ -25,9 +28,12 @@ use Generated\Shared\Transfer\WebhookRequestTransfer;
 use Generated\Shared\Transfer\WebhookResponseTransfer;
 use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToAppKernelFacadeBridge;
 use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToAppKernelFacadeInterface;
+use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToAppWebhookFacadeBridge;
+use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToAppWebhookFacadeInterface;
 use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToMessageBrokerFacadeBridge;
 use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToMessageBrokerFacadeInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformMarketplacePluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPaymentMethodsPluginInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPaymentPagePluginInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\Kernel\AbstractBundleDependencyProvider;
@@ -56,6 +62,11 @@ class AppPaymentDependencyProvider extends AbstractBundleDependencyProvider
     /**
      * @var string
      */
+    public const FACADE_APP_WEBHOOK = 'APP_PAYMENT:FACADE_APP_WEBHOOK';
+
+    /**
+     * @var string
+     */
     public const SERVICE_UTIL_ENCODING = 'APP_PAYMENT:SERVICE_UTIL_ENCODING';
 
     /**
@@ -70,6 +81,7 @@ class AppPaymentDependencyProvider extends AbstractBundleDependencyProvider
         $container = $this->addPlatformPlugin($container);
         $container = $this->addAppKernelFacade($container);
         $container = $this->addMessageBrokerFacade($container);
+        $container = $this->addAppWebhookFacade($container);
 
         return $this->addPaymentTransmissionRequestExtenderPlugins($container);
     }
@@ -92,7 +104,7 @@ class AppPaymentDependencyProvider extends AbstractBundleDependencyProvider
     protected function getPlatformPlugin(): AppPaymentPlatformPluginInterface
     {
         // @codeCoverageIgnoreStart
-        return new class implements AppPaymentPlatformPluginInterface, AppPaymentPlatformPaymentPagePluginInterface, AppPaymentPlatformMarketplacePluginInterface {
+        return new class implements AppPaymentPlatformPluginInterface, AppPaymentPlatformPaymentPagePluginInterface, AppPaymentPlatformMarketplacePluginInterface, AppPaymentPlatformPaymentMethodsPluginInterface {
             public function initializePayment(InitializePaymentRequestTransfer $initializePaymentRequestTransfer): InitializePaymentResponseTransfer
             {
                 return (new InitializePaymentResponseTransfer())->setIsSuccessful(true);
@@ -134,6 +146,21 @@ class AppPaymentDependencyProvider extends AbstractBundleDependencyProvider
             {
                 return (new PaymentTransmissionsResponseTransfer())->setIsSuccessful(true);
             }
+
+            public function configurePaymentMethods(
+                PaymentMethodConfigurationRequestTransfer $paymentMethodConfigurationRequestTransfer
+            ): PaymentMethodConfigurationResponseTransfer {
+                $paymentMethodConfigurationResponseTransfer = new PaymentMethodConfigurationResponseTransfer();
+
+                $paymentMethodTransfer = new PaymentMethodTransfer();
+                $paymentMethodTransfer
+                    ->setProviderName('test-payment-provider-name')
+                    ->setName('test-payment-method-name');
+
+                $paymentMethodConfigurationResponseTransfer->addPaymentMethod($paymentMethodTransfer);
+
+                return $paymentMethodConfigurationResponseTransfer;
+            }
         };
         // @codeCoverageIgnoreEnd
     }
@@ -151,6 +178,15 @@ class AppPaymentDependencyProvider extends AbstractBundleDependencyProvider
     {
         $container->set(static::FACADE_MESSAGE_BROKER, static function (Container $container): AppPaymentToMessageBrokerFacadeInterface {
             return new AppPaymentToMessageBrokerFacadeBridge($container->getLocator()->messageBroker()->facade());
+        });
+
+        return $container;
+    }
+
+    protected function addAppWebhookFacade(Container $container): Container
+    {
+        $container->set(static::FACADE_APP_WEBHOOK, static function (Container $container): AppPaymentToAppWebhookFacadeInterface {
+            return new AppPaymentToAppWebhookFacadeBridge($container->getLocator()->appWebhook()->facade());
         });
 
         return $container;

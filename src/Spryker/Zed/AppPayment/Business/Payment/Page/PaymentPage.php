@@ -39,7 +39,7 @@ class PaymentPage
             ->setIsSuccessful(false)
             ->setPaymentPageTemplate('@AppPayment/index/error-page.twig'); // This is the default error page for all errors that can occur before the PaymentPlatformPlugin is executed.
 
-        $requestData = $paymentPageRequestTransfer->getRequestDataOrFail();
+        $requestData = $paymentPageRequestTransfer->getRequestData();
 
         if (!$this->appPaymentPlatformPlugin instanceof AppPaymentPlatformPaymentPagePluginInterface) {
             return $this->buildErrorPaymentPageResponse(

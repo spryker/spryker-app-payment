@@ -39,6 +39,11 @@ class MessageBuilder
         return 'Platform plugin does not provide rendering a payment page';
     }
 
+    public static function getPlatformPluginDoesNotProvideMarketplaceFeatures(): string
+    {
+        return 'Platform plugin does not provide Marketplace features';
+    }
+
     public static function paymentByTenantIdentifierAndOrderReferenceNotFound(string $tenantIdentifier, string $orderReference): string
     {
         return sprintf('Could not find a payment with the tenantIdentifier "%s" and orderReference "%s"', $tenantIdentifier, $orderReference);

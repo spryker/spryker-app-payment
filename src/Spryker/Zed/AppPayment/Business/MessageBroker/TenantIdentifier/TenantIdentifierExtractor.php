@@ -13,7 +13,7 @@ class TenantIdentifierExtractor
 {
     public function getTenantIdentifierFromMessage(AbstractTransfer $messageTransfer): string
     {
-        if ($messageTransfer->getMessageAttributesOrFail()->getTenantIdentifier() !== null) {
+        if (method_exists($messageTransfer, 'getMessageAttributesOrFail') && $messageTransfer->getMessageAttributesOrFail()->getTenantIdentifier() !== null) {
             return $messageTransfer->getMessageAttributesOrFail()->getTenantIdentifier();
         }
 
