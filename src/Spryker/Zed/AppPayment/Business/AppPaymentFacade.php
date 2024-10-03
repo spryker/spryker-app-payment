@@ -17,6 +17,8 @@ use Generated\Shared\Transfer\ConfirmPreOrderPaymentResponseTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
 use Generated\Shared\Transfer\PaymentCollectionDeleteCriteriaTransfer;
+use Generated\Shared\Transfer\PaymentCollectionTransfer;
+use Generated\Shared\Transfer\PaymentCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentPageRequestTransfer;
 use Generated\Shared\Transfer\PaymentPageResponseTransfer;
 use Generated\Shared\Transfer\PaymentTransmissionsRequestTransfer;
@@ -143,6 +145,16 @@ class AppPaymentFacade extends AbstractFacade implements AppPaymentFacadeInterfa
     public function getRedirectUrl(RedirectRequestTransfer $redirectRequestTransfer): RedirectResponseTransfer
     {
         return $this->getFactory()->createRedirect()->getRedirectUrl($redirectRequestTransfer);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @api
+     */
+    public function getPaymentCollection(PaymentCriteriaTransfer $paymentCriteriaTransfer): PaymentCollectionTransfer
+    {
+        return $this->getRepository()->getPaymentCollection($paymentCriteriaTransfer);
     }
 
     /**

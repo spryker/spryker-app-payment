@@ -13,6 +13,8 @@ use Generated\Shared\Transfer\ConfirmPreOrderPaymentRequestTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentResponseTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
+use Generated\Shared\Transfer\PaymentCollectionTransfer;
+use Generated\Shared\Transfer\PaymentCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentTransmissionsRequestTransfer;
 use Generated\Shared\Transfer\PaymentTransmissionsResponseTransfer;
 
@@ -29,4 +31,6 @@ interface AppPaymentBackendApiToAppPaymentFacadeInterface
     public function cancelPreOrderPayment(
         CancelPreOrderPaymentRequestTransfer $cancelPreOrderPaymentRequestTransfer
     ): CancelPreOrderPaymentResponseTransfer;
+
+    public function getPaymentCollection(PaymentCriteriaTransfer $paymentCriteriaTransfer): PaymentCollectionTransfer;
 }

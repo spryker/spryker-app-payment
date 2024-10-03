@@ -11,4 +11,13 @@ use Spryker\Glue\Kernel\AbstractBundleConfig;
 
 class AppPaymentBackendApiConfig extends AbstractBundleConfig
 {
+    /**
+     * @var string
+     */
+    public const ERROR_CODE_PAYMENT_DISCONNECTION_CANNOT_BE_PROCEEDED = '21000';
+
+    /**
+     * @var string
+     */
+    public const ERROR_CODE_PAYMENT_DISCONNECTION_FORBIDDEN = '21001';
 }

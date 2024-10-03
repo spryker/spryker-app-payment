@@ -17,6 +17,8 @@ use Generated\Shared\Transfer\ConfirmPreOrderPaymentResponseTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
 use Generated\Shared\Transfer\PaymentCollectionDeleteCriteriaTransfer;
+use Generated\Shared\Transfer\PaymentCollectionTransfer;
+use Generated\Shared\Transfer\PaymentCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentPageRequestTransfer;
 use Generated\Shared\Transfer\PaymentPageResponseTransfer;
 use Generated\Shared\Transfer\PaymentTransmissionsRequestTransfer;
@@ -170,6 +172,14 @@ interface AppPaymentFacadeInterface
      * @api
      */
     public function getRedirectUrl(RedirectRequestTransfer $redirectRequestTransfer): RedirectResponseTransfer;
+
+    /**
+     * Specification:
+     * - Returns a collection of payments based on the provided criteria.
+     *
+     * @api
+     */
+    public function getPaymentCollection(PaymentCriteriaTransfer $paymentCriteriaTransfer): PaymentCollectionTransfer;
 
     /**
      * Specification:

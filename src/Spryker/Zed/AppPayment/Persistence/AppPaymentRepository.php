@@ -7,11 +7,14 @@
 
 namespace Spryker\Zed\AppPayment\Persistence;
 
+use Generated\Shared\Transfer\PaymentCollectionTransfer;
+use Generated\Shared\Transfer\PaymentCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentMethodTransfer;
 use Generated\Shared\Transfer\PaymentRefundTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 use Orm\Zed\AppPayment\Persistence\SpyPayment;
+use Orm\Zed\AppPayment\Persistence\SpyPaymentQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTenantIdentifierAndOrderReferenceNotFoundException;
 use Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTransactionIdNotFoundException;
@@ -23,6 +26,17 @@ use Spryker\Zed\Kernel\Persistence\AbstractRepository;
  */
 class AppPaymentRepository extends AbstractRepository implements AppPaymentRepositoryInterface
 {
+    public function getPaymentCollection(PaymentCriteriaTransfer $paymentCriteriaTransfer): PaymentCollectionTransfer
+    {
+        $paymentCollection = $this->applyPaymentCriteria(
+            $this->getFactory()->createPaymentQuery(),
+            $paymentCriteriaTransfer,
+        )->find();
+
+        return $this->getFactory()->createPaymentMapper()
+            ->mapPaymentEntitiesToPaymentCollectionTransfer($paymentCollection, new PaymentCollectionTransfer());
+    }
+
     /**
      * @throws \Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTransactionIdNotFoundException
      */
@@ -103,6 +117,23 @@ class AppPaymentRepository extends AbstractRepository implements AppPaymentRepos
 
         return $this->getFactory()->createPaymentMapper()
             ->mapPaymentRefundEntityCollectionToPaymentRefundTransfers($paymentRefundEntityCollection);
+    }
+
+    protected function applyPaymentCriteria(
+        SpyPaymentQuery $spyPaymentQuery,
+        PaymentCriteriaTransfer $paymentCriteriaTransfer
+    ): SpyPaymentQuery {
+        $paymentConditionsTransfer = $paymentCriteriaTransfer->getPaymentConditionsOrFail();
+
+        if ($paymentConditionsTransfer->getTenantIdentifier() !== null) {
+            $spyPaymentQuery->filterByTenantIdentifier($paymentConditionsTransfer->getTenantIdentifier());
+        }
+
+        if ($paymentConditionsTransfer->getExcludingStatuses() !== []) {
+            $spyPaymentQuery->filterByStatus($paymentConditionsTransfer->getExcludingStatuses(), Criteria::NOT_IN);
+        }
+
+        return $spyPaymentQuery;
     }
 
     protected function mapPaymentEntityToPaymentTransfer(SpyPayment $spyPayment): PaymentTransfer

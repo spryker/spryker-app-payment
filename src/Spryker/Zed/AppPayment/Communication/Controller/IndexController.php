@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUndefinedClassInspection */
 
 /**
  * This file is part of the Spryker Suite.
@@ -14,7 +14,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @method \Spryker\Zed\AppPayment\Business\AppPaymentFacadeInterface getFacade()
- * @method \Spryker\Zed\AppPayment\Communication\AppPaymentCommunicationFactory getFactory()
  * @method \Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface getRepository()
  */
 class IndexController extends AbstractController

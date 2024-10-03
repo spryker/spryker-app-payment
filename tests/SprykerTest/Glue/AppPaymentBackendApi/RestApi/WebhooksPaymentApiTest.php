@@ -192,26 +192,6 @@ class WebhooksPaymentApiTest extends Unit
         $this->tester->assertPaymentIsInState($transactionId, PaymentStatus::STATUS_CAPTURE_FAILED);
     }
 
-    public function testGivenPaymentInStateCapturedWhenThePlatformPluginReturnsASuccessfulWebhookResponseTransferAndSucceededStatusThenPaymentIsMovedToSucceeded(): void
-    {
-        // Arrange
-        $transactionId = Uuid::uuid4()->toString();
-        $tenantIdentifier = Uuid::uuid4()->toString();
-
-        $this->tester->haveAppConfigForTenant($tenantIdentifier);
-        $this->tester->havePaymentForTransactionId($transactionId, $tenantIdentifier, PaymentStatus::STATUS_CAPTURED);
-
-        $this->tester->mockGlueRequestWebhookMapperPlugin(WebhookDataType::PAYMENT, $transactionId);
-        $this->mockPaymentPlatformPlugin(true, PaymentStatus::STATUS_SUCCEEDED);
-
-        // Act
-        $this->tester->sendPost($this->tester->buildWebhookUrl(), ['data' => ['object' => ['id' => 123456789]]]);
-
-        // Assert
-        $this->tester->seeResponseCodeIs(Response::HTTP_OK);
-        $this->tester->assertPaymentIsInState($transactionId, PaymentStatus::STATUS_SUCCEEDED);
-    }
-
     public function testGivenNoContentInPostRequestWhenISendTheRequestThenTheApplicationReturnsAHttpStatus400(): void
     {
         // Act

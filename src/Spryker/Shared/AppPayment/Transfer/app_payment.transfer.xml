@@ -410,6 +410,19 @@
         <property name="amount" type="string"/>
     </transfer>
 
+    <transfer name="PaymentCriteriaTransfer" strict="true">
+        <property name="paymentConditions" type="PaymentConditions"/>
+    </transfer>
+
+    <transfer name="PaymentConditions" strict="true">
+        <property name="tenantIdentifier" type="string"/>
+        <property name="excludingStatuses" type="string[]" singular="excludingStatus"/>
+    </transfer>
+
+    <transfer name="PaymentCollectionTransfer" strict="true">
+        <property name="payments" type="Payment[]" singular="payment"/>
+    </transfer>
+
     <transfer name="PaymentCollectionDeleteCriteria" strict="true">
         <property name="tenantIdentifier" type="string"/>
         <property name="transactionId" type="string"/>

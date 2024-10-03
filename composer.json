@@ -5,7 +5,8 @@
     "license": "proprietary",
     "require": {
         "php": ">=8.2",
-        "spryker/app-kernel": "^2.0.0",
+        "spryker/application": "^3.35.0",
+        "spryker/app-kernel": "^2.1.0",
         "spryker/app-webhook": "^1.1.0",
         "spryker/event-dispatcher": "^1.6.0",
         "spryker/glue-application-extension": "^1.0.0",
@@ -14,6 +15,7 @@
         "spryker/kernel": "^3.30.0",
         "spryker/log": "^3.0.0",
         "spryker/message-broker": "^1.11.0",
+        "spryker/message-broker-aws-extension": "^1.0.0",
         "spryker/router": "^1.19.0",
         "spryker/symfony": "^3.0.0",
         "spryker/transfer": "^3.33.0",
@@ -65,7 +67,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "scripts": {
-        "setup": "tests/bin/console app-payment:setup && tests/bin/console transfer:generate && tests/bin/console transfer:databuilder:generate && tests/bin/console dev:ide-auto-completion:zed:generate && tests/bin/console dev:ide-auto-completion:glue:generate && tests/bin/console dev:ide-auto-completion:glue-backend:generate && tests/bin/console propel:install && vendor/bin/codecept build",
+        "setup": "tests/bin/console app-payment:setup && tests/bin/console transfer:generate && tests/bin/console transfer:databuilder:generate && tests/bin/console translator:generate && tests/bin/console dev:ide-auto-completion:zed:generate && tests/bin/console dev:ide-auto-completion:glue:generate && tests/bin/console dev:ide-auto-completion:glue-backend:generate && tests/bin/console propel:install && vendor/bin/codecept build",
         "cs-check": "phpcs -p src/ tests/",
         "cs-fix": "phpcbf -p src/ tests/",
         "stan": "phpstan analyze src/Spryker/ --memory-limit=1G",
