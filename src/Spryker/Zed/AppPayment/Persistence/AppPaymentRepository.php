@@ -9,6 +9,7 @@ namespace Spryker\Zed\AppPayment\Persistence;
 
 use Generated\Shared\Transfer\PaymentCollectionTransfer;
 use Generated\Shared\Transfer\PaymentCriteriaTransfer;
+use Generated\Shared\Transfer\PaymentMethodTransfer;
 use Generated\Shared\Transfer\PaymentRefundTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 use Generated\Shared\Transfer\PaymentTransmissionTransfer;
@@ -157,5 +158,56 @@ class AppPaymentRepository extends AbstractRepository implements AppPaymentRepos
         }
 
         return $paymentTransmissionTransfers;
+    }
+
+    /**
+     * @return array<\Generated\Shared\Transfer\PaymentMethodTransfer>
+     */
+    public function getTenantPaymentMethods(string $tenantIdentifier): array
+    {
+        $collection = $this->getFactory()->createPaymentMethodQuery()
+            ->filterByTenantIdentifier($tenantIdentifier)
+            ->find();
+
+        $paymentMethodTransfers = [];
+
+        foreach ($collection as $paymentMethodEntity) {
+            $paymentMethodTransfers[] = $this->getFactory()->createPaymentMapper()
+                ->mapPaymentMethodEntityToPaymentMethodTransfer($paymentMethodEntity, new PaymentMethodTransfer());
+        }
+
+        return $paymentMethodTransfers;
+    }
+
+    public function savePaymentMethod(PaymentMethodTransfer $paymentMethodTransfer, string $tenantIdentifier): PaymentMethodTransfer
+    {
+        $paymentMethodEntity = $this->getFactory()->createPaymentMethodQuery()
+            ->filterByTenantIdentifier($tenantIdentifier)
+            ->filterByName($paymentMethodTransfer->getName())
+            ->findOneOrCreate();
+
+        $paymentMethodEntity = $this->getFactory()->createPaymentMapper()
+            ->mapPaymentMethodTransferToPaymentMethodEntity($paymentMethodTransfer, $paymentMethodEntity);
+
+        $paymentMethodEntity->save();
+
+        return $this->getFactory()->createPaymentMapper()
+            ->mapPaymentMethodEntityToPaymentMethodTransfer($paymentMethodEntity, $paymentMethodTransfer);
+    }
+
+    public function deletePaymentMethod(PaymentMethodTransfer $paymentMethodTransfer, string $tenantIdentifier): PaymentMethodTransfer
+    {
+        $paymentMethodEntity = $this->getFactory()->createPaymentMethodQuery()
+            ->filterByTenantIdentifier($tenantIdentifier)
+            ->filterByName($paymentMethodTransfer->getName())
+            ->findOne();
+
+        if ($paymentMethodEntity === null) {
+            return $paymentMethodTransfer;
+        }
+
+        $paymentMethodEntity->delete();
+
+        return $paymentMethodTransfer;
     }
 }

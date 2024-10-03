@@ -22,12 +22,6 @@ class AppPaymentConfig extends AbstractBundleConfig
         return $this->getStringValue(AppPaymentConstants::APP_IDENTIFIER);
     }
 
-    public function getPaymentProviderName(): string
-    {
-        // When extracting into a standalone package we should throw an exception here when this method is not overridden on project level
-        return 'You need to configure the PaymentProviderName omn the project level';
-    }
-
     public function getZedBaseUrl(): string
     {
         return $this->getStringValue(ApplicationConstants::BASE_URL_ZED);

@@ -36,4 +36,9 @@
         <exclude name="SlevomatCodingStandard.Classes.DisallowConstructorPropertyPromotion.DisallowedConstructorPropertyPromotion"/>
     </rule>
 
+    <!-- PHP 8.0 we will allow the null safe operator -->
+    <rule ref="SlevomatCodingStandard.ControlStructures.DisallowNullSafeObjectOperator">
+        <exclude name="SlevomatCodingStandard.ControlStructures.DisallowNullSafeObjectOperator"/>
+    </rule>
+
 </ruleset>

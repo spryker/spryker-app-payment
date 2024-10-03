@@ -9,7 +9,11 @@ namespace Spryker\Zed\AppPayment\Business;
 
 use Generated\Shared\Transfer\AppConfigTransfer;
 use Generated\Shared\Transfer\CancelPaymentTransfer;
+use Generated\Shared\Transfer\CancelPreOrderPaymentRequestTransfer;
+use Generated\Shared\Transfer\CancelPreOrderPaymentResponseTransfer;
 use Generated\Shared\Transfer\CapturePaymentTransfer;
+use Generated\Shared\Transfer\ConfirmPreOrderPaymentRequestTransfer;
+use Generated\Shared\Transfer\ConfirmPreOrderPaymentResponseTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
 use Generated\Shared\Transfer\PaymentCollectionDeleteCriteriaTransfer;
@@ -29,12 +33,14 @@ interface AppPaymentFacadeInterface
 {
     /**
      * Specification:
+     * - When `PaymentPlatformPluginInterface::initializePayment()` was already executed and the paymentProviderData contains a transaction id (PreOrder payment) the original payment will be added to `InitializePaymentRequestTransfer::payment`.
      * - Calls the `PaymentPlatformPluginInterface::initializePayment()` method.
      * - When `PaymentPlatformPluginInterface::initializePayment()` throws an exception, the exception is logged.
      * - When `PaymentPlatformPluginInterface::initializePayment()` throws an exception, a `InitializePaymentResponseTransfer` with a failed response is returned.
-     * - When `PaymentPlatformPluginInterface::initializePayment()` is successful, the `InitializePaymentResponseTransfer::redirectUrl` will be set to the current application.
+     * - When `PaymentPlatformPluginInterface::initializePayment()` is successful, the `InitializePaymentResponseTransfer::redirectUrl` will be set to the current application only for non pre-order payments.
      * - When `PaymentPlatformPluginInterface::initializePayment()` is successful, a `SpyPayment` entity will be persisted.
      * - When `PaymentPlatformPluginInterface::initializePayment()` is successful, a `InitializePaymentResponseTransfer` with a successful response is returned.
+     * - When `PaymentPlatformPluginInterface::initializePayment()` is successful and the PSP updated the transaction id, the `SpyPayment` entity will be updated with the new transaction id.
      *
      * @api
      */
@@ -82,11 +88,38 @@ interface AppPaymentFacadeInterface
 
     /**
      * Specification:
+     * - Requests the `AppPaymentPlatformPaymentMethodsPluginInterface::configurePaymentMethods()` method to return a list PaymentMethods to be activated.
+     * - The `AppPaymentPlatformPaymentMethodsPluginInterface::configurePaymentMethods()` is responsible to make a decision which of which Payment methods should be returned via the passed AppConfig transfer
+     * - When the passed `AppPaymentPlatformPluginInterface` is not an instance of `AppPaymentPlatformPaymentMethodsPluginInterface` it will return early.
+     * - The `AppPaymentPlatformPaymentMethodsPluginInterface::configurePaymentMethods()` get the `PaymentMethodConfigurationRequestTransfer` passed which contains the `AppConfigTransfer`.
+     * - Each PaymentMethod will enriched with PSP App defaults such as known endpoints from this package.
+     * - PaymentMethods that were already added will trigger a `AddPaymentMethod` message.
+     * - PaymentMethods that were already added will not be added again.
+     * - PaymentMethods that were already persisted and are no longer returned from `AppPaymentPlatformPaymentMethodsPluginInterface::configurePaymentMethods()` method will be deleted and trigger a `DeletePaymentMethod` message.
+     * - PaymentMethods that were already persisted and require an update (payment method data has changed, configuration has changed) will trigger a `UpdatePaymentMethod` message.
+     *
+     * @api
+     */
+    public function configurePaymentMethods(AppConfigTransfer $appConfigTransfer): AppConfigTransfer;
+
+    /**
+     * Specification:
+     * - Requests the `AppPaymentPlatformPaymentMethodsPluginInterface::configurePaymentMethods()` method to return a list of PaymentMethods to delete.
+     * - When the passed `AppPaymentPlatformPluginInterface` is not an instance of `AppPaymentPlatformPaymentMethodsPluginInterface` it will return early.
+     *
+     * @api
+     */
+    public function deletePaymentMethods(AppConfigTransfer $appConfigTransfer): AppConfigTransfer;
+
+    /**
+     * Specification:
      * - Sends a `AddPaymentMethod` message when the AppConfiguration is in state NEW.
      * - Updates the AppConfiguration and sets its state to connected after the `AddPaymentMethod` message was sent.
      * - When the AppConfiguration is in state CONNECTED the `AddPaymentMethod` message will not be sent.
      *
      * @api
+     *
+     * @deprecated Use {@link \Spryker\Zed\AppPayment\Business\AppPaymentFacadeInterface::configurePaymentMethods() } instead
      */
     public function sendAddPaymentMethodMessage(AppConfigTransfer $appConfigTransfer): AppConfigTransfer;
 
@@ -95,6 +128,8 @@ interface AppPaymentFacadeInterface
      * - Sends a `DeletePaymentMethod` message when the AppConfiguration is removed.
      *
      * @api
+     *
+     * @deprecated Use {@link \Spryker\Zed\AppPayment\Business\AppPaymentFacade::deletePaymentMethods() } instead
      */
     public function sendDeletePaymentMethodMessage(AppConfigTransfer $appConfigTransfer): AppConfigTransfer;
 
@@ -167,4 +202,30 @@ interface AppPaymentFacadeInterface
      * @api
      */
     public function transferPayments(PaymentTransmissionsRequestTransfer $paymentTransmissionsRequestTransfer): PaymentTransmissionsResponseTransfer;
+
+    /**
+     * Specification:
+     * - Confirm a payment that was made before the order was persisted.
+     * - Loads the `AppConfigTransfer` and adds it to the ConfirmPreOrderPaymentRequestTransfer.
+     * - Loads the `PaymentTransfer` and adds it to the ConfirmPreOrderPaymentRequestTransfer.
+     * - Returns a ConfirmPreOrderPaymentResponseTransfer.
+     *
+     * @api
+     */
+    public function confirmPreOrderPayment(
+        ConfirmPreOrderPaymentRequestTransfer $confirmPreOrderPaymentRequestTransfer
+    ): ConfirmPreOrderPaymentResponseTransfer;
+
+    /**
+     * Specification:
+     * - Cancels a payment that was made before the order was persisted.
+     * - Loads the `AppConfigTransfer` and adds it to the CancePreOrderPaymentRequestTransfer.
+     * - Loads the `PaymentTransfer` and adds it to the CancePreOrderPaymentRequestTransfer.
+     * - Returns a CancelPreOrderPaymentResponseTransfer.
+     *
+     * @api
+     */
+    public function cancelPreOrderPayment(
+        CancelPreOrderPaymentRequestTransfer $cancelPreOrderPaymentRequestTransfer
+    ): CancelPreOrderPaymentResponseTransfer;
 }

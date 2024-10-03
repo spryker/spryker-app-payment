@@ -25,7 +25,7 @@ class IndexController extends AbstractController
 
         return $this->renderView(
             $paymentPageResponseTransfer->getPaymentPageTemplateOrFail(),
-            $paymentPageResponseTransfer->getPaymentPageData() ?? [], // Not all pages may require payment page data.
+            $paymentPageResponseTransfer->getPaymentPageData(), // Not all pages may require payment page data.
         );
     }
 }
