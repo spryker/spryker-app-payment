@@ -121,7 +121,7 @@ This plugin can be implemented to extend the request data that is send to the PS
 
 ## Configure the MessageBroker
 
-Add this to your project configuration:
+Add this to your app configuration:
 
 ```
 $config[MessageBrokerConstants::MESSAGE_TO_CHANNEL_MAP] =
