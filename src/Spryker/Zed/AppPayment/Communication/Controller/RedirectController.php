@@ -21,7 +21,12 @@ class RedirectController extends AbstractController
 {
     public function indexAction(Request $request): Response
     {
-        $redirectRequestTransfer = (new RedirectRequestTransfer())->setTransactionId((string)$request->query->get('transactionId'));
+        $transactionId = $request->query->get('transactionId');
+        if (empty($transactionId)) {
+            return new Response('Transaction ID is missing.', Response::HTTP_BAD_REQUEST);
+        }
+
+        $redirectRequestTransfer = (new RedirectRequestTransfer())->setTransactionId((string)$transactionId);
         $redirectResponseTransfer = $this->getFacade()->getRedirectUrl($redirectRequestTransfer);
 
         return new RedirectResponse($redirectResponseTransfer->getUrlOrFail());
