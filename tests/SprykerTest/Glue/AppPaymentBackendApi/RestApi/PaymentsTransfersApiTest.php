@@ -110,7 +110,7 @@ class PaymentsTransfersApiTest extends Unit
 
         $response = $this->tester->sendPost(
             $this->tester->buildPaymentsTransfersUrl(),
-            ['orderItems' => $requestOrderItems],
+            ['paymentTransmissionItems' => $requestOrderItems],
         );
 
         $response = json_decode($response->getContent(), true);
@@ -198,7 +198,7 @@ class PaymentsTransfersApiTest extends Unit
 
         $response = $this->tester->sendPost(
             $this->tester->buildPaymentsTransfersUrl(),
-            ['orderItems' => $requestOrderItems, 'transferId' => $transferId],
+            ['paymentTransmissionItems' => $requestOrderItems, 'transferId' => $transferId],
         );
 
         $response = json_decode($response->getContent(), true);
@@ -271,7 +271,7 @@ class PaymentsTransfersApiTest extends Unit
 
         $response = $this->tester->sendPost(
             $this->tester->buildPaymentsTransfersUrl(),
-            ['orderItems' => $requestOrderItems],
+            ['paymentTransmissionItems' => $requestOrderItems],
         );
 
         $response = json_decode($response->getContent(), true);
@@ -301,7 +301,7 @@ class PaymentsTransfersApiTest extends Unit
 
         $response = $this->tester->sendPost(
             $this->tester->buildPaymentsTransfersUrl(),
-            ['orderItems' => $requestOrderItems, 'transferId' => $transferId],
+            ['paymentTransmissionItems' => $requestOrderItems, 'transferId' => $transferId],
         );
 
         $response = json_decode($response->getContent(), true);
@@ -341,7 +341,7 @@ class PaymentsTransfersApiTest extends Unit
         $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
         $this->tester->sendPost(
             $this->tester->buildPaymentsTransfersUrl(),
-            ['orderItems' => $requestOrderItems],
+            ['paymentTransmissionItems' => $requestOrderItems],
         );
 
         // Assert
@@ -380,7 +380,7 @@ class PaymentsTransfersApiTest extends Unit
         $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
         $this->tester->sendPost(
             $this->tester->buildPaymentsTransfersUrl(),
-            ['orderItems' => $requestOrderItems],
+            ['paymentTransmissionItems' => $requestOrderItems],
         );
 
         // Assert
@@ -428,7 +428,7 @@ class PaymentsTransfersApiTest extends Unit
 
         $response = $this->tester->sendPost(
             $this->tester->buildPaymentsTransfersUrl(),
-            ['orderItems' => $requestOrderItems],
+            ['paymentTransmissionItems' => $requestOrderItems],
         );
 
         // Assert
@@ -459,7 +459,7 @@ class PaymentsTransfersApiTest extends Unit
         $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
         $this->tester->sendPost(
             $this->tester->buildPaymentsTransfersUrl(),
-            ['orderItems' => $requestOrderItems],
+            ['paymentTransmissionItems' => $requestOrderItems],
         );
 
         // Assert

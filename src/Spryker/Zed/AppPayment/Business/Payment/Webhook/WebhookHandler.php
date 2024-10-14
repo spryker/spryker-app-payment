@@ -36,6 +36,11 @@ class WebhookHandler
         try {
             $webhookRequestTransfer = $this->extendWebhookRequestTransfer($webhookRequestTransfer);
 
+            if ($webhookRequestTransfer->getAbortHandling() === true) {
+                // This will result in a 200 OK Response send back to the caller of the webhook endpoint.
+                return $webhookResponseTransfer->setIsSuccessful(true);
+            }
+
             $webhookResponseTransfer = $this->appPaymentPlatformPlugin->handleWebhook($webhookRequestTransfer, $webhookResponseTransfer);
         } catch (Throwable $throwable) {
             $this->getLogger()->error($throwable->getMessage(), [
@@ -50,9 +55,9 @@ class WebhookHandler
             return $webhookResponseTransfer;
         }
 
-        // Return a failed response when response transfer is not successful.
+        // Return a failed response when response transfer is not successful or the WebhookRequest is explicitly set to not handled.
         // The message should already be set in the payment platform plugin.
-        if ($webhookResponseTransfer->getIsSuccessful() !== true) {
+        if ($webhookResponseTransfer->getIsSuccessful() !== true || $webhookResponseTransfer->getIsHandled() === false) {
             return $webhookResponseTransfer;
         }
 

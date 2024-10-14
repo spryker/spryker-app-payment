@@ -27,7 +27,7 @@ class PaymentRefundValidator
     ): ?RefundPaymentResponseTransfer {
         $paymentStatus = $refundPaymentRequestTransfer->getPaymentOrFail()->getStatusOrFail();
 
-        // only captured payments can be refunded, everything else is cancellation process
+        // only captured and succeeded payments can be refunded, everything else is cancellation process
         if ($paymentStatus !== PaymentStatus::STATUS_CAPTURED) {
             return (new RefundPaymentResponseTransfer())
                 ->setIsSuccessful(false)

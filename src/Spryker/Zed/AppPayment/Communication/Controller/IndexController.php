@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUndefinedClassInspection */
 
 /**
  * This file is part of the Spryker Suite.
@@ -14,7 +14,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @method \Spryker\Zed\AppPayment\Business\AppPaymentFacadeInterface getFacade()
- * @method \Spryker\Zed\AppPayment\Communication\AppPaymentCommunicationFactory getFactory()
  * @method \Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface getRepository()
  */
 class IndexController extends AbstractController
@@ -26,7 +25,7 @@ class IndexController extends AbstractController
 
         return $this->renderView(
             $paymentPageResponseTransfer->getPaymentPageTemplateOrFail(),
-            $paymentPageResponseTransfer->getPaymentPageData() ?? [], // Not all pages may require payment page data.
+            $paymentPageResponseTransfer->getPaymentPageData(), // Not all pages may require payment page data.
         );
     }
 }

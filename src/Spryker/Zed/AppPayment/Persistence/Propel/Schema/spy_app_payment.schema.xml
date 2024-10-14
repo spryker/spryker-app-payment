@@ -9,6 +9,7 @@
         <column name="status" type="CHAR" size="64"/>
         <column name="redirect_success_url" type="LONGVARCHAR"/>
         <column name="redirect_cancel_url" type="LONGVARCHAR"/>
+        <column name="details" type="LONGVARCHAR"/>
 
         <unique name="spy_payment-unique-order_reference">
             <unique-column name="order_reference"/>
@@ -25,7 +26,7 @@
         </behavior>
     </table>
 
-    <table name="spy_payment_transfer" idMethod="native" class="SpyPayment">
+    <table name="spy_payment_transfer" idMethod="native" class="SpyPaymentTransfer">
         <column name="id_payment_transfer" type="INTEGER" required="true" autoIncrement="true" primaryKey="true"/>
         <column name="tenant_identifier" type="CHAR" size="60"/>
         <column name="transaction_id" type="CHAR" size="36"/>
@@ -69,6 +70,24 @@
             <index-column name="transaction_id"/>
             <index-column name="status"/>
             <index-column name="order_item_ids" size="255"/>
+        </index>
+    </table>
+
+    <table name="spy_payment_method" idMethod="native" class="SpyPaymentMethod">
+        <column name="id_payment_method" required="true" type="INTEGER" autoIncrement="true" primaryKey="true"/>
+        <column name="tenant_identifier" type="CHAR" size="60"/>
+        <column name="name" required="true" type="VARCHAR" size="128"/>
+        <column name="provider_name" required="true" type="VARCHAR" size="128"/>
+        <column name="payment_method_app_configuration" type="LONGVARCHAR"/>
+
+        <behavior name="timestampable">
+            <parameter name="create_column" value="created_at"/>
+            <parameter name="update_column" value="updated_at"/>
+        </behavior>
+
+        <index name="spy_payment_method-index">
+            <index-column name="tenant_identifier"/>
+            <index-column name="name"/>
         </index>
     </table>
 </database>

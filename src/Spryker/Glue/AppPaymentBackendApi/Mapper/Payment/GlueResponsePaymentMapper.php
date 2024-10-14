@@ -8,6 +8,8 @@
 namespace Spryker\Glue\AppPaymentBackendApi\Mapper\Payment;
 
 use ArrayObject;
+use Generated\Shared\Transfer\CancelPreOrderPaymentResponseTransfer;
+use Generated\Shared\Transfer\ConfirmPreOrderPaymentResponseTransfer;
 use Generated\Shared\Transfer\GlueErrorTransfer;
 use Generated\Shared\Transfer\GlueResourceTransfer;
 use Generated\Shared\Transfer\GlueResponseTransfer;
@@ -49,12 +51,44 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
         return $glueResponseTransfer;
     }
 
+    public function mapConfirmPreOrderPaymentResponseTransferToSingleResourceGlueResponseTransfer(
+        ConfirmPreOrderPaymentResponseTransfer $confirmPreOrderPaymentResponseTransfer
+    ): GlueResponseTransfer {
+        $glueResponseTransfer = new GlueResponseTransfer();
+        $glueResponseTransfer->setHttpStatus(Response::HTTP_OK);
+
+        if ($confirmPreOrderPaymentResponseTransfer->getIsSuccessful() === false) {
+            $glueResponseTransfer->setHttpStatus(Response::HTTP_BAD_REQUEST);
+            $glueResponseTransfer->addError((new GlueErrorTransfer())->setMessage(
+                $confirmPreOrderPaymentResponseTransfer->getMessageOrFail(),
+            ));
+        }
+
+        return $glueResponseTransfer;
+    }
+
+    public function mapCancelPreOrderPaymentResponseTransferToSingleResourceGlueResponseTransfer(
+        CancelPreOrderPaymentResponseTransfer $cancelPreOrderPaymentResponseTransfer
+    ): GlueResponseTransfer {
+        $glueResponseTransfer = new GlueResponseTransfer();
+        $glueResponseTransfer->setHttpStatus(Response::HTTP_OK);
+
+        if ($cancelPreOrderPaymentResponseTransfer->getIsSuccessful() === false) {
+            $glueResponseTransfer->setHttpStatus(Response::HTTP_BAD_REQUEST);
+            $glueResponseTransfer->addError((new GlueErrorTransfer())->setMessage(
+                $cancelPreOrderPaymentResponseTransfer->getMessageOrFail(),
+            ));
+        }
+
+        return $glueResponseTransfer;
+    }
+
     protected function addInitializePaymentResponseTransferToGlueResponse(
         InitializePaymentResponseTransfer $initializePaymentResponseTransfer,
         GlueResponseTransfer $glueResponseTransfer
     ): GlueResponseTransfer {
         $glueResponseTransfer->setContent(
-            (string)json_encode($initializePaymentResponseTransfer->toArray()),
+            (string)json_encode($initializePaymentResponseTransfer->toArray(true, true)),
         );
 
         // SCOS Checkout expects a 200 response code and check isSuccessful property to show error message.
@@ -75,7 +109,7 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
                 'failureMessage' => $paymentTransmission->getMessage(),
                 'merchantReference' => $paymentTransmission->getMerchantReference(),
                 'orderReference' => $paymentTransmission->getOrderReference(),
-                'orderItems' => $this->formatOrderItemsForTransferResponse($paymentTransmission->getOrderItems()),
+                'paymentTransmissionItems' => $this->formatPaymentTransmissionItemsForTransferResponse($paymentTransmission->getPaymentTransmissionItems()),
                 'amount' => $paymentTransmission->getAmount(),
                 'transferId' => $paymentTransmission->getTransferId(), // Return the transfer identifier as transaction id to be known on the Tenant side. May be empty in case oif a failure
             ];
@@ -85,23 +119,22 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
     }
 
     /**
-     * @param \ArrayObject<int, \Generated\Shared\Transfer\OrderItemTransfer> $arrayObject
+     * @param \ArrayObject<int, (\Generated\Shared\Transfer\OrderItemTransfer | \Generated\Shared\Transfer\PaymentTransmissionItemTransfer)> $arrayObject
      *
      * @return array<int, array<string, string|null>>
      */
-    protected function formatOrderItemsForTransferResponse(ArrayObject $arrayObject): array
+    protected function formatPaymentTransmissionItemsForTransferResponse(ArrayObject $arrayObject): array
     {
-        $orderItemsData = [];
-
-        foreach ($arrayObject as $orderItem) {
-            $orderItemsData[] = [
-                'merchantReference' => $orderItem->getMerchantReferenceOrFail(),
-                'orderReference' => $orderItem->getOrderReferenceOrFail(),
-                'itemReference' => $orderItem->getItemReferenceOrFail(),
-                'amount' => $orderItem->getAmountOrFail(),
+        $paymentTransmissionItemsData = [];
+        foreach ($arrayObject as $paymentTransmissionItem) {
+            $paymentTransmissionItemsData[] = [
+                'merchantReference' => $paymentTransmissionItem->getMerchantReferenceOrFail(),
+                'orderReference' => $paymentTransmissionItem->getOrderReferenceOrFail(),
+                'itemReference' => $paymentTransmissionItem->getItemReferenceOrFail(),
+                'amount' => $paymentTransmissionItem->getAmountOrFail(),
             ];
         }
 
-        return $orderItemsData;
+        return $paymentTransmissionItemsData;
     }
 }

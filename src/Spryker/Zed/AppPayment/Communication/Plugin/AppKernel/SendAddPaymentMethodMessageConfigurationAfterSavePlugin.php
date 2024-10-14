@@ -14,6 +14,8 @@ use Spryker\Zed\Kernel\Communication\AbstractPlugin;
 /**
  * {@inheritDoc}
  *
+ * @deprecated use `\Spryker\Zed\AppPayment\Communication\Plugin\AppKernel\SendAddPaymentMethodMessagesConfigurationAfterSavePlugin` instead.
+ *
  * @api
  *
  * @method \Spryker\Zed\AppPayment\AppPaymentConfig getConfig()

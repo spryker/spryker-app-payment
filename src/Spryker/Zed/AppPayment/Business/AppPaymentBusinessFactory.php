@@ -20,8 +20,11 @@ use Spryker\Zed\AppPayment\Business\Payment\Cancel\CancelPayment;
 use Spryker\Zed\AppPayment\Business\Payment\Capture\PaymentCapturer;
 use Spryker\Zed\AppPayment\Business\Payment\Initialize\PaymentInitializer;
 use Spryker\Zed\AppPayment\Business\Payment\Message\MessageSender;
+use Spryker\Zed\AppPayment\Business\Payment\Message\PaymentMethodMessageSender;
+use Spryker\Zed\AppPayment\Business\Payment\Method\PaymentMethod;
 use Spryker\Zed\AppPayment\Business\Payment\Page\PaymentPage;
 use Spryker\Zed\AppPayment\Business\Payment\Payment;
+use Spryker\Zed\AppPayment\Business\Payment\PreOrder\PaymentPreOrder;
 use Spryker\Zed\AppPayment\Business\Payment\Refund\PaymentRefunder;
 use Spryker\Zed\AppPayment\Business\Payment\Refund\PaymentRefundValidator;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatusTransitionValidator;
@@ -34,6 +37,7 @@ use Spryker\Zed\AppPayment\Business\Payment\Webhook\WebhookMessageSender;
 use Spryker\Zed\AppPayment\Business\Payment\Webhook\WebhookRequestExtender;
 use Spryker\Zed\AppPayment\Business\Redirect\Redirect;
 use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToAppKernelFacadeInterface;
+use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToAppWebhookFacadeInterface;
 use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToMessageBrokerFacadeInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\Kernel\Business\AbstractBusinessFactory;
@@ -50,6 +54,7 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
         return new Payment(
             $this->getPlatformPlugin(),
             $this->createPaymentInitializer(),
+            $this->createPaymentPreOrder(),
             $this->createPaymentTransfer(),
             $this->createPaymentPage(),
             $this->createWebhookHandler(),
@@ -58,7 +63,12 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
 
     public function createPaymentInitializer(): PaymentInitializer
     {
-        return new PaymentInitializer($this->getPlatformPlugin(), $this->getEntityManager(), $this->createMessageSender(), $this->getConfig(), $this->createAppConfigLoader());
+        return new PaymentInitializer($this->getPlatformPlugin(), $this->getEntityManager(), $this->getRepository(), $this->createMessageSender(), $this->getConfig(), $this->createAppConfigLoader());
+    }
+
+    public function createPaymentPreOrder(): PaymentPreOrder
+    {
+        return new PaymentPreOrder($this->getPlatformPlugin(), $this->getRepository(), $this->getEntityManager(), $this->getAppWebhookFacade(), $this->createMessageSender(), $this->getConfig(), $this->createAppConfigLoader());
     }
 
     public function createPaymentTransfer(): PaymentTransfer
@@ -147,7 +157,17 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
 
     public function createMessageSender(): MessageSender
     {
-        return new MessageSender($this->getMessageBrokerFacade(), $this->getConfig());
+        return new MessageSender($this->getConfig(), $this->getMessageBrokerFacade());
+    }
+
+    public function createPaymentMethod(): PaymentMethod
+    {
+        return new PaymentMethod($this->getPlatformPlugin(), $this->getConfig(), $this->createPaymentMethodMessageSender(), $this->getRepository());
+    }
+
+    public function createPaymentMethodMessageSender(): PaymentMethodMessageSender
+    {
+        return new PaymentMethodMessageSender($this->getConfig(), $this->getMessageBrokerFacade(), $this->getPlatformPlugin());
     }
 
     public function createAppConfigLoader(): AppConfigLoader
@@ -165,6 +185,12 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
     {
         /** @phpstan-var \Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToMessageBrokerFacadeInterface */
         return $this->getProvidedDependency(AppPaymentDependencyProvider::FACADE_MESSAGE_BROKER);
+    }
+
+    public function getAppWebhookFacade(): AppPaymentToAppWebhookFacadeInterface
+    {
+        /** @phpstan-var \Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToAppWebhookFacadeInterface */
+        return $this->getProvidedDependency(AppPaymentDependencyProvider::FACADE_APP_WEBHOOK);
     }
 
     public function createCancelPaymentMessageHandler(): CancelPaymentMessageHandlerInterface

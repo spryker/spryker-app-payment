@@ -17,6 +17,7 @@ use Ramsey\Uuid\Uuid;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Business\Message\MessageBuilder;
 use Spryker\Zed\AppPayment\Business\Payment\Refund\PaymentRefundStatus;
+use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
 use Spryker\Zed\AppPayment\Business\Payment\Webhook\WebhookDataType;
 use Spryker\Zed\AppPayment\Communication\Plugin\AppWebhook\PaymentWebhookHandlerPlugin;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
@@ -144,6 +145,25 @@ class WebhooksRefundApiTest extends Unit
         // Assert
         $this->tester->seeResponseCodeIs(Response::HTTP_BAD_REQUEST);
         $this->tester->seeResponseContainsErrorMessage(MessageBuilder::refundByRefundIdNotFound($refundId));
+    }
+
+    public function testHandleRefundWebhookReturnsA200OkWhenTheThePaymentIsInStateCancelled(): void
+    {
+        // Arrange
+        $transactionId = Uuid::uuid4()->toString();
+        $tenantIdentifier = Uuid::uuid4()->toString();
+        $refundId = Uuid::uuid4()->toString();
+
+        $this->tester->haveAppConfigForTenant($tenantIdentifier);
+        $this->tester->havePaymentForTransactionId($transactionId, $tenantIdentifier, PaymentStatus::STATUS_CANCELED);
+
+        $this->tester->mockGlueRequestWebhookMapperPlugin(WebhookDataType::REFUND, $transactionId, $refundId);
+
+        // Act
+        $this->tester->sendPost($this->tester->buildWebhookUrl(), ['web hook content received from third party payment provider']);
+
+        // Assert
+        $this->tester->seeResponseCodeIs(Response::HTTP_OK);
     }
 
     public function testHandleRefundWebhookReturnsA400BadRequestWhenRefundIdHasBeenChangedByPlatformPlugin(): void

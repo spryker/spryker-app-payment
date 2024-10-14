@@ -45,14 +45,18 @@ return static function (RectorConfig $rectorConfig): void {
         ],
         ClassPropertyAssignToConstructorPromotionRector::class => [
             __DIR__ . '/src/Spryker/Glue/AppPaymentBackendApi/Dependency/Facade/AppPaymentBackendApiToAppPaymentFacadeBridge.php',
+            __DIR__ . '/src/Spryker/Glue/AppPaymentBackendApi/Dependency/Facade/AppPaymentBackendApiToTranslatorFacadeBridge.php',
             __DIR__ . '/src/Spryker/Zed/AppPayment/Dependency/Facade/AppPaymentToAppKernelFacadeBridge.php',
             __DIR__ . '/src/Spryker/Zed/AppPayment/Dependency/Facade/AppPaymentToMessageBrokerFacadeBridge.php',
+            __DIR__ . '/src/Spryker/Zed/AppPayment/Dependency/Facade/AppPaymentToAppWebhookFacadeBridge.php',
             __DIR__ . '/src/Spryker/Zed/AppPayment/Dependency/Service/AppPaymentToUtilEncodingServiceBridge.php',
         ],
         AddParamTypeFromPropertyTypeRector::class => [
             __DIR__ . '/src/Spryker/Glue/AppPaymentBackendApi/Dependency/Facade/AppPaymentBackendApiToAppPaymentFacadeBridge.php',
+            __DIR__ . '/src/Spryker/Glue/AppPaymentBackendApi/Dependency/Facade/AppPaymentBackendApiToTranslatorFacadeBridge.php',
             __DIR__ . '/src/Spryker/Zed/AppPayment/Dependency/Facade/AppPaymentToAppKernelFacadeBridge.php',
             __DIR__ . '/src/Spryker/Zed/AppPayment/Dependency/Facade/AppPaymentToMessageBrokerFacadeBridge.php',
+            __DIR__ . '/src/Spryker/Zed/AppPayment/Dependency/Facade/AppPaymentToAppWebhookFacadeBridge.php',
             __DIR__ . '/src/Spryker/Zed/AppPayment/Dependency/Service/AppPaymentToUtilEncodingServiceBridge.php',
         ],
     ]);

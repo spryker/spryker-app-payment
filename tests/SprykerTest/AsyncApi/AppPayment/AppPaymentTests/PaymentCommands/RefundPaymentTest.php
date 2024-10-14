@@ -43,7 +43,7 @@ class RefundPaymentTest extends Unit
 
     protected AppPaymentAsyncApiTester $tester;
 
-    public function testRefundPaymentMessageSendsPaymentRefundedMessageAndCreatesPaymentRefundWhenPaymentIsRefundable(): void
+    public function testRefundPaymentMessageSendsPaymentRefundedMessageAndCreatesPaymentRefundWhenPaymentIsInCapturedState(): void
     {
         // Arrange
         $tenantIdentifier = Uuid::uuid4()->toString();
