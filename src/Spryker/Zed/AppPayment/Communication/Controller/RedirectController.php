@@ -22,7 +22,7 @@ class RedirectController extends AbstractController
     public function indexAction(Request $request): Response
     {
         $transactionId = $request->query->get('transactionId');
-        if (empty($transactionId)) {
+        if ($transactionId === null || $transactionId === '') {
             return new Response('Transaction ID is missing.', Response::HTTP_BAD_REQUEST);
         }
 
