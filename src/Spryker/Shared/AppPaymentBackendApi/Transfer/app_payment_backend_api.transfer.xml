@@ -101,4 +101,13 @@
     <transfer name="WebhookResponse" strict="true">
     </transfer>
 
+    <transfer name="CustomerRequest" strict="true">
+        <property name="customer" type="Customer"/>
+        <property name="customerPaymentServiceProviderData" type="array"/>
+    </transfer>
+
+    <transfer name="CustomerResponse" strict="true">
+        <property name="customer" type="Customer"/>
+    </transfer>
+
 </transfers>

@@ -14,6 +14,8 @@ use Generated\Shared\Transfer\CancelPreOrderPaymentResponseTransfer;
 use Generated\Shared\Transfer\CapturePaymentTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentRequestTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentResponseTransfer;
+use Generated\Shared\Transfer\CustomerRequestTransfer;
+use Generated\Shared\Transfer\CustomerResponseTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
 use Generated\Shared\Transfer\PaymentCollectionDeleteCriteriaTransfer;
@@ -101,7 +103,11 @@ class AppPaymentFacade extends AbstractFacade implements AppPaymentFacadeInterfa
     /**
      * @api
      *
+     * @codeCoverageIgnore
+     *
      * @inheritDoc
+     *
+     * @deprecated Method is used by a deprecated plugin and will be removed as well.
      */
     public function sendDeletePaymentMethodMessage(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
     {
@@ -193,6 +199,11 @@ class AppPaymentFacade extends AbstractFacade implements AppPaymentFacadeInterfa
 
     public function getPaymentMethodByTenantIdentifierAndPaymentMethodKey(string $tenantIdentifier, string $paymentMethodKey): PaymentMethodTransfer
     {
-        return $this->getFactory()->createPaymentMethodReader()->getPaymentMethodByTenantIdentifierAndPaymentMethodKey($tenantIdentifier, $paymentMethodKey);
+        return $this->getFactory()->createPayment()->getPaymentMethodByTenantIdentifierAndPaymentMethodKey($tenantIdentifier, $paymentMethodKey);
+    }
+
+    public function customer(CustomerRequestTransfer $customerRequestTransfer): CustomerResponseTransfer
+    {
+        return $this->getFactory()->createPayment()->customer($customerRequestTransfer);
     }
 }

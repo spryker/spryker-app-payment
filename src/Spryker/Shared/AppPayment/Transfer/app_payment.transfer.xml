@@ -351,6 +351,7 @@
     <transfer name="PaymentMethod" strict="true">
         <property name="name" type="string"/>
         <property name="providerName" type="string"/>
+        <property name="paymentMethodKey" type="string"/>
         <property name="paymentMethodAppConfiguration" type="PaymentMethodAppConfiguration"/>
         <property name="tenantIdentifier" type="string"/>
     </transfer>
@@ -442,6 +443,54 @@
         <property name="isSuccessful" type="bool"/>
         <property name="message" type="string"/>
         <property name="paymentTransmissions" type="PaymentTransmission[]" singular="paymentTransmission"/>
+    </transfer>
+
+    <transfer name="CustomerRequest" strict="true">
+        <property name="appConfig" type="AppConfig"/>
+        <property name="tenantIdentifier" type="string"/>
+        <property name="customer" type="Customer"/>
+        <property name="customerPaymentServiceProviderData" type="array"/>
+    </transfer>
+
+    <transfer name="CustomerResponse" strict="true">
+        <property name="isSuccessful" type="bool"/>
+        <property name="message" type="string"/>
+        <property name="customer" type="Customer"/>
+    </transfer>
+
+    <transfer name="Customer">
+        <property name="salutation" type="string"/>
+        <property name="firstName" type="string"/>
+        <property name="lastName" type="string"/>
+        <property name="middleName" type="string"/>
+        <property name="gender" type="string"/>
+        <property name="dateOfBirth" type="string"/>
+        <property name="email" type="string"/>
+        <property name="username" type="string"/>
+        <property name="phone" type="string"/>
+        <property name="company" type="string"/>
+        <property name="locale" type="string"/>
+        <property name="billingAddress" type="Address"/>
+        <property name="shippingAddress" type="Address"/>
+    </transfer>
+
+    <transfer name="Address">
+        <property name="salutation" type="string"/>
+        <property name="firstName" type="string"/>
+        <property name="lastName" type="string"/>
+        <property name="middleName" type="string"/>
+        <property name="address1" type="string"/>
+        <property name="address2" type="string"/>
+        <property name="address3" type="string"/>
+        <property name="city" type="string"/>
+        <property name="zipCode" type="string"/>
+        <property name="state" type="string"/>
+        <property name="country" type="string"/>
+        <property name="region" type="string"/>
+        <property name="company" type="string"/>
+        <property name="email" type="string"/>
+        <property name="phone" type="string"/>
+        <property name="cellPhone" type="string"/>
     </transfer>
 
 </transfers>

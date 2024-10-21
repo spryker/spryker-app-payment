@@ -21,6 +21,7 @@ use Spryker\Glue\AppPaymentBackendApi\Mapper\Payment\GlueRequestPaymentMapper;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Business\Message\MessageBuilder;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformMarketplacePluginInterface;
+use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\PaymentTransmissionsRequestExtenderPluginInterface;
 use SprykerTest\Glue\AppPaymentBackendApi\AppPaymentBackendApiTester;
 use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
@@ -465,5 +466,37 @@ class PaymentsTransfersApiTest extends Unit
         // Assert
         $this->tester->seeResponseCodeIs(Response::HTTP_BAD_REQUEST);
         $this->tester->seeResponseContainsErrorMessage(MessageBuilder::paymentByTenantIdentifierAndOrderReferenceNotFound($tenantIdentifier, $orderReference));
+    }
+
+    public function testPostPaymentTransmissionRequestReturnsHttpResponseCode400WhenThePluginImplementationDoesNotProvideMarketplaceFeatures(): void
+    {
+        // Arrange
+        $transactionId = Uuid::uuid4()->toString();
+        $tenantIdentifier = Uuid::uuid4()->toString();
+        $orderReference = Uuid::uuid4()->toString();
+
+        $this->tester->haveAppConfigForTenant($tenantIdentifier);
+
+        $this->tester->havePayment([
+            PaymentTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
+            PaymentTransfer::TRANSACTION_ID => $transactionId,
+            PaymentTransfer::ORDER_REFERENCE => $orderReference,
+        ]);
+
+        $requestOrderItems = $this->tester->haveOrderItemsForTransfer($orderReference);
+
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class);
+        $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
+
+        // Act
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
+        $this->tester->sendPost(
+            $this->tester->buildPaymentsTransfersUrl(),
+            ['paymentTransmissionItems' => $requestOrderItems],
+        );
+
+        // Assert
+        $this->tester->seeResponseCodeIs(Response::HTTP_BAD_REQUEST);
+        $this->tester->seeResponseContainsErrorMessage(MessageBuilder::getPlatformPluginDoesNotProvideMarketplaceFeatures($tenantIdentifier, $orderReference));
     }
 }

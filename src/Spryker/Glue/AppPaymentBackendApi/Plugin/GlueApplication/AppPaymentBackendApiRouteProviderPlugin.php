@@ -9,6 +9,7 @@ namespace Spryker\Glue\AppPaymentBackendApi\Plugin\GlueApplication;
 
 use Spryker\Glue\AppPaymentBackendApi\Controller\CancelPreOrderPaymentResourceController;
 use Spryker\Glue\AppPaymentBackendApi\Controller\ConfirmPreOrderPaymentResourceController;
+use Spryker\Glue\AppPaymentBackendApi\Controller\CustomerResourceController;
 use Spryker\Glue\AppPaymentBackendApi\Controller\InitializePaymentResourceController;
 use Spryker\Glue\AppPaymentBackendApi\Controller\PaymentsTransfersResourceController;
 use Spryker\Glue\GlueApplicationExtension\Dependency\Plugin\RouteProviderPluginInterface;
@@ -28,6 +29,7 @@ class AppPaymentBackendApiRouteProviderPlugin extends AbstractPlugin implements 
         $routeCollection->add('postConfirmPreOrderPayment', $this->getPostConfirmPreOrderPaymentRoute());
         $routeCollection->add('postCancelPreOrderPayment', $this->getPostCancelPreOrderPaymentRoute());
         $routeCollection->add('postPaymentsTransfers', $this->getPostPaymentsTransfersRoute());
+        $routeCollection->add('getCustomer', $this->getGetCustomerRoute());
 
         return $routeCollection;
     }
@@ -74,5 +76,16 @@ class AppPaymentBackendApiRouteProviderPlugin extends AbstractPlugin implements 
                 '_method' => 'post',
             ])
             ->setMethods(Request::METHOD_POST);
+    }
+
+    public function getGetCustomerRoute(): Route
+    {
+        return (new Route('/private/customer'))
+            ->setDefaults([
+                '_controller' => [CustomerResourceController::class, 'getAction'],
+                '_resourceName' => 'customer',
+                '_method' => 'get',
+            ])
+            ->setMethods(Request::METHOD_GET);
     }
 }
