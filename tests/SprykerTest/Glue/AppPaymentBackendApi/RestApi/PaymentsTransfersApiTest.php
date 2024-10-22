@@ -350,6 +350,49 @@ class PaymentsTransfersApiTest extends Unit
         $this->tester->seeResponseContainsErrorMessage('There was an error in the PlatformPlugin implementation');
     }
 
+    public function testWhenThePlatformPluginValidationFailsA422ResponseIsReturned(): void
+    {
+        // Arrange
+        $transactionId = Uuid::uuid4()->toString();
+        $tenantIdentifier = Uuid::uuid4()->toString();
+        $orderReference = Uuid::uuid4()->toString();
+
+        $this->tester->haveAppConfigForTenant($tenantIdentifier);
+
+        $this->tester->havePayment([
+            PaymentTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
+            PaymentTransfer::TRANSACTION_ID => $transactionId,
+            PaymentTransfer::ORDER_REFERENCE => $orderReference,
+        ]);
+
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformMarketplacePluginInterface::class, [
+            'transferPayments' => function (): PaymentTransmissionsResponseTransfer {
+                $paymentTransmissionsResponseTransfer = new PaymentTransmissionsResponseTransfer();
+                $paymentTransmissionsResponseTransfer
+                    ->setIsSuccessful(false)
+                    ->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY)
+                    ->setMessage('Validation failed');
+
+                return $paymentTransmissionsResponseTransfer;
+            },
+        ]);
+
+        $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
+
+        $requestOrderItems = $this->tester->haveOrderItemsForTransfer($orderReference);
+
+        // Act
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $tenantIdentifier);
+        $this->tester->sendPost(
+            $this->tester->buildPaymentsTransfersUrl(),
+            ['paymentTransmissionItems' => $requestOrderItems],
+        );
+
+        // Assert
+        $this->tester->seeResponseCodeIs(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $this->tester->seeResponseContainsErrorMessage('Validation failed');
+    }
+
     public function testWhenThePlatformPluginReturnsAFailedResponseWithTheExceptionMessageForwardedInTheResponse(): void
     {
         // Arrange

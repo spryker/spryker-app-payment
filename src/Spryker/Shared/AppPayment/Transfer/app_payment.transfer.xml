@@ -51,6 +51,7 @@
 
     <transfer name="InitializePaymentResponse" strict="true">
         <property name="isSuccessful" type="bool"/>
+        <property name="statusCode" type="int"/>
         <property name="transactionId" type="string"/>
         <property name="preOrderPaymentData" type="array" singular="preOrderPaymentDatum"/>
         <property name="redirectUrl" type="string"/>
@@ -69,6 +70,7 @@
 
     <transfer name="ConfirmPreOrderPaymentResponse" strict="true">
         <property name="isSuccessful" type="bool"/>
+        <property name="statusCode" type="int"/>
         <property name="message" type="string"/>
         <property name="status" type="string" description="This will be set by the PSP implementation and is used to determine the Payment Status"/>
     </transfer>
@@ -83,6 +85,7 @@
 
     <transfer name="CancelPreOrderPaymentResponse" strict="true">
         <property name="isSuccessful" type="bool"/>
+        <property name="statusCode" type="int"/>
         <property name="message" type="string"/>
     </transfer>
 
@@ -454,6 +457,7 @@
 
     <transfer name="CustomerResponse" strict="true">
         <property name="isSuccessful" type="bool"/>
+        <property name="statusCode" type="int"/>
         <property name="message" type="string"/>
         <property name="customer" type="Customer"/>
     </transfer>

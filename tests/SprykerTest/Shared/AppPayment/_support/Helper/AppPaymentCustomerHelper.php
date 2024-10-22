@@ -22,6 +22,9 @@ class AppPaymentCustomerHelper extends Module
     {
         $customerRequestBuilder = new CustomerRequestBuilder($seed);
 
-        return $customerRequestBuilder->build();
+        $customerRequestTransfer = $customerRequestBuilder->withCustomer()->build();
+        $customerRequestTransfer->setCustomerPaymentServiceProviderData(['foo' => 'bar']);
+
+        return $customerRequestTransfer;
     }
 }

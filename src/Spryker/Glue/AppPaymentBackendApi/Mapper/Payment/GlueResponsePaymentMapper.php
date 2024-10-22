@@ -25,6 +25,18 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
     ): GlueResponseTransfer {
         $glueResponseTransfer = new GlueResponseTransfer();
 
+        if ($initializePaymentResponseTransfer->getIsSuccessful() === false) {
+            $glueResponseTransfer->setHttpStatus($initializePaymentResponseTransfer->getStatusCode() ?? Response::HTTP_BAD_REQUEST);
+
+            if ($initializePaymentResponseTransfer->getMessage() !== null && $initializePaymentResponseTransfer->getMessage() !== '' && $initializePaymentResponseTransfer->getMessage() !== '0') {
+                $glueResponseTransfer->addError((new GlueErrorTransfer())->setMessage(
+                    $initializePaymentResponseTransfer->getMessage(),
+                ));
+            }
+
+            return $glueResponseTransfer;
+        }
+
         return $this->addInitializePaymentResponseTransferToGlueResponse($initializePaymentResponseTransfer, $glueResponseTransfer);
     }
 
@@ -34,7 +46,7 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
         $glueResponseTransfer = new GlueResponseTransfer();
 
         if ($paymentTransmissionsResponseTransfer->getIsSuccessful() === false) {
-            $glueResponseTransfer->setHttpStatus(Response::HTTP_BAD_REQUEST);
+            $glueResponseTransfer->setHttpStatus($paymentTransmissionsResponseTransfer->getStatusCode() ?? Response::HTTP_BAD_REQUEST);
             $glueResponseTransfer->addError((new GlueErrorTransfer())->setMessage(
                 $paymentTransmissionsResponseTransfer->getMessageOrFail(),
             ));
@@ -59,7 +71,7 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
         $glueResponseTransfer->setHttpStatus(Response::HTTP_OK);
 
         if ($confirmPreOrderPaymentResponseTransfer->getIsSuccessful() === false) {
-            $glueResponseTransfer->setHttpStatus(Response::HTTP_BAD_REQUEST);
+            $glueResponseTransfer->setHttpStatus($confirmPreOrderPaymentResponseTransfer->getStatusCode() ?? Response::HTTP_BAD_REQUEST);
             $glueResponseTransfer->addError((new GlueErrorTransfer())->setMessage(
                 $confirmPreOrderPaymentResponseTransfer->getMessageOrFail(),
             ));
@@ -75,7 +87,7 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
         $glueResponseTransfer->setHttpStatus(Response::HTTP_OK);
 
         if ($cancelPreOrderPaymentResponseTransfer->getIsSuccessful() === false) {
-            $glueResponseTransfer->setHttpStatus(Response::HTTP_BAD_REQUEST);
+            $glueResponseTransfer->setHttpStatus($cancelPreOrderPaymentResponseTransfer->getStatusCode() ?? Response::HTTP_BAD_REQUEST);
             $glueResponseTransfer->addError((new GlueErrorTransfer())->setMessage(
                 $cancelPreOrderPaymentResponseTransfer->getMessageOrFail(),
             ));
@@ -91,7 +103,7 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
         $glueResponseTransfer->setHttpStatus(Response::HTTP_OK);
 
         if ($customerResponseTransfer->getIsSuccessful() === false) {
-            $glueResponseTransfer->setHttpStatus(Response::HTTP_BAD_REQUEST);
+            $glueResponseTransfer->setHttpStatus($customerResponseTransfer->getStatusCode() ?? Response::HTTP_BAD_REQUEST);
             $glueResponseTransfer->addError((new GlueErrorTransfer())->setMessage(
                 $customerResponseTransfer->getMessageOrFail(),
             ));

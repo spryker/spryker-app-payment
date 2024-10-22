@@ -138,4 +138,32 @@ class CustomerPaymentApiTest extends Unit
         $this->tester->seeResponseCodeIs(Response::HTTP_BAD_REQUEST);
         $this->tester->seeResponseContainsErrorMessage(MessageBuilder::getPlatformPluginDoesNotProvideCustomerFeatures());
     }
+
+    public function testCustomerGetRequestReturnsHttpResponseCode422WhenNeitherACustomerNorCustomerPaymentServiceProviderDataIsPresent(): void
+    {
+        // Arrange
+        $tenantIdentifier = Uuid::uuid4()->toString();
+
+        $customerRequestTransfer = $this->tester->haveCustomerRequestTransfer([
+            CustomerRequestTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
+        ]);
+
+        $customerRequestTransfer
+            ->setCustomer(null)
+            ->setCustomerPaymentServiceProviderData(null);
+
+        $this->tester->haveAppConfigForTenant($customerRequestTransfer->getTenantIdentifier());
+
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformCustomerPluginInterface::class);
+        $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
+
+        // Act
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $customerRequestTransfer->getTenantIdentifier());
+
+        $this->tester->sendGet($this->tester->buildCustomerUrl(), $customerRequestTransfer->toArray());
+
+        // Assert
+        $this->tester->seeResponseCodeIs(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $this->tester->seeResponseContainsErrorMessage(MessageBuilder::getNeitherACustomerNorCustomerPaymentProviderDataIsPresent());
+    }
 }
