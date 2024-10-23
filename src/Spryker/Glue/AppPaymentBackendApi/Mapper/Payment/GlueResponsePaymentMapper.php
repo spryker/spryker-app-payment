@@ -107,6 +107,8 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
             $glueResponseTransfer->addError((new GlueErrorTransfer())->setMessage(
                 $customerResponseTransfer->getMessageOrFail(),
             ));
+
+            return $glueResponseTransfer;
         }
 
         $glueResponseTransfer->setContent(
