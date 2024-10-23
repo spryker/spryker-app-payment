@@ -20,10 +20,11 @@ class AppPaymentCustomerHelper extends Module
 
     public function haveCustomerRequestTransfer(array $seed = []): CustomerRequestTransfer
     {
+        $seed[CustomerRequestTransfer::CUSTOMER_PAYMENT_SERVICE_PROVIDER_DATA] = $seed[CustomerRequestTransfer::CUSTOMER_PAYMENT_SERVICE_PROVIDER_DATA] ?? ['foo' => 'bar'];
+
         $customerRequestBuilder = new CustomerRequestBuilder($seed);
 
         $customerRequestTransfer = $customerRequestBuilder->withCustomer()->build();
-        $customerRequestTransfer->setCustomerPaymentServiceProviderData(['foo' => 'bar']);
 
         return $customerRequestTransfer;
     }

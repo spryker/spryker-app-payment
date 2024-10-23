@@ -109,6 +109,10 @@ class GlueResponsePaymentMapper implements GlueResponsePaymentMapperInterface
             ));
         }
 
+        $glueResponseTransfer->setContent(
+            (string)json_encode($customerResponseTransfer->toArray(true, true)),
+        );
+
         return $glueResponseTransfer;
     }
 
