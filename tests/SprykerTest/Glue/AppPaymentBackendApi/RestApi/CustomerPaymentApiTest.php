@@ -69,7 +69,7 @@ class CustomerPaymentApiTest extends Unit
         // Act
         $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $customerRequestTransfer->getTenantIdentifier());
 
-        $this->tester->sendGet($this->tester->buildCustomerUrl(), $customerRequestTransfer->toArray());
+        $this->tester->sendPost($this->tester->buildCustomerUrl(), $customerRequestTransfer->toArray());
 
         // Assert
         $this->tester->seeResponseCodeIs(Response::HTTP_OK);
@@ -102,7 +102,7 @@ class CustomerPaymentApiTest extends Unit
         // Act
         $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $customerRequestTransfer->getTenantIdentifier());
 
-        $this->tester->sendGet($this->tester->buildCustomerUrl(), $customerRequestTransfer->toArray());
+        $this->tester->sendPost($this->tester->buildCustomerUrl(), $customerRequestTransfer->toArray());
 
         // Assert
         $this->tester->seeResponseCodeIs(Response::HTTP_BAD_REQUEST);
@@ -132,7 +132,7 @@ class CustomerPaymentApiTest extends Unit
         // Act
         $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $customerRequestTransfer->getTenantIdentifier());
 
-        $this->tester->sendGet($this->tester->buildCustomerUrl(), $customerRequestTransfer->toArray());
+        $this->tester->sendPost($this->tester->buildCustomerUrl(), $customerRequestTransfer->toArray());
 
         // Assert
         $this->tester->seeResponseCodeIs(Response::HTTP_BAD_REQUEST);
@@ -160,7 +160,7 @@ class CustomerPaymentApiTest extends Unit
         // Act
         $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $customerRequestTransfer->getTenantIdentifier());
 
-        $this->tester->sendGet($this->tester->buildCustomerUrl(), $customerRequestTransfer->toArray());
+        $this->tester->sendPost($this->tester->buildCustomerUrl(), $customerRequestTransfer->toArray());
 
         // Assert
         $this->tester->seeResponseCodeIs(Response::HTTP_UNPROCESSABLE_ENTITY);

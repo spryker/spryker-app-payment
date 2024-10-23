@@ -29,7 +29,7 @@ class AppPaymentBackendApiRouteProviderPlugin extends AbstractPlugin implements 
         $routeCollection->add('postConfirmPreOrderPayment', $this->getPostConfirmPreOrderPaymentRoute());
         $routeCollection->add('postCancelPreOrderPayment', $this->getPostCancelPreOrderPaymentRoute());
         $routeCollection->add('postPaymentsTransfers', $this->getPostPaymentsTransfersRoute());
-        $routeCollection->add('getCustomer', $this->getGetCustomerRoute());
+        $routeCollection->add('postCustomer', $this->getPostCustomerRoute());
 
         return $routeCollection;
     }
@@ -78,14 +78,14 @@ class AppPaymentBackendApiRouteProviderPlugin extends AbstractPlugin implements 
             ->setMethods(Request::METHOD_POST);
     }
 
-    public function getGetCustomerRoute(): Route
+    public function getPostCustomerRoute(): Route
     {
         return (new Route('/private/customer'))
             ->setDefaults([
-                '_controller' => [CustomerResourceController::class, 'getAction'],
+                '_controller' => [CustomerResourceController::class, 'postAction'],
                 '_resourceName' => 'customer',
-                '_method' => 'get',
+                '_method' => 'post',
             ])
-            ->setMethods(Request::METHOD_GET);
+            ->setMethods(Request::METHOD_POST);
     }
 }

@@ -16,7 +16,7 @@ use Spryker\Glue\Kernel\Backend\Controller\AbstractController;
  */
 class CustomerResourceController extends AbstractController
 {
-    public function getAction(GlueRequestTransfer $glueRequestTransfer): GlueResponseTransfer
+    public function postAction(GlueRequestTransfer $glueRequestTransfer): GlueResponseTransfer
     {
         $customerRequestTransfer = $this->getFactory()->createGlueRequestPaymentMapper()->mapGlueRequestTransferToCustomerRequestTransfer($glueRequestTransfer);
         $customerResponseTransfer = $this->getFactory()->getAppPaymentFacade()->customer($customerRequestTransfer);
