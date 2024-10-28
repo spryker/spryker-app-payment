@@ -5,7 +5,7 @@
  * For full license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace SprykerTest\AsyncApi\AppPayment\PaymentTests\PaymentMethodCommands;
+namespace SprykerTest\AsyncApi\AppPayment\AppPaymentTests\PaymentMethodCommands;
 
 use Codeception\Stub;
 use Codeception\Test\Unit;
@@ -29,7 +29,7 @@ use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
  * @group SprykerTest
  * @group AsyncApi
  * @group AppPayment
- * @group PaymentTests
+ * @group AppPaymentTests
  * @group PaymentMethodCommands
  * @group UpdatePaymentMethodTest
  * Add your own group annotations below this line
@@ -210,50 +210,6 @@ class UpdatePaymentMethodTest extends Unit
 
         // Assert
         $this->tester->assertMessageWasEmittedOnChannel($updatePaymentMethodTransfer, 'payment-method-commands');
-    }
-
-    public function testUpdatePaymentMethodMessageIsNotSendWhenBothPaymentMethodsDoNotHaveAnPaymentMethodAppConfiguration(): void
-    {
-        // Arrange
-        $tenantIdentifier = Uuid::uuid4()->toString();
-        $paymentMethodName = Uuid::uuid4()->toString();
-        $paymentProviderName = Uuid::uuid4()->toString();
-
-        $this->tester->havePaymentMethodPersisted([
-            PaymentMethodTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
-            PaymentMethodTransfer::NAME => $paymentMethodName,
-            PaymentMethodTransfer::PROVIDER_NAME => $paymentProviderName,
-        ]);
-
-        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPaymentMethodsPluginInterface::class, [
-            'configurePaymentMethods' => function () use ($paymentMethodName, $paymentProviderName) {
-                $paymentMethodTransfer = new PaymentMethodTransfer();
-                $paymentMethodTransfer
-                    ->setName($paymentMethodName)
-                    ->setProviderName($paymentProviderName);
-
-                $paymentMethodConfigurationResponseTransfer = new PaymentMethodConfigurationResponseTransfer();
-                $paymentMethodConfigurationResponseTransfer->addPaymentMethod($paymentMethodTransfer);
-
-                return $paymentMethodConfigurationResponseTransfer;
-            },
-        ]);
-
-        $this->tester->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
-        $this->tester->setDependency(AppKernelDependencyProvider::PLUGIN_CONFIGURATION_BEFORE_SAVE_PLUGINS, []);
-        $this->tester->setDependency(AppKernelDependencyProvider::PLUGIN_CONFIGURATION_AFTER_SAVE_PLUGINS, [new ConfigurePaymentMethodsConfigurationAfterSavePlugin()]);
-
-        $appConfigTransfer = new AppConfigTransfer();
-        $appConfigTransfer
-            ->setConfig(['business_model' => 'foo', 'my' => 'app', 'configuration' => 'data', 'mode' => 'test'])
-            ->setTenantIdentifier($tenantIdentifier)
-            ->setIsActive(true);
-
-        $appKernelFacade = new AppKernelFacade();
-        $appKernelFacade->saveConfig($appConfigTransfer);
-
-        // Assert
-        $this->tester->assertMessageWasNotSent(UpdatePaymentMethodTransfer::class, 'payment-method-commands');
     }
 
     public function testUpdatePaymentMethodMessageIsNotSendWhenPaymentMethodHasNotChanged(): void

@@ -53,6 +53,9 @@ class PaymentMethod
         /** @var array<\Generated\Shared\Transfer\PaymentMethodTransfer> $configuredPaymentMethodTransfers */
         $configuredPaymentMethodTransfers = $paymentMethodCollectionResponseTransfer->getPaymentMethods()->getArrayCopy();
 
+        // Add the configuration to the Payment Methods to be able to compare them with the persisted ones.
+        $configuredPaymentMethodTransfers = $this->addConfigurationToPaymentMethods($configuredPaymentMethodTransfers);
+
         $paymentMethodTransfersToAdd = $this->getPaymentMethodsToAdd($persistedPaymentMethodTransfers, $configuredPaymentMethodTransfers);
         $paymentMethodTransfersToUpdate = $this->getPaymentMethodsToUpdate($persistedPaymentMethodTransfers, $configuredPaymentMethodTransfers);
         $paymentMethodTransfersToDelete = $this->getPaymentMethodsToDelete($persistedPaymentMethodTransfers, $configuredPaymentMethodTransfers);
@@ -74,22 +77,13 @@ class PaymentMethod
 
     protected function addPaymentMethod(PaymentMethodTransfer $paymentMethodTransfer, AppConfigTransfer $appConfigTransfer): void
     {
-        $paymentMethodAppConfigurationTransfer = $this->getDefaultPaymentMethodAppConfiguration();
-
-        // In case of the PSP App configured a custom checkout configuration, we will use it here and pass it as such to the configuration.
-        if ($paymentMethodTransfer->getPaymentMethodAppConfiguration() instanceof PaymentMethodAppConfigurationTransfer) {
-            $paymentMethodAppConfigurationTransfer->setCheckoutConfiguration($paymentMethodTransfer->getPaymentMethodAppConfiguration()->getCheckoutConfiguration());
-        }
-
         $addPaymentMethodTransfer = new AddPaymentMethodTransfer();
         $addPaymentMethodTransfer
             ->setName($paymentMethodTransfer->getNameOrFail())
             ->setProviderName($paymentMethodTransfer->getProviderNameOrFail())
             // @deprecated This line can be removed when all PSP Apps are updated.
             ->setPaymentAuthorizationEndpoint(sprintf('%s/private/initialize-payment', $this->appPaymentConfig->getGlueBaseUrl()))
-            ->setPaymentMethodAppConfiguration($paymentMethodAppConfigurationTransfer);
-
-        $paymentMethodTransfer->setPaymentMethodAppConfiguration($paymentMethodAppConfigurationTransfer);
+            ->setPaymentMethodAppConfiguration($paymentMethodTransfer->getPaymentMethodAppConfigurationOrFail());
 
         $this->appPaymentRepository->savePaymentMethod($paymentMethodTransfer, $appConfigTransfer->getTenantIdentifierOrFail());
 
@@ -98,21 +92,12 @@ class PaymentMethod
 
     protected function updatePaymentMethod(PaymentMethodTransfer $paymentMethodTransfer, AppConfigTransfer $appConfigTransfer): void
     {
-        // Add the passed configuration to the default configuration.
-        $paymentMethodAppConfigurationTransfer = $this->getDefaultPaymentMethodAppConfiguration();
-
-        if ($paymentMethodTransfer->getPaymentMethodAppConfiguration() instanceof PaymentMethodAppConfigurationTransfer) {
-            $paymentMethodAppConfigurationTransfer->setCheckoutConfiguration($paymentMethodTransfer->getPaymentMethodAppConfiguration()->getCheckoutConfiguration());
-        }
-
         $updatePaymentMethodTransfer = new UpdatePaymentMethodTransfer();
         $updatePaymentMethodTransfer
             ->setName($paymentMethodTransfer->getNameOrFail())
             ->setProviderName($paymentMethodTransfer->getProviderNameOrFail())
             ->setPaymentAuthorizationEndpoint(sprintf('%s/private/initialize-payment', $this->appPaymentConfig->getGlueBaseUrl()))
-            ->setPaymentMethodAppConfiguration($paymentMethodAppConfigurationTransfer);
-
-        $paymentMethodTransfer->setPaymentMethodAppConfiguration($paymentMethodAppConfigurationTransfer);
+            ->setPaymentMethodAppConfiguration($paymentMethodTransfer->getPaymentMethodAppConfigurationOrFail());
 
         $this->appPaymentRepository->savePaymentMethod($paymentMethodTransfer, $appConfigTransfer->getTenantIdentifierOrFail());
 
@@ -314,5 +299,31 @@ class PaymentMethod
         $paymentMethodAppConfigurationTransfer->addEndpoint($transferEndpointTransfer);
 
         return $paymentMethodAppConfigurationTransfer;
+    }
+
+    /**
+     * @param array<\Generated\Shared\Transfer\PaymentMethodTransfer> $configuredPaymentMethodTransfers
+     *
+     * @return array<\Generated\Shared\Transfer\PaymentMethodTransfer>
+     */
+    protected function addConfigurationToPaymentMethods(array $configuredPaymentMethodTransfers): array
+    {
+        $updatedPaymentMethodTransfers = [];
+
+        // Add the passed configuration to the default configuration.
+
+        foreach ($configuredPaymentMethodTransfers as $configuredPaymentMethodTransfer) {
+            $paymentMethodAppConfigurationTransfer = $this->getDefaultPaymentMethodAppConfiguration();
+
+            if ($configuredPaymentMethodTransfer->getPaymentMethodAppConfiguration() instanceof PaymentMethodAppConfigurationTransfer) {
+                $paymentMethodAppConfigurationTransfer->setCheckoutConfiguration($configuredPaymentMethodTransfer->getPaymentMethodAppConfiguration()->getCheckoutConfiguration());
+            }
+
+            $configuredPaymentMethodTransfer->setPaymentMethodAppConfiguration($paymentMethodAppConfigurationTransfer);
+
+            $updatedPaymentMethodTransfers[] = $configuredPaymentMethodTransfer;
+        }
+
+        return $updatedPaymentMethodTransfers;
     }
 }
