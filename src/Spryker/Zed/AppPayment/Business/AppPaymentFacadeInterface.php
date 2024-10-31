@@ -248,7 +248,7 @@ interface AppPaymentFacadeInterface
      *
      * @api
      */
-    public function customer(
+    public function getCustomer(
         CustomerRequestTransfer $customerRequestTransfer
     ): CustomerResponseTransfer;
 }

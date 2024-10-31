@@ -26,7 +26,7 @@ class Customer
     {
     }
 
-    public function customer(CustomerRequestTransfer $customerRequestTransfer): CustomerResponseTransfer
+    public function getCustomer(CustomerRequestTransfer $customerRequestTransfer): CustomerResponseTransfer
     {
         if (!$this->appPaymentPlatformPlugin instanceof AppPaymentPlatformCustomerPluginInterface) {
             $this->getLogger()->error(MessageBuilder::getPlatformPluginDoesNotProvideCustomerFeatures(), [
@@ -53,7 +53,7 @@ class Customer
 
         try {
             $customerRequestTransfer->setAppConfigOrFail($this->appConfigLoader->loadAppConfig($customerRequestTransfer->getTenantIdentifierOrFail()));
-            $customerResponseTransfer = $this->appPaymentPlatformPlugin->customer($customerRequestTransfer);
+            $customerResponseTransfer = $this->appPaymentPlatformPlugin->getCustomer($customerRequestTransfer);
         } catch (Throwable $throwable) {
             $this->getLogger()->error($throwable->getMessage(), [
                 CustomerRequestTransfer::TENANT_IDENTIFIER => $customerRequestTransfer->getTenantIdentifierOrFail(),

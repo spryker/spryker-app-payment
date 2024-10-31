@@ -75,8 +75,8 @@ class Payment
         return $this->paymentMethodReader->getPaymentMethodByTenantIdentifierAndPaymentMethodKey($tenantIdentifier, $paymentMethodKey);
     }
 
-    public function customer(CustomerRequestTransfer $customerRequestTransfer): CustomerResponseTransfer
+    public function getCustomer(CustomerRequestTransfer $customerRequestTransfer): CustomerResponseTransfer
     {
-        return $this->customer->customer($customerRequestTransfer);
+        return $this->customer->getCustomer($customerRequestTransfer);
     }
 }

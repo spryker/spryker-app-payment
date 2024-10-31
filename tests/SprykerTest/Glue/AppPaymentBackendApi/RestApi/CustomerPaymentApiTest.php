@@ -56,7 +56,7 @@ class CustomerPaymentApiTest extends Unit
             ->setCustomer($customerRequestTransfer->getCustomer());
 
         $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformCustomerPluginInterface::class, [
-            'customer' => function (CustomerRequestTransfer $customerRequestTransfer) use ($customerResponseTransfer) {
+            'getCustomer' => function (CustomerRequestTransfer $customerRequestTransfer) use ($customerResponseTransfer) {
                 // Ensure that the AppConfig is always passed to the platform plugin.
                 $this->assertInstanceOf(AppConfigTransfer::class, $customerRequestTransfer->getAppConfig());
 
@@ -92,7 +92,7 @@ class CustomerPaymentApiTest extends Unit
             ->setCustomer($customerRequestTransfer->getCustomer());
 
         $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformCustomerPluginInterface::class, [
-            'customer' => function (CustomerRequestTransfer $customerRequestTransfer) use ($customerResponseTransfer): void {
+            'getCustomer' => function (CustomerRequestTransfer $customerRequestTransfer) use ($customerResponseTransfer): void {
                 throw new Exception('Bad request');
             },
         ]);
