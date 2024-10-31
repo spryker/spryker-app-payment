@@ -390,7 +390,13 @@
     <transfer name="CheckoutConfiguration" strict="true">
         <property name="strategy" type="string"/>
         <property name="appPaymentMethodKey" type="string"/>
-        <property name="scripts" type="array" singular="script"/>
+        <property name="scripts" type="Script[]" singular="script"/>
+        <property name="paymentServiceProviderData" type="array" singular="paymentServiceProviderDatum" associative="true"/>
+    </transfer>
+
+    <transfer name="Script" strict="true">
+        <property name="url" type="string"/>
+        <property name="queryParams" type="array" singular="queryParam" associative="true"/>
     </transfer>
 
     <transfer name="Endpoint" strict="true">
