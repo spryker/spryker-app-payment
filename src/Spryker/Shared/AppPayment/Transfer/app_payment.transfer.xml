@@ -389,6 +389,7 @@
 
     <transfer name="CheckoutConfiguration" strict="true">
         <property name="strategy" type="string"/>
+        <property name="appPaymentMethodKey" type="string"/>
         <property name="scripts" type="array" singular="script"/>
     </transfer>
 
