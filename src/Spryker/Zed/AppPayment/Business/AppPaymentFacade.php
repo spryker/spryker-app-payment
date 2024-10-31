@@ -199,7 +199,7 @@ class AppPaymentFacade extends AbstractFacade implements AppPaymentFacadeInterfa
 
     public function getPaymentMethodByTenantIdentifierAndPaymentMethodKey(string $tenantIdentifier, string $paymentMethodKey): PaymentMethodTransfer
     {
-        return $this->getFactory()->createPayment()->getPaymentMethodByTenantIdentifierAndPaymentMethodKey($tenantIdentifier, $paymentMethodKey);
+        return $this->getFactory()->createPaymentMethodReader()->getPaymentMethodByTenantIdentifierAndPaymentMethodKey($tenantIdentifier, $paymentMethodKey);
     }
 
     public function getCustomer(CustomerRequestTransfer $customerRequestTransfer): CustomerResponseTransfer
