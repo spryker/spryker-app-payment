@@ -99,6 +99,28 @@ class PaymentFacadeTest extends Unit
     /**
      * @return void
      */
+    public function testGetPaymentMethodByTenantIdentifierAndPaymentMethodKeyReturnsPaymentMethodTransferWhenPassedPaymentMethodCasingUsesWhiteSpaceAndUpperCaseLetters(): void
+    {
+        // Arrange
+        $tenantIdentifier = Uuid::uuid4()->toString();
+        $persistedPaymentMethodKey = 'test-payment-method-key';
+        $paymentMethodKey = 'Test Payment Method Key';
+
+        $this->tester->havePaymentMethodPersisted([
+            PaymentMethodTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
+            PaymentMethodTransfer::PAYMENT_METHOD_KEY => $persistedPaymentMethodKey,
+        ]);
+
+        // Act
+        $paymentMethodTransfer = $this->tester->getFacade()->getPaymentMethodByTenantIdentifierAndPaymentMethodKey($tenantIdentifier, $paymentMethodKey);
+
+        // Assert
+        $this->assertInstanceOf(PaymentMethodTransfer::class, $paymentMethodTransfer);
+    }
+
+    /**
+     * @return void
+     */
     public function testGetPaymentMethodByTenantIdentifierAndPaymentMethodKeyThrowsExceptionWhenPaymentMethodNotFound(): void
     {
         // Arrange
