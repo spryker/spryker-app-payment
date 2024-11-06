@@ -22,6 +22,7 @@ use Spryker\Zed\AppPayment\Business\Payment\Capture\PaymentCapturer;
 use Spryker\Zed\AppPayment\Business\Payment\Initialize\PaymentInitializer;
 use Spryker\Zed\AppPayment\Business\Payment\Message\MessageSender;
 use Spryker\Zed\AppPayment\Business\Payment\Message\PaymentMethodMessageSender;
+use Spryker\Zed\AppPayment\Business\Payment\Method\Normalizer\PaymentMethodNormalizer;
 use Spryker\Zed\AppPayment\Business\Payment\Method\PaymentMethod;
 use Spryker\Zed\AppPayment\Business\Payment\Method\Reader\PaymentMethodReader;
 use Spryker\Zed\AppPayment\Business\Payment\Page\PaymentPage;
@@ -67,7 +68,7 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
 
     public function createPaymentInitializer(): PaymentInitializer
     {
-        return new PaymentInitializer($this->getPlatformPlugin(), $this->getEntityManager(), $this->getRepository(), $this->createMessageSender(), $this->getConfig(), $this->createAppConfigLoader());
+        return new PaymentInitializer($this->getPlatformPlugin(), $this->getEntityManager(), $this->getRepository(), $this->createPaymentMethodNormalizer(), $this->createMessageSender(), $this->getConfig(), $this->createAppConfigLoader());
     }
 
     public function createPaymentPreOrder(): PaymentPreOrder
@@ -157,6 +158,11 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
     {
         /** @phpstan-var \Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface */
         return $this->getProvidedDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM);
+    }
+
+    public function createPaymentMethodNormalizer(): PaymentMethodNormalizer
+    {
+        return new PaymentMethodNormalizer();
     }
 
     public function createMessageSender(): MessageSender
@@ -274,7 +280,7 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
 
     public function createPaymentMethodReader(): PaymentMethodReader
     {
-        return new PaymentMethodReader($this->getRepository());
+        return new PaymentMethodReader($this->getRepository(), $this->createPaymentMethodNormalizer());
     }
 
     public function createCustomer(): Customer
