@@ -53,6 +53,7 @@ class Customer
 
         try {
             $customerRequestTransfer->setAppConfigOrFail($this->appConfigLoader->loadAppConfig($customerRequestTransfer->getTenantIdentifierOrFail()));
+
             $customerResponseTransfer = $this->appPaymentPlatformPlugin->getCustomer($customerRequestTransfer);
         } catch (Throwable $throwable) {
             $this->getLogger()->error($throwable->getMessage(), [
