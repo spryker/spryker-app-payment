@@ -81,7 +81,7 @@ class PaymentPreOrder
         return $this->getTransactionHandler()->handleTransaction(function () use ($confirmPreOrderPaymentRequestTransfer, $confirmPreOrderPaymentResponseTransfer) {
             $this->savePayment($confirmPreOrderPaymentRequestTransfer, $confirmPreOrderPaymentResponseTransfer);
 
-            // In case of pre-order payment we may have unprocessed webhook requests persisted and we must process them here
+            // In case of pre-order payment we may have unprocessed webhook requests persisted, and we must process them here
             $webhookInboxCriteriaTransfer = new WebhookInboxCriteriaTransfer();
 
             // Unprocessed webhooks will be persisted by the transaction id
@@ -148,6 +148,11 @@ class PaymentPreOrder
             ->setOrderReference($confirmPreOrderPaymentRequestTransfer->getOrderReference())
             ->setStatus($confirmPreOrderPaymentResponseTransfer->getStatus())
             ->setQuote($confirmPreOrderPaymentRequestTransfer->getOrderData());
+
+        // Covers the case when the implementation alters the payment transfer
+        if ($confirmPreOrderPaymentResponseTransfer->getPayment() instanceof PaymentTransfer) {
+            $paymentTransfer->fromArray($confirmPreOrderPaymentResponseTransfer->getPayment()->modifiedToArray());
+        }
 
         $this->appPaymentEntityManager->savePayment($paymentTransfer);
     }

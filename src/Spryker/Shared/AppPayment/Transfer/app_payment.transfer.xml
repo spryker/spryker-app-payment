@@ -73,6 +73,7 @@
         <property name="statusCode" type="int"/>
         <property name="message" type="string"/>
         <property name="status" type="string" description="This will be set by the PSP implementation and is used to determine the Payment Status"/>
+        <property name="payment" type="Payment" description="In case of the PSP implementation returns the payment transfer a change on it has happened and needs to be persisted."/>
     </transfer>
 
     <transfer name="CancelPreOrderPaymentRequest" strict="true">
@@ -192,6 +193,7 @@
     </transfer>
 
     <transfer name="Payment" strict="true">
+        <property name="idPayment" type="string"/>
         <property name="orderReference" type="string"/>
         <property name="transactionId" type="string"/>
         <property name="transferId" type="string"/>
