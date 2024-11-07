@@ -130,7 +130,7 @@ class PaymentInitializer
         $paymentTransfer = new PaymentTransfer();
         $paymentTransfer
             ->fromArray($initializePaymentResponseTransfer->toArray(), true)
-            ->setTransactionId($initializePaymentResponseTransfer->getTransactionIdOrFail())
+            ->setTransactionId($initializePaymentResponseTransfer->getTransactionId())
             ->setTenantIdentifier($initializePaymentRequestTransfer->getTenantIdentifierOrFail())
             ->setOrderReference($quoteTransfer->getOrderReference()) // Optional for the pre-order payment case.
             ->setQuote($quoteTransfer)

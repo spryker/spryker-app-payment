@@ -106,11 +106,17 @@ class MessageSender extends AbstractMessageSender
     ): void {
         $quoteTransfer = $initializePaymentRequestTransfer->getOrderDataOrFail();
 
+        // It may be that payment gets created without having either of the following. (PreOrderPayment)
+        // In this case, we do send a message later. E.g. when ConfirmPreOrderPayment is made
+        if (!$quoteTransfer->getOrderReference() && ($initializePaymentResponseTransfer->getTransactionId() === null || $initializePaymentResponseTransfer->getTransactionId() === '' || $initializePaymentResponseTransfer->getTransactionId() === '0')) {
+            return;
+        }
+
         $paymentCreatedTransfer = new PaymentCreatedTransfer();
         $paymentCreatedTransfer->fromArray($initializePaymentResponseTransfer->toArray(), true);
         $paymentCreatedTransfer
             ->setEntityReference($quoteTransfer->getOrderReference())
-            ->setPaymentReference($initializePaymentResponseTransfer->getTransactionIdOrFail());
+            ->setPaymentReference($initializePaymentResponseTransfer->getTransactionId());
 
         $paymentCreatedTransfer->setMessageAttributes($this->getMessageAttributes(
             $initializePaymentRequestTransfer->getTenantIdentifierOrFail(),
