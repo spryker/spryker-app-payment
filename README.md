@@ -315,7 +315,7 @@ This is known on the Tenant side as Payout or Reverse Payout. This feature will 
 The orderItems will be grouped into `PaymentTransmissionTransfers` and are forwarded to the Platform implementation.
 
 The platform implementation must set the successful state of each transfer and in a failure case, it must add a failure message. The payment transfers are persisted on the App side and a response with all the transmissions successful or failed will be returned in the response to the Tenant.
-=======
+
 ### Configure Payment Methods
 
 Each PSP implementation has different Payment Methods available. Through the `\Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPaymentMethodsPluginInterface` you can provide the available Payment Methods.
