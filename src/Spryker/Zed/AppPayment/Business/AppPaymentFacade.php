@@ -21,6 +21,7 @@ use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
 use Generated\Shared\Transfer\PaymentCollectionDeleteCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentCollectionTransfer;
 use Generated\Shared\Transfer\PaymentCriteriaTransfer;
+use Generated\Shared\Transfer\PaymentMethodCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentMethodTransfer;
 use Generated\Shared\Transfer\PaymentPageRequestTransfer;
 use Generated\Shared\Transfer\PaymentPageResponseTransfer;
@@ -197,9 +198,9 @@ class AppPaymentFacade extends AbstractFacade implements AppPaymentFacadeInterfa
         return $this->getFactory()->createPayment()->cancelPreOrderPayment($cancelPreOrderPaymentRequestTransfer);
     }
 
-    public function getPaymentMethodByTenantIdentifierAndPaymentMethodKey(string $tenantIdentifier, string $paymentMethodKey): PaymentMethodTransfer
+    public function getPaymentMethodByTenantIdentifierAndPaymentMethodKey(PaymentMethodCriteriaTransfer $paymentMethodCriteriaTransfer): PaymentMethodTransfer
     {
-        return $this->getFactory()->createPaymentMethodReader()->getPaymentMethodByTenantIdentifierAndPaymentMethodKey($tenantIdentifier, $paymentMethodKey);
+        return $this->getFactory()->createPaymentMethodReader()->getPaymentMethodByTenantIdentifierAndPaymentMethodKey($paymentMethodCriteriaTransfer);
     }
 
     public function getCustomer(CustomerRequestTransfer $customerRequestTransfer): CustomerResponseTransfer

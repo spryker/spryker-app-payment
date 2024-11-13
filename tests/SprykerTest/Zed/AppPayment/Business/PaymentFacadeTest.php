@@ -9,6 +9,7 @@ namespace SprykerTest\Zed\AppPayment\Business;
 
 use Codeception\Test\Unit;
 use Generated\Shared\Transfer\PaymentCollectionDeleteCriteriaTransfer;
+use Generated\Shared\Transfer\PaymentMethodCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentMethodTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 use Ramsey\Uuid\Uuid;
@@ -89,8 +90,12 @@ class PaymentFacadeTest extends Unit
             PaymentMethodTransfer::PAYMENT_METHOD_KEY => $paymentMethodKey,
         ]);
 
+        $paymentMethodCriteriaTransfer = (new PaymentMethodCriteriaTransfer())
+            ->setTenantIdentifier($tenantIdentifier)
+            ->setPaymentMethodKey($paymentMethodKey);
+
         // Act
-        $paymentMethodTransfer = $this->tester->getFacade()->getPaymentMethodByTenantIdentifierAndPaymentMethodKey($tenantIdentifier, $paymentMethodKey);
+        $paymentMethodTransfer = $this->tester->getFacade()->getPaymentMethodByTenantIdentifierAndPaymentMethodKey($paymentMethodCriteriaTransfer);
 
         // Assert
         $this->assertInstanceOf(PaymentMethodTransfer::class, $paymentMethodTransfer);
@@ -111,8 +116,12 @@ class PaymentFacadeTest extends Unit
             PaymentMethodTransfer::PAYMENT_METHOD_KEY => $persistedPaymentMethodKey,
         ]);
 
+        $paymentMethodCriteriaTransfer = (new PaymentMethodCriteriaTransfer())
+            ->setTenantIdentifier($tenantIdentifier)
+            ->setPaymentMethodKey($paymentMethodKey);
+
         // Act
-        $paymentMethodTransfer = $this->tester->getFacade()->getPaymentMethodByTenantIdentifierAndPaymentMethodKey($tenantIdentifier, $paymentMethodKey);
+        $paymentMethodTransfer = $this->tester->getFacade()->getPaymentMethodByTenantIdentifierAndPaymentMethodKey($paymentMethodCriteriaTransfer);
 
         // Assert
         $this->assertInstanceOf(PaymentMethodTransfer::class, $paymentMethodTransfer);
@@ -131,7 +140,11 @@ class PaymentFacadeTest extends Unit
         $this->expectException(PaymentMethodNotFoundException::class);
         $this->expectExceptionMessage(sprintf('Payment method "%s" not found for Tenant "%s"', $paymentMethodKey, $tenantIdentifier));
 
+        $paymentMethodCriteriaTransfer = (new PaymentMethodCriteriaTransfer())
+            ->setTenantIdentifier($tenantIdentifier)
+            ->setPaymentMethodKey($paymentMethodKey);
+
         // Act
-        $this->tester->getFacade()->getPaymentMethodByTenantIdentifierAndPaymentMethodKey($tenantIdentifier, $paymentMethodKey);
+        $this->tester->getFacade()->getPaymentMethodByTenantIdentifierAndPaymentMethodKey($paymentMethodCriteriaTransfer);
     }
 }

@@ -21,6 +21,7 @@ use Spryker\Glue\GlueBackendApiApplication\Plugin\GlueApplication\ControllerCach
 use Spryker\Glue\GlueBackendApiApplication\Plugin\GlueApplication\CustomRouteRoutesProviderPlugin;
 use Spryker\Glue\GlueBackendApiApplication\Plugin\GlueApplication\ResourcesProviderPlugin as BackendResourcesProviderPlugin;
 use Spryker\Glue\GlueJsonApiConvention\Plugin\GlueApplication\JsonApiConventionPlugin;
+use Spryker\Glue\RestRequestValidator\Plugin\ValidateRestRequestAttributesPlugin;
 use Spryker\Shared\Application\ApplicationInterface;
 use Spryker\Zed\AppKernel\AppKernelDependencyProvider as SprykerAppKernelDependencyProvider;
 use Spryker\Zed\AppPayment\Communication\Plugin\AppKernel\DeleteTenantPaymentsConfigurationAfterDeletePlugin;
@@ -110,6 +111,10 @@ class PaymentGlueBackendApiHelper extends SprykerGlueBackendApiHelper
 
         $this->getDependencyProviderHelper()->setDependency(GlueApplicationDependencyProvider::PLUGINS_CONTROLLER_CACHE_COLLECTOR, [
             new BackendControllerCacheCollectorPlugin(),
+        ], get_class($glueApplicationFactory));
+
+        $this->getDependencyProviderHelper()->setDependency(GlueApplicationDependencyProvider::PLUGIN_REST_REQUEST_VALIDATOR, [
+            new ValidateRestRequestAttributesPlugin(),
         ], get_class($glueApplicationFactory));
 
         $this->getDependencyProviderHelper()->setDependency(

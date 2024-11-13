@@ -7,6 +7,7 @@
 
 namespace Spryker\Zed\AppPayment\Business\Payment\Method\Reader;
 
+use Generated\Shared\Transfer\PaymentMethodCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentMethodTransfer;
 use Spryker\Zed\AppPayment\Business\Exception\PaymentMethodNotFoundException;
 use Spryker\Zed\AppPayment\Business\Payment\Method\Normalizer\PaymentMethodNormalizer;
@@ -18,11 +19,19 @@ class PaymentMethodReader
     {
     }
 
-    public function getPaymentMethodByTenantIdentifierAndPaymentMethodKey(string $tenantIdentifier, string $paymentMethodKey): PaymentMethodTransfer
+    public function getPaymentMethodByTenantIdentifierAndPaymentMethodKey(PaymentMethodCriteriaTransfer $paymentMethodCriteriaTransfer): PaymentMethodTransfer
     {
-        $paymentMethodTransferCollection = $this->appPaymentRepository->getTenantPaymentMethods($tenantIdentifier);
+        if ($paymentMethodCriteriaTransfer->getTenantIdentifier() === null || $paymentMethodCriteriaTransfer->getTenantIdentifier() === '' || $paymentMethodCriteriaTransfer->getTenantIdentifier() === '0' || ($paymentMethodCriteriaTransfer->getPaymentMethodKey() === null || $paymentMethodCriteriaTransfer->getPaymentMethodKey() === '' || $paymentMethodCriteriaTransfer->getPaymentMethodKey() === '0')) {
+            throw new PaymentMethodNotFoundException(sprintf(
+                'Payment method "%s" not found for Tenant "%s". Maybe the TenantIdentifier, the PaymentMethodKey, or both are missing.',
+                $paymentMethodCriteriaTransfer->getPaymentMethodKey(),
+                $paymentMethodCriteriaTransfer->getTenantIdentifier(),
+            ));
+        }
 
-        $normalizePaymentMethodKey = $this->paymentMethodNormalizer->normalizePaymentMethodKey($paymentMethodKey);
+        $paymentMethodTransferCollection = $this->appPaymentRepository->getTenantPaymentMethods($paymentMethodCriteriaTransfer->getTenantIdentifier());
+
+        $normalizePaymentMethodKey = $this->paymentMethodNormalizer->normalizePaymentMethodKey($paymentMethodCriteriaTransfer->getPaymentMethodKey());
 
         foreach ($paymentMethodTransferCollection as $paymentMethodTransfer) {
             if ($paymentMethodTransfer->getPaymentMethodKey() !== $normalizePaymentMethodKey) {
@@ -32,6 +41,10 @@ class PaymentMethodReader
             return $paymentMethodTransfer;
         }
 
-        throw new PaymentMethodNotFoundException(sprintf('Payment method "%s" not found for Tenant "%s"', $paymentMethodKey, $tenantIdentifier));
+        throw new PaymentMethodNotFoundException(sprintf(
+            'Payment method "%s" not found for Tenant "%s"',
+            $paymentMethodCriteriaTransfer->getPaymentMethodKey(),
+            $paymentMethodCriteriaTransfer->getTenantIdentifier(),
+        ));
     }
 }

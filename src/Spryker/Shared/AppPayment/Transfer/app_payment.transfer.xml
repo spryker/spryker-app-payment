@@ -361,6 +361,13 @@
         <property name="tenantIdentifier" type="string"/>
     </transfer>
 
+    <transfer name="PaymentMethodCriteria" strict="true">
+        <property name="name" type="string"/>
+        <property name="providerName" type="string"/>
+        <property name="paymentMethodKey" type="string"/>
+        <property name="tenantIdentifier" type="string"/>
+    </transfer>
+
     <transfer name="AddPaymentMethod" strict="true">
         <property name="name" type="string"/>
         <property name="providerName" type="string"/>

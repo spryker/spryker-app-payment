@@ -5,9 +5,9 @@
     "license": "proprietary",
     "require": {
         "php": ">=8.2",
-        "spryker/application": "^3.35.0",
         "spryker/app-kernel": "^2.1.0",
         "spryker/app-webhook": "^1.1.0",
+        "spryker/application": "^3.35.0",
         "spryker/event-dispatcher": "^1.6.0",
         "spryker/glue-application-extension": "^1.0.0",
         "spryker/glue-backend-api-application": "^1.7.0",
@@ -16,6 +16,7 @@
         "spryker/log": "^3.0.0",
         "spryker/message-broker": "^1.11.0",
         "spryker/message-broker-aws-extension": "^1.0.0",
+        "spryker/rest-request-validator": "^1.0.0",
         "spryker/router": "^1.19.0",
         "spryker/symfony": "^3.0.0",
         "spryker/transfer": "^3.33.0",
