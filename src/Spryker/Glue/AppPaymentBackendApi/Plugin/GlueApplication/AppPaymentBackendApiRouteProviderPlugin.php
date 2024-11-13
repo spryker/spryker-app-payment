@@ -23,6 +23,31 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class AppPaymentBackendApiRouteProviderPlugin extends AbstractPlugin implements RouteProviderPluginInterface
 {
+    /**
+     * @var string
+     */
+    public const ROUTE_INITIALIZE_PAYMENT = '/private/initialize-payment';
+
+    /**
+     * @var string
+     */
+    public const ROUTE_CONFIRM_PRE_ORDER_PAYMENT = '/private/confirm-pre-order-payment';
+
+    /**
+     * @var string
+     */
+    public const ROUTE_CANCEL_PRE_ORDER_PAYMENT = '/private/cancel-pre-order-payment';
+
+    /**
+     * @var string
+     */
+    public const ROUTE_PAYMENTS_TRANSFERS = '/private/payments/transfers';
+
+    /**
+     * @var string
+     */
+    public const ROUTE_CUSTOMER = '/private/customer';
+
     public function addRoutes(RouteCollection $routeCollection): RouteCollection
     {
         $routeCollection->add('postPayment', $this->getPostPaymentRoute());
@@ -36,7 +61,7 @@ class AppPaymentBackendApiRouteProviderPlugin extends AbstractPlugin implements 
 
     public function getPostPaymentRoute(): Route
     {
-        return (new Route('/private/initialize-payment'))
+        return (new Route(static::ROUTE_INITIALIZE_PAYMENT))
             ->setDefaults([
                 '_controller' => [InitializePaymentResourceController::class, 'postAction'],
                 '_resourceName' => 'Payment',
@@ -47,7 +72,7 @@ class AppPaymentBackendApiRouteProviderPlugin extends AbstractPlugin implements 
 
     public function getPostConfirmPreOrderPaymentRoute(): Route
     {
-        return (new Route('/private/confirm-pre-order-payment'))
+        return (new Route(static::ROUTE_CONFIRM_PRE_ORDER_PAYMENT))
             ->setDefaults([
                 '_controller' => [ConfirmPreOrderPaymentResourceController::class, 'postAction'],
                 '_resourceName' => 'Payment',
@@ -58,7 +83,7 @@ class AppPaymentBackendApiRouteProviderPlugin extends AbstractPlugin implements 
 
     public function getPostCancelPreOrderPaymentRoute(): Route
     {
-        return (new Route('/private/cancel-pre-order-payment'))
+        return (new Route(static::ROUTE_CANCEL_PRE_ORDER_PAYMENT))
             ->setDefaults([
                 '_controller' => [CancelPreOrderPaymentResourceController::class, 'postAction'],
                 '_resourceName' => 'Payment',
@@ -69,7 +94,7 @@ class AppPaymentBackendApiRouteProviderPlugin extends AbstractPlugin implements 
 
     public function getPostPaymentsTransfersRoute(): Route
     {
-        return (new Route('/private/payments/transfers'))
+        return (new Route(static::ROUTE_PAYMENTS_TRANSFERS))
             ->setDefaults([
                 '_controller' => [PaymentsTransfersResourceController::class, 'postAction'],
                 '_resourceName' => 'payments-transfers',
@@ -80,7 +105,7 @@ class AppPaymentBackendApiRouteProviderPlugin extends AbstractPlugin implements 
 
     public function getPostCustomerRoute(): Route
     {
-        return (new Route('/private/customer'))
+        return (new Route(static::ROUTE_CUSTOMER))
             ->setDefaults([
                 '_controller' => [CustomerResourceController::class, 'postAction'],
                 '_resourceName' => 'customer',
