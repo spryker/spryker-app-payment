@@ -486,6 +486,8 @@ components:
                     example:
                         externalReference: '#061280'
                         other: '#061114'
+            required:
+                - customerPaymentServiceProviderData
 
         CustomerResponse:
             properties:
