@@ -195,71 +195,10 @@ components:
                 - orderData
             properties:
                 orderData:
-                    description: 'Order data.'
-                    type: object
-                    required:
-                        - countryCode
-                        - customerFirstName
-                        - customerLastName
-                        - currencyCode
-                        - grandTotal
-                        - paymentMethod
-                        - items
-                    properties:
-                        orderReference:
-                            type: string
-                            example: 'DE--123456'
-                        storeName:
-                            type: string
-                            example: 'DE'
-                        localeName:
-                            type: string
-                            enum:
-                                - en_US
-                                - de_DE
-                        countryCode:
-                            type: string
-                            example: 'DE'
-                        customerFirstName:
-                            type: string
-                            example: 'John'
-                        customerLastName:
-                            type: string
-                            example: 'McClane'
-                        currencyCode:
-                            type: string
-                            example: 'EUR'
-                        grandTotal:
-                            type: integer
-                            example: 10000
-                            description: 'Total in lowest denominator (cents)'
-                        paymentMethod:
-                            type: string
-                            enum:
-                                - 'Credit Card'
-                                - 'PayPal'
-                        items:
-                            type: array
-                            items:
-                                $ref: '#/components/schemas/QuoteItem'
-                            minItems: 1
-                        additionalPaymentData:
-                            type: object
-                            additionalProperties:
-                                type: string
-                            description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
-                            example:
-                                paymentId: '#061280'
-                                other: '#061114'
+                    $ref: '#/components/schemas/OrderData'
 
                 preOrderPaymentData:
-                    description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
-                    type: string
-                    additionalProperties:
-                        type: string
-                    example:
-                        paymentId: '#061280'
-                        other: '#061114'
+                    $ref: '#/components/schemas/PreOrderPaymentData'
 
                 redirectSuccessUrl:
                     description: 'Provides redirect success URL.'
@@ -285,13 +224,7 @@ components:
                     type: string
                     nullable: true
                 preOrderPaymentData:
-                    description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
-                    type: string
-                    additionalProperties:
-                        type: string
-                    example:
-                        paymentId: '#061280'
-                        other: '#061114'
+                    $ref: '#/components/schemas/PreOrderPaymentData'
 
         ConfirmPreOrderPaymentRequest:
             type: object
@@ -301,73 +234,12 @@ components:
                 - preOrderPaymentData
             properties:
                 orderData:
-                    description: 'Order data.'
-                    type: object
-                    required:
-                        - countryCode
-                        - customerFirstName
-                        - customerLastName
-                        - currencyCode
-                        - grandTotal
-                        - paymentMethod
-                        - items
-                    properties:
-                        orderReference:
-                            type: string
-                            example: 'DE--123456'
-                        storeName:
-                            type: string
-                            example: 'DE'
-                        localeName:
-                            type: string
-                            enum:
-                                - en_US
-                                - de_DE
-                        countryCode:
-                            type: string
-                            example: 'DE'
-                        customerFirstName:
-                            type: string
-                            example: 'John'
-                        customerLastName:
-                            type: string
-                            example: 'McClane'
-                        currencyCode:
-                            type: string
-                            example: 'EUR'
-                        grandTotal:
-                            type: integer
-                            example: 10000
-                            description: 'Total in lowest denominator (cents)'
-                        paymentMethod:
-                            type: string
-                            enum:
-                                - 'Credit Card'
-                                - 'PayPal'
-                        items:
-                            type: array
-                            items:
-                                $ref: '#/components/schemas/QuoteItem'
-                            minItems: 1
-                        additionalPaymentData:
-                            type: object
-                            additionalProperties:
-                                type: string
-                            description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
-                            example:
-                                paymentId: '#061280'
-                                other: '#061114'
+                    $ref: '#/components/schemas/OrderData'
                 orderReference:
                     type: string
                     example: 'DE-123456'
                 preOrderPaymentData:
-                    description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
-                    type: string
-                    additionalProperties:
-                        type: string
-                    example:
-                        paymentId: '#061280'
-                        other: '#061114'
+                    $ref: '#/components/schemas/PreOrderPaymentData'
 
         ConfirmPreOrderPaymentResponse:
             properties:
@@ -384,13 +256,7 @@ components:
                 - preOrderPaymentData
             properties:
                 preOrderPaymentData:
-                    description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
-                    type: string
-                    additionalProperties:
-                        type: string
-                    example:
-                        paymentId: '#061280'
-                        other: '#061114'
+                    $ref: '#/components/schemas/PreOrderPaymentData'
 
         CancelPreOrderPaymentResponse:
             properties:
@@ -401,18 +267,6 @@ components:
                     type: string
                     nullable: true
 
-        QuoteItem:
-            type: object
-            required:
-                - idSalesOrderItem
-            properties:
-                idSalesOrderItem:
-                    type: integer
-                    example: 210
-                name:
-                    type: string
-                    example: "Oryx Figurine"
-
         TransfersRequest:
             properties:
                 orderItems:
@@ -420,6 +274,8 @@ components:
                     items:
                         $ref: '#/components/schemas/OrderItem'
                     minItems: 1
+            required:
+                - orderItems
 
         TransfersResponse:
             properties:
@@ -427,6 +283,87 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/Transfer'
+
+        CustomerRequest:
+            properties:
+                customer:
+                    $ref: '#/components/schemas/Customer'
+                customerPaymentServiceProviderData:
+                    $ref: '#/components/schemas/CustomerPaymentServiceProviderData'
+            required:
+                - customerPaymentServiceProviderData
+
+        CustomerResponse:
+            properties:
+                customer:
+                    $ref: '#/components/schemas/Customer'
+
+        OrderData:
+            description: 'Order data.'
+            type: object
+            required:
+                - countryCode
+                - customerFirstName
+                - customerLastName
+                - currencyCode
+                - grandTotal
+                - paymentMethod
+                - items
+            properties:
+                orderReference:
+                    type: string
+                    nullable: true
+                    example: 'DE--123456'
+                storeName:
+                    type: string
+                    nullable: true
+                    example: 'DE'
+                localeName:
+                    type: string
+                    nullable: true
+                    examples:
+                        - en_US
+                        - de_DE
+                countryCode:
+                    type: string
+                    example: 'DE'
+                customerFirstName:
+                    type: string
+                    example: 'John'
+                customerLastName:
+                    type: string
+                    example: 'McClane'
+                currencyCode:
+                    type: string
+                    example: 'EUR'
+                grandTotal:
+                    type: integer
+                    example: 10000
+                    description: 'Total in lowest denominator (cents)'
+                paymentMethod:
+                    type: string
+                    examples:
+                        - 'Credit Card'
+                        - 'PayPal'
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/QuoteItem'
+                    minItems: 1
+                additionalPaymentData:
+                    $ref: '#/components/schemas/AdditionalPaymentData'
+
+        QuoteItem:
+            type: object
+            properties:
+                idSalesOrderItem:
+                    type: integer
+                    nullable: true
+                    example: 210
+                name:
+                    type: string
+                    nullable: true
+                    example: "Oryx Figurine"
         Transfer:
             properties:
                 merchantReference:
@@ -452,6 +389,7 @@ components:
             properties:
                 transferId:
                     type: string
+                    nullable: true
                     description: 'ID of a previous made transfer, passed to make a reverse transfer.'
                 merchantReference:
                     type: string
@@ -474,50 +412,67 @@ components:
                 - amount
                 - itemReference
 
-        CustomerRequest:
-            properties:
-                customer:
-                    $ref: '#/components/schemas/Customer'
-                customerPaymentServiceProviderData:
-                    description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
-                    type: string
-                    additionalProperties:
-                        type: string
-                    example:
-                        externalReference: '#061280'
-                        other: '#061114'
-            required:
-                - customerPaymentServiceProviderData
+        PreOrderPaymentData:
+            description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
+            type: string
+            additionalProperties:
+                type: string
+            example:
+                paymentId: '#061280'
+                other: '#061114'
 
-        CustomerResponse:
-            properties:
-                customer:
-                    $ref: '#/components/schemas/Customer'
+        AdditionalPaymentData:
+            type: object
+            additionalProperties:
+                type: string
+            description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
+            example:
+                paymentId: '#061280'
+                other: '#061114'
+
+        CustomerPaymentServiceProviderData:
+            description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
+            type: string
+            additionalProperties:
+                type: string
+            example:
+                externalReference: '#061280'
+                other: '#061114'
 
         Customer:
             properties:
                 salutation:
                     type: string
+                    nullable: true
                 firstName:
                     type: string
                 lastName:
                     type: string
+                    nullable: true
                 middleName:
                     type: string
+                    nullable: true
                 gender:
                     type: string
+                    nullable: true
                 dateOfBirth:
                     type: string
+                    nullable: true
                 email:
                     type: string
+                    nullable: true
                 username:
                     type: string
+                    nullable: true
                 phone:
                     type: string
+                    nullable: true
                 company:
                     type: string
+                    nullable: true
                 locale:
                     type: string
+                    nullable: true
                 billingAddress:
                     $ref: '#/components/schemas/Address'
                 shippingAddress:
@@ -527,36 +482,52 @@ components:
             properties:
                 salutation:
                     type: string
+                    nullable: true
                 firstName:
                     type: string
+                    nullable: true
                 lastName:
                     type: string
+                    nullable: true
                 middleName:
                     type: string
+                    nullable: true
                 address1:
                     type: string
+                    nullable: true
                 address2:
                     type: string
+                    nullable: true
                 address3:
                     type: string
+                    nullable: true
                 city:
                     type: string
+                    nullable: true
                 zipCode:
                     type: string
+                    nullable: true
                 state:
                     type: string
+                    nullable: true
                 country:
                     type: string
+                    nullable: true
                 region:
                     type: string
+                    nullable: true
                 company:
                     type: string
+                    nullable: true
                 email:
                     type: string
+                    nullable: true
                 phone:
                     type: string
+                    nullable: true
                 cellPhone:
                     type: string
+                    nullable: true
 
     parameters:
         tenantIdentifier:

@@ -142,7 +142,10 @@ class PaymentGlueBackendApiHelper extends SprykerGlueBackendApiHelper
     public function seeResponseContainsErrorMessage(string $expectedErrorMessage): void
     {
         $response = json_decode($this->getResponse()->getContent(), true);
-        if (!isset($response['errors'])) {
+
+        $errors = $this->getErrorsFromResponse($response);
+
+        if (!$errors) {
             $this->fail('Response does not contain errors.');
         }
 
@@ -150,20 +153,39 @@ class PaymentGlueBackendApiHelper extends SprykerGlueBackendApiHelper
 
         $errorMessages = [];
 
-        foreach ($response['errors'] as $error) {
-            if ($error['message'] === $expectedErrorMessage) {
+        foreach ($errors as $error) {
+            if ($error === $expectedErrorMessage) {
                 $foundMessage = true;
 
                 break;
             }
 
-            $errorMessages[] = $error['message'];
+            $errorMessages[] = $error;
         }
 
         $this->assertTrue(
             $foundMessage,
             sprintf('Expected to see the error message "%s" in the response, but it was not found. Error messages: "%s"', $expectedErrorMessage, implode('', $errorMessages)),
         );
+    }
+
+    protected function getErrorsFromResponse(array $response): array
+    {
+        $errors = [];
+
+        if (isset($response['errors'])) {
+            foreach ($response['errors'] as $error) {
+                $errors[] = $error['message'];
+            }
+
+            return $errors;
+        }
+
+        foreach ($response as $item) {
+            $errors[] = $item['message'];
+        }
+
+        return $errors;
     }
 
     /**
