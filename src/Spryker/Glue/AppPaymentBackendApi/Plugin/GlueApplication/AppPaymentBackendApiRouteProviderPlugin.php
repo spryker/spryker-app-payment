@@ -12,6 +12,7 @@ use Spryker\Glue\AppPaymentBackendApi\Controller\ConfirmPreOrderPaymentResourceC
 use Spryker\Glue\AppPaymentBackendApi\Controller\CustomerResourceController;
 use Spryker\Glue\AppPaymentBackendApi\Controller\InitializePaymentResourceController;
 use Spryker\Glue\AppPaymentBackendApi\Controller\PaymentsTransfersResourceController;
+use Spryker\Glue\AppPaymentBackendApi\Controller\PreOrderPaymentResourceController;
 use Spryker\Glue\GlueApplicationExtension\Dependency\Plugin\RouteProviderPluginInterface;
 use Spryker\Glue\Kernel\Backend\AbstractPlugin;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,6 +28,10 @@ class AppPaymentBackendApiRouteProviderPlugin extends AbstractPlugin implements 
      * @var string
      */
     public const ROUTE_INITIALIZE_PAYMENT = '/private/initialize-payment';
+    /**
+     * @var string
+     */
+    public const ROUTE_PRE_ORDER_PAYMENT = '/private/pre-order-payment';
 
     /**
      * @var string
@@ -51,6 +56,7 @@ class AppPaymentBackendApiRouteProviderPlugin extends AbstractPlugin implements 
     public function addRoutes(RouteCollection $routeCollection): RouteCollection
     {
         $routeCollection->add('postPayment', $this->getPostPaymentRoute());
+        $routeCollection->add('postPreOrderPayment', $this->getPostPreOrderPaymentRoute());
         $routeCollection->add('postConfirmPreOrderPayment', $this->getPostConfirmPreOrderPaymentRoute());
         $routeCollection->add('postCancelPreOrderPayment', $this->getPostCancelPreOrderPaymentRoute());
         $routeCollection->add('postPaymentsTransfers', $this->getPostPaymentsTransfersRoute());
@@ -64,6 +70,17 @@ class AppPaymentBackendApiRouteProviderPlugin extends AbstractPlugin implements 
         return (new Route(static::ROUTE_INITIALIZE_PAYMENT))
             ->setDefaults([
                 '_controller' => [InitializePaymentResourceController::class, 'postAction'],
+                '_resourceName' => 'Payment',
+                '_method' => 'post',
+            ])
+            ->setMethods(Request::METHOD_POST);
+    }
+
+    public function getPostPreOrderPaymentRoute(): Route
+    {
+        return (new Route(static::ROUTE_PRE_ORDER_PAYMENT))
+            ->setDefaults([
+                '_controller' => [PreOrderPaymentResourceController::class, 'postAction'],
                 '_resourceName' => 'Payment',
                 '_method' => 'post',
             ])

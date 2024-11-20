@@ -20,6 +20,53 @@ servers:
     description: 'Production glue endpoint'
 
 paths:
+  '/private/pre-order-payment':
+    post:
+      operationId: 'preOrderPayment'
+      x-spryker:
+        module: PaymentBackendApi
+        controller: PreOrderPaymentResourceController
+      summary: 'Initializes a payment with a third party provider before an order is persisted.'
+      security:
+        - Bearer: [ ]
+      parameters:
+        - $ref: '#/components/parameters/tenantIdentifier'
+      requestBody:
+        description: 'Provides Order Data (incl. orderReference) or Quote Data (excl. orderReference).'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreOrderPaymentRequest'
+          # SCOS tenants are NOT sending this as JSON, but as form data! This is only for BC reasons. "application/json" should be used instead.
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PreOrderPaymentResponse'
+            encoding:
+              orderData:
+                # Arrays of objects (as url-encoded form data) is not officially supported by the
+                # OpenAPI spec, as there are different standards for how this is serialized.
+                # The current format will incorrectly appear as a JSON form field in swagger, while
+                # postman will generate working examples with it.
+                # See this discussion on the OpenAPI specification on the limitations of deepObject
+                # https://github.com/OAI/OpenAPI-Specification/issues/1706
+                style: deepObject
+                explode: true
+      responses:
+        200:
+          description: 'Expected response to a valid request.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InitializePaymentResponse'
+        400:
+          description: 'Bad request.'
+        default:
+          description: 'Expected response to a bad request.'
+          content:
+            text/plain:
+              schema:
+                type: string
   '/private/initialize-payment':
     post:
       operationId: 'initializePayment'
@@ -220,10 +267,7 @@ components:
         - orderData
       properties:
         orderData:
-          $ref: '#/components/schemas/OptionalOrderData'
-
-        preOrderPaymentData:
-          $ref: '#/components/schemas/PreOrderPaymentData'
+          $ref: '#/components/schemas/OrderData'
 
         redirectSuccessUrl:
           description: 'Provides redirect success URL.'
@@ -239,6 +283,37 @@ components:
           example: 'https://example.com/summary'
 
     InitializePaymentResponse:
+      properties:
+        isSuccessful:
+          type: boolean
+        redirectUrl:
+          type: string
+          description: 'URL for payment authorization'
+        message:
+          type: string
+          nullable: true
+
+    PreOrderPaymentRequest:
+      type: object
+      required:
+        - orderData
+      properties:
+        orderData:
+          $ref: '#/components/schemas/PreOrderPaymentOrderData'
+        redirectSuccessUrl:
+          description: 'Provides redirect success URL.'
+          type: string
+          example: 'https://example.com/success'
+        redirectCancelUrl:
+          description: 'Provides redirect cancel URL.'
+          type: string
+          example: 'https://example.com/cancel'
+        checkoutSummaryPageUrl:
+          description: 'Provides checkout summary page URL.'
+          type: string
+          example: 'https://example.com/summary'
+
+    PreOrderPaymentResponse:
       properties:
         isSuccessful:
           type: boolean
@@ -323,7 +398,7 @@ components:
         customer:
           $ref: '#/components/schemas/Customer'
 
-    OptionalOrderData:
+    PreOrderPaymentOrderData:
       description: 'Order data with optional fields to be used for pre order payments.'
       type: object
       required:
@@ -371,7 +446,8 @@ components:
             $ref: '#/components/schemas/QuoteItem'
           minItems: 1
         additionalPaymentData:
-          $ref: '#/components/schemas/AdditionalPaymentData'
+          $ref: '#/components/schemas/PreOrderPaymentAdditionalPaymentData'
+          
     OrderData:
       description: 'Order data.'
       type: object
@@ -492,6 +568,15 @@ components:
         other: '#061114'
 
     AdditionalPaymentData:
+      type: object
+      additionalProperties:
+        type: string
+      description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
+      example:
+        paymentId: '#061280'
+        other: '#061114'
+
+    PreOrderPaymentAdditionalPaymentData:
       type: object
       additionalProperties:
         type: string

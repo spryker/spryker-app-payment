@@ -14,6 +14,8 @@ use Spryker\Zed\Kernel\AbstractBundleConfig;
 
 class AppPaymentConfig extends AbstractBundleConfig
 {
+    public const CHECKOUT_STRATEGY_EXPRESS_CHECKOUT = 'express-checkout';
+
     /**
      * @api
      */
