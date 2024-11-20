@@ -1,562 +1,611 @@
 openapi: 3.0.0
 info:
-    version: 1.0.0
-    contact:
-        name: Spryker
-        url: 'https://spryker.com/'
-        email: support@spryker.com
-    title: 'Spryker Payment App API'
-    license:
-        name: MIT
-        url: 'https://opensource.org/licenses/MIT'
+  version: 1.0.0
+  contact:
+    name: Spryker
+    url: 'https://spryker.com/'
+    email: support@spryker.com
+  title: 'Spryker Payment App API'
+  license:
+    name: MIT
+    url: 'https://opensource.org/licenses/MIT'
 servers:
-    -   url: 'http://api.payment.spryker.local'
-        description: 'Local glue endpoint'
-    -   url: 'https://api.payment-testing.acp.demo-spryker.com'
-        description: 'Testing glue endpoint'
-    -   url: 'https://api.payment-staging.acp.demo-spryker.com'
-        description: 'Staging glue endpoint'
-    -   url: 'https://api.payment.acp.spryker.com'
-        description: 'Production glue endpoint'
+  - url: 'http://api.payment.spryker.local'
+    description: 'Local glue endpoint'
+  - url: 'https://api.payment-testing.acp.demo-spryker.com'
+    description: 'Testing glue endpoint'
+  - url: 'https://api.payment-staging.acp.demo-spryker.com'
+    description: 'Staging glue endpoint'
+  - url: 'https://api.payment.acp.spryker.com'
+    description: 'Production glue endpoint'
 
 paths:
-    '/private/initialize-payment':
-        post:
-            operationId: 'initializePayment'
-            x-spryker:
-                module: PaymentBackendApi
-                controller: InitializePaymentResourceController
-            summary: 'Initializes a payment with a third party provider.'
-            security:
-                -   Bearer: [ ]
-            parameters:
-                - $ref: '#/components/parameters/tenantIdentifier'
-            requestBody:
-                description: 'Provides Order Data (incl. orderReference) or Quote Data (excl. orderReference).'
-                required: true
-                content:
-                    # SCOS tenants are NOT sending this as JSON, but as form data!
-                    application/x-www-form-urlencoded:
-                        schema:
-                            $ref: '#/components/schemas/InitializePaymentRequest'
-                        encoding:
-                            orderData:
-                                # Arrays of objects (as url-encoded form data) is not officially supported by the
-                                # OpenAPI spec, as there are different standards for how this is serialized.
-                                # The current format will incorrectly appear as a JSON form field in swagger, while
-                                # postman will generate working examples with it.
-                                # See this discussion on the OpenAPI specification on the limitations of deepObject
-                                # https://github.com/OAI/OpenAPI-Specification/issues/1706
-                                style: deepObject
-                                explode: true
+  '/private/initialize-payment':
+    post:
+      operationId: 'initializePayment'
+      x-spryker:
+        module: PaymentBackendApi
+        controller: InitializePaymentResourceController
+      summary: 'Initializes a payment with a third party provider.'
+      security:
+        - Bearer: [ ]
+      parameters:
+        - $ref: '#/components/parameters/tenantIdentifier'
+      requestBody:
+        description: 'Provides Order Data (incl. orderReference) or Quote Data (excl. orderReference).'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InitializePaymentRequest'
+          # SCOS tenants are NOT sending this as JSON, but as form data! This is only for BC reasons. "application/json" should be used instead.
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InitializePaymentRequest'
+            encoding:
+              orderData:
+                # Arrays of objects (as url-encoded form data) is not officially supported by the
+                # OpenAPI spec, as there are different standards for how this is serialized.
+                # The current format will incorrectly appear as a JSON form field in swagger, while
+                # postman will generate working examples with it.
+                # See this discussion on the OpenAPI specification on the limitations of deepObject
+                # https://github.com/OAI/OpenAPI-Specification/issues/1706
+                style: deepObject
+                explode: true
+      responses:
+        200:
+          description: 'Expected response to a valid request.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InitializePaymentResponse'
+        400:
+          description: 'Bad request.'
+        default:
+          description: 'Expected response to a bad request.'
+          content:
+            text/plain:
+              schema:
+                type: string
 
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/InitializePaymentRequest'
-            responses:
-                200:
-                    description: 'Expected response to a valid request.'
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/InitializePaymentResponse'
-                400:
-                    description: 'Bad request.'
-                default:
-                    description: 'Expected response to a bad request.'
-                    content:
-                        text/plain:
-                            schema:
-                                type: string
-
-    '/private/confirm-pre-order-payment':
-        post:
-            operationId: 'confirmPreOrderPayment'
-            x-spryker:
-                module: PaymentBackendApi
-                controller: ConfirmPreOrderPaymentResourceController
-            summary: 'Confirms a Pre-Order Payment (Payment Initialized without an orderReference before the order was persisted) and connects the payment with an order.'
-            security:
-                -   Bearer: [ ]
-            parameters:
-                - $ref: '#/components/parameters/tenantIdentifier'
-            requestBody:
-                description: 'PSP data object that enables the connection between the payment that currently does not have an orderReference yet.'
-                required: true
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/ConfirmPreOrderPaymentRequest'
-            responses:
-                200:
-                    description: 'Expected response to a valid request.'
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/ConfirmPreOrderPaymentResponse'
-                400:
-                    description: 'Bad request.'
-                default:
-                    description: 'Expected response to a bad request.'
-                    content:
-                        text/plain:
-                            schema:
-                                type: string
+  '/private/confirm-pre-order-payment':
+    post:
+      operationId: 'confirmPreOrderPayment'
+      x-spryker:
+        module: PaymentBackendApi
+        controller: ConfirmPreOrderPaymentResourceController
+      summary: 'Confirms a Pre-Order Payment (Payment Initialized without an orderReference before the order was persisted) and connects the payment with an order.'
+      security:
+        - Bearer: [ ]
+      parameters:
+        - $ref: '#/components/parameters/tenantIdentifier'
+      requestBody:
+        description: 'PSP data object that enables the connection between the payment that currently does not have an orderReference yet.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmPreOrderPaymentRequest'
+      responses:
+        200:
+          description: 'Expected response to a valid request.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfirmPreOrderPaymentResponse'
+        400:
+          description: 'Bad request.'
+        default:
+          description: 'Expected response to a bad request.'
+          content:
+            text/plain:
+              schema:
+                type: string
 
 
-    '/private/cancel-pre-order-payment':
-        post:
-            operationId: 'cancelPreOrderPayment'
-            x-spryker:
-                module: PaymentBackendApi
-                controller: CancelPreOrderPaymentResourceController
-            summary: 'Cancels a Pre-Order Payment. The Payment will be deleted and the third party will be informed about the cancellation.'
-            security:
-                -   Bearer: [ ]
-            parameters:
-                - $ref: '#/components/parameters/tenantIdentifier'
-            requestBody:
-                description: 'PSP data object that enables the connection between the payment that currently does not have an orderReference yet.'
-                required: true
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/CancelPreOrderPaymentRequest'
-            responses:
-                200:
-                    description: 'Expected response to a valid request.'
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/CancelPreOrderPaymentResponse'
-                400:
-                    description: 'Bad request.'
-                default:
-                    description: 'Expected response to a bad request.'
-                    content:
-                        text/plain:
-                            schema:
-                                type: string
+  '/private/cancel-pre-order-payment':
+    post:
+      operationId: 'cancelPreOrderPayment'
+      x-spryker:
+        module: PaymentBackendApi
+        controller: CancelPreOrderPaymentResourceController
+      summary: 'Cancels a Pre-Order Payment. The Payment will be deleted and the third party will be informed about the cancellation.'
+      security:
+        - Bearer: [ ]
+      parameters:
+        - $ref: '#/components/parameters/tenantIdentifier'
+      requestBody:
+        description: 'PSP data object that enables the connection between the payment that currently does not have an orderReference yet.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelPreOrderPaymentRequest'
+      responses:
+        200:
+          description: 'Expected response to a valid request.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelPreOrderPaymentResponse'
+        400:
+          description: 'Bad request.'
+        default:
+          description: 'Expected response to a bad request.'
+          content:
+            text/plain:
+              schema:
+                type: string
 
-    '/private/payments/transfers':
-        post:
-            operationId: 'transfers'
-            x-spryker:
-                module: PaymentBackendApi
-                controller: PaymentsTransfersResourceController
-            summary: 'Endpoint which will be used by SCOS to transfer money to Merchants or to reverse previously made transfers.'
-            security:
-                -   Bearer: [ ]
-            parameters:
-                -   $ref: '#/components/parameters/tenantIdentifier'
-            requestBody:
-                description: 'Provides data needed to do transfers or reverse transfers.'
-                required: true
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/TransfersRequest'
-            responses:
-                201:
-                    description: 'Response when transfers are initiated.'
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/TransfersResponse'
-                400:
-                    description: 'Bad request.'
-                default:
-                    description: 'Expected response to a bad request.'
-                    content:
-                        text/plain:
-                            schema:
-                                type: string
+  '/private/payments/transfers':
+    post:
+      operationId: 'transfers'
+      x-spryker:
+        module: PaymentBackendApi
+        controller: PaymentsTransfersResourceController
+      summary: 'Endpoint which will be used by SCOS to transfer money to Merchants or to reverse previously made transfers.'
+      security:
+        - Bearer: [ ]
+      parameters:
+        - $ref: '#/components/parameters/tenantIdentifier'
+      requestBody:
+        description: 'Provides data needed to do transfers or reverse transfers.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransfersRequest'
+      responses:
+        201:
+          description: 'Response when transfers are initiated.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransfersResponse'
+        400:
+          description: 'Bad request.'
+        default:
+          description: 'Expected response to a bad request.'
+          content:
+            text/plain:
+              schema:
+                type: string
 
-    '/private/customer':
-        post:
-            operationId: 'customer'
-            x-spryker:
-                module: PaymentBackendApi
-                controller: CustomerResourceController
-            summary: 'Endpoint which will be used by SCOS to get customer details. The customer data could be retrieved from the App DB or via an API call from the PSP depending on the Payment App implementation.'
-            security:
-                -   Bearer: [ ]
-            parameters:
-                -   $ref: '#/components/parameters/tenantIdentifier'
-            requestBody:
-                description: 'Provides data needed to get customer data.'
-                required: true
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/CustomerRequest'
-            responses:
-                201:
-                    description: 'Response with customer data.'
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/CustomerResponse'
-                400:
-                    description: 'Bad request.'
-                default:
-                    description: 'Expected response to a bad request.'
-                    content:
-                        text/plain:
-                            schema:
-                                type: string
+  '/private/customer':
+    post:
+      operationId: 'customer'
+      x-spryker:
+        module: PaymentBackendApi
+        controller: CustomerResourceController
+      summary: 'Endpoint which will be used by SCOS to get customer details. The customer data could be retrieved from the App DB or via an API call from the PSP depending on the Payment App implementation.'
+      security:
+        - Bearer: [ ]
+      parameters:
+        - $ref: '#/components/parameters/tenantIdentifier'
+      requestBody:
+        description: 'Provides data needed to get customer data.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerRequest'
+      responses:
+        201:
+          description: 'Response with customer data.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        400:
+          description: 'Bad request.'
+        default:
+          description: 'Expected response to a bad request.'
+          content:
+            text/plain:
+              schema:
+                type: string
 
 components:
-    securitySchemes:
-        Bearer:
-            type: apiKey
-            in: header
-            name: Authorization
-            description: >-
-                Enter the token with the `Bearer: ` prefix, e.g. "Bearer abcde12345".
-    schemas:
-        InitializePaymentRequest:
-            type: object
-            required:
-                - orderData
-            properties:
-                orderData:
-                    $ref: '#/components/schemas/OrderData'
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: >-
+        Enter the token with the `Bearer: ` prefix, e.g. "Bearer abcde12345".
+  schemas:
+    InitializePaymentRequest:
+      type: object
+      required:
+        - orderData
+      properties:
+        orderData:
+          $ref: '#/components/schemas/OptionalOrderData'
 
-                preOrderPaymentData:
-                    $ref: '#/components/schemas/PreOrderPaymentData'
+        preOrderPaymentData:
+          $ref: '#/components/schemas/PreOrderPaymentData'
 
-                redirectSuccessUrl:
-                    description: 'Provides redirect success URL.'
-                    type: string
-                    example: 'https://example.com/success'
-                redirectCancelUrl:
-                    description: 'Provides redirect cancel URL.'
-                    type: string
-                    example: 'https://example.com/cancel'
-                checkoutSummaryPageUrl:
-                    description: 'Provides checkout summary page URL.'
-                    type: string
-                    example: 'https://example.com/summary'
+        redirectSuccessUrl:
+          description: 'Provides redirect success URL.'
+          type: string
+          example: 'https://example.com/success'
+        redirectCancelUrl:
+          description: 'Provides redirect cancel URL.'
+          type: string
+          example: 'https://example.com/cancel'
+        checkoutSummaryPageUrl:
+          description: 'Provides checkout summary page URL.'
+          type: string
+          example: 'https://example.com/summary'
 
-        InitializePaymentResponse:
-            properties:
-                isSuccessful:
-                    type: boolean
-                redirectUrl:
-                    type: string
-                    description: 'URL for payment authorization'
-                message:
-                    type: string
-                    nullable: true
-                preOrderPaymentData:
-                    $ref: '#/components/schemas/PreOrderPaymentData'
+    InitializePaymentResponse:
+      properties:
+        isSuccessful:
+          type: boolean
+        redirectUrl:
+          type: string
+          description: 'URL for payment authorization'
+        message:
+          type: string
+          nullable: true
+        preOrderPaymentData:
+          $ref: '#/components/schemas/PreOrderPaymentData'
 
-        ConfirmPreOrderPaymentRequest:
-            type: object
-            required:
-                - orderData
-                - orderReference
-                - preOrderPaymentData
-            properties:
-                orderData:
-                    $ref: '#/components/schemas/OrderData'
-                orderReference:
-                    type: string
-                    example: 'DE-123456'
-                preOrderPaymentData:
-                    $ref: '#/components/schemas/PreOrderPaymentData'
+    ConfirmPreOrderPaymentRequest:
+      type: object
+      required:
+        - orderData
+        - orderReference
+        - preOrderPaymentData
+      properties:
+        orderData:
+          $ref: '#/components/schemas/OrderData'
+        orderReference:
+          type: string
+          example: 'DE-123456'
+        preOrderPaymentData:
+          $ref: '#/components/schemas/PreOrderPaymentData'
 
-        ConfirmPreOrderPaymentResponse:
-            properties:
-                isSuccessful:
-                    type: boolean
-                message:
-                    description: 'Message in case of failure to know the issue on the Tenant side.'
-                    type: string
-                    nullable: true
+    ConfirmPreOrderPaymentResponse:
+      properties:
+        isSuccessful:
+          type: boolean
+        message:
+          description: 'Message in case of failure to know the issue on the Tenant side.'
+          type: string
+          nullable: true
 
-        CancelPreOrderPaymentRequest:
-            type: object
-            required:
-                - preOrderPaymentData
-            properties:
-                preOrderPaymentData:
-                    $ref: '#/components/schemas/PreOrderPaymentData'
+    CancelPreOrderPaymentRequest:
+      type: object
+      required:
+        - preOrderPaymentData
+      properties:
+        preOrderPaymentData:
+          $ref: '#/components/schemas/PreOrderPaymentData'
 
-        CancelPreOrderPaymentResponse:
-            properties:
-                isSuccessful:
-                    type: boolean
-                message:
-                    description: 'Message in case of failure to know the issue on the Tenant side.'
-                    type: string
-                    nullable: true
+    CancelPreOrderPaymentResponse:
+      properties:
+        isSuccessful:
+          type: boolean
+        message:
+          description: 'Message in case of failure to know the issue on the Tenant side.'
+          type: string
+          nullable: true
 
-        TransfersRequest:
-            properties:
-                orderItems:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/OrderItem'
-                    minItems: 1
-            required:
-                - orderItems
+    TransfersRequest:
+      properties:
+        orderItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+          minItems: 1
+      required:
+        - orderItems
 
-        TransfersResponse:
-            properties:
-                transfers:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/Transfer'
+    TransfersResponse:
+      properties:
+        transfers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transfer'
 
-        CustomerRequest:
-            properties:
-                customer:
-                    $ref: '#/components/schemas/Customer'
-                customerPaymentServiceProviderData:
-                    $ref: '#/components/schemas/CustomerPaymentServiceProviderData'
-            required:
-                - customerPaymentServiceProviderData
+    CustomerRequest:
+      properties:
+        customer:
+          $ref: '#/components/schemas/Customer'
+        customerPaymentServiceProviderData:
+          $ref: '#/components/schemas/CustomerPaymentServiceProviderData'
+      required:
+        - customerPaymentServiceProviderData
 
-        CustomerResponse:
-            properties:
-                customer:
-                    $ref: '#/components/schemas/Customer'
+    CustomerResponse:
+      properties:
+        customer:
+          $ref: '#/components/schemas/Customer'
 
-        OrderData:
-            description: 'Order data.'
-            type: object
-            required:
-                - countryCode
-                - customerFirstName
-                - customerLastName
-                - currencyCode
-                - grandTotal
-                - paymentMethod
-                - items
-            properties:
-                orderReference:
-                    type: string
-                    nullable: true
-                    example: 'DE--123456'
-                storeName:
-                    type: string
-                    nullable: true
-                    example: 'DE'
-                localeName:
-                    type: string
-                    nullable: true
-                    example: en_US
-                countryCode:
-                    type: string
-                    example: 'DE'
-                customerFirstName:
-                    type: string
-                    example: 'John'
-                customerLastName:
-                    type: string
-                    example: 'McClane'
-                currencyCode:
-                    type: string
-                    example: 'EUR'
-                grandTotal:
-                    type: integer
-                    example: 10000
-                    description: 'Total in lowest denominator (cents)'
-                paymentMethod:
-                    type: string
-                    example: 'Credit Card'
-                items:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/QuoteItem'
-                    minItems: 1
-                additionalPaymentData:
-                    $ref: '#/components/schemas/AdditionalPaymentData'
+    OptionalOrderData:
+      description: 'Order data with optional fields to be used for pre order payments.'
+      type: object
+      required:
+        - grandTotal
+        - paymentMethod
+        - items
+      properties:
+        orderReference:
+          type: string
+          nullable: true
+          example: 'DE--123456'
+        storeName:
+          type: string
+          nullable: true
+          example: 'DE'
+        localeName:
+          type: string
+          nullable: true
+          example: en_US
+        countryCode:
+          type: string
+          nullable: true
+          example: 'DE'
+        customerFirstName:
+          type: string
+          nullable: true
+          example: 'John'
+        customerLastName:
+          type: string
+          nullable: true
+          example: 'McClane'
+        currencyCode:
+          type: string
+          nullable: true
+          example: 'EUR'
+        grandTotal:
+          type: integer
+          example: 10000
+          description: 'Total in lowest denominator (cents)'
+        paymentMethod:
+          type: string
+          example: 'Credit Card'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteItem'
+          minItems: 1
+        additionalPaymentData:
+          $ref: '#/components/schemas/AdditionalPaymentData'
+    OrderData:
+      description: 'Order data.'
+      type: object
+      required:
+        - countryCode
+        - customerFirstName
+        - customerLastName
+        - currencyCode
+        - grandTotal
+        - paymentMethod
+        - items
+      properties:
+        orderReference:
+          type: string
+          nullable: true
+          example: 'DE--123456'
+        storeName:
+          type: string
+          nullable: true
+          example: 'DE'
+        localeName:
+          type: string
+          nullable: true
+          example: en_US
+        countryCode:
+          type: string
+          example: 'DE'
+        customerFirstName:
+          type: string
+          example: 'John'
+        customerLastName:
+          type: string
+          example: 'McClane'
+        currencyCode:
+          type: string
+          example: 'EUR'
+        grandTotal:
+          type: integer
+          example: 10000
+          description: 'Total in lowest denominator (cents)'
+        paymentMethod:
+          type: string
+          example: 'Credit Card'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteItem'
+          minItems: 1
+        additionalPaymentData:
+          $ref: '#/components/schemas/AdditionalPaymentData'
 
-        QuoteItem:
-            type: object
-            properties:
-                idSalesOrderItem:
-                    type: integer
-                    nullable: true
-                    example: 210
-                name:
-                    type: string
-                    nullable: true
-                    example: "Oryx Figurine"
-        Transfer:
-            properties:
-                merchantReference:
-                    type: string
-                orderReference:
-                    type: string
-                amount:
-                    type: string
-                transferId:
-                    type: string
-                    description: 'Will be returned to the Tenant so that he knows about the transaction ID and to use the transaction ID for a reverse payout.'
-                orderItems:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/OrderItem'
-                isSuccessful:
-                    type: boolean
-                    description: 'Indicates if the transfer was successful or not.'
-                failureMessage:
-                    type: string
-                    description: 'Message in case of failure to know the issue on the Tenant side.'
-        OrderItem:
-            properties:
-                transferId:
-                    type: string
-                    nullable: true
-                    description: 'ID of a previous made transfer, passed to make a reverse transfer.'
-                merchantReference:
-                    type: string
-                    description: 'ID of the merchant.'
-                orderReference:
-                    type: string
-                    description: 'ID of the sales order.'
-                itemReference:
-                    type: string
-                    description: 'UUID of the sales order item.'
-                amount:
-                    type: string
-                    description: 'Amount in lowest denominator (cents, YEN). When negative money has to be refunded, when positive money has to be transferred.'
-                    example:
-                        - '1000' # Positive number used for transfer
-                        - '-1000' # Negative number used for transfer reversal
-            required:
-                - merchantReference
-                - orderReference
-                - amount
-                - itemReference
+    QuoteItem:
+      type: object
+      properties:
+        idSalesOrderItem:
+          type: integer
+          nullable: true
+          example: 210
+        name:
+          type: string
+          nullable: true
+          example: "Oryx Figurine"
+    Transfer:
+      properties:
+        merchantReference:
+          type: string
+        orderReference:
+          type: string
+        amount:
+          type: string
+        transferId:
+          type: string
+          description: 'Will be returned to the Tenant so that he knows about the transaction ID and to use the transaction ID for a reverse payout.'
+        orderItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        isSuccessful:
+          type: boolean
+          description: 'Indicates if the transfer was successful or not.'
+        failureMessage:
+          type: string
+          description: 'Message in case of failure to know the issue on the Tenant side.'
+    OrderItem:
+      properties:
+        transferId:
+          type: string
+          nullable: true
+          description: 'ID of a previous made transfer, passed to make a reverse transfer.'
+        merchantReference:
+          type: string
+          description: 'ID of the merchant.'
+        orderReference:
+          type: string
+          description: 'ID of the sales order.'
+        itemReference:
+          type: string
+          description: 'UUID of the sales order item.'
+        amount:
+          type: string
+          description: 'Amount in lowest denominator (cents, YEN). When negative money has to be refunded, when positive money has to be transferred.'
+          example:
+            - '1000' # Positive number used for transfer
+            - '-1000' # Negative number used for transfer reversal
+      required:
+        - merchantReference
+        - orderReference
+        - amount
+        - itemReference
 
-        PreOrderPaymentData:
-            description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
-            type: string
-            additionalProperties:
-                type: string
-            example:
-                paymentId: '#061280'
-                other: '#061114'
+    PreOrderPaymentData:
+      description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
+      type: string
+      additionalProperties:
+        type: string
+      example:
+        paymentId: '#061280'
+        other: '#061114'
 
-        AdditionalPaymentData:
-            type: object
-            additionalProperties:
-                type: string
-            description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
-            example:
-                paymentId: '#061280'
-                other: '#061114'
+    AdditionalPaymentData:
+      type: object
+      additionalProperties:
+        type: string
+      description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
+      example:
+        paymentId: '#061280'
+        other: '#061114'
 
-        CustomerPaymentServiceProviderData:
-            description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
-            type: string
-            additionalProperties:
-                type: string
-            example:
-                externalReference: '#061280'
-                other: '#061114'
+    CustomerPaymentServiceProviderData:
+      description: 'Key-value object with attributes that can be forwarded to the PSP implementation. https://swagger.io/docs/specification/data-models/dictionaries/'
+      type: string
+      additionalProperties:
+        type: string
+      example:
+        externalReference: '#061280'
+        other: '#061114'
 
-        Customer:
-            properties:
-                salutation:
-                    type: string
-                    nullable: true
-                firstName:
-                    type: string
-                lastName:
-                    type: string
-                    nullable: true
-                middleName:
-                    type: string
-                    nullable: true
-                gender:
-                    type: string
-                    nullable: true
-                dateOfBirth:
-                    type: string
-                    nullable: true
-                email:
-                    type: string
-                    nullable: true
-                username:
-                    type: string
-                    nullable: true
-                phone:
-                    type: string
-                    nullable: true
-                company:
-                    type: string
-                    nullable: true
-                locale:
-                    type: string
-                    nullable: true
-                billingAddress:
-                    $ref: '#/components/schemas/Address'
-                shippingAddress:
-                    $ref: '#/components/schemas/Address'
+    Customer:
+      properties:
+        salutation:
+          type: string
+          nullable: true
+        firstName:
+          type: string
+        lastName:
+          type: string
+          nullable: true
+        middleName:
+          type: string
+          nullable: true
+        gender:
+          type: string
+          nullable: true
+        dateOfBirth:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        username:
+          type: string
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        company:
+          type: string
+          nullable: true
+        locale:
+          type: string
+          nullable: true
+        billingAddress:
+          $ref: '#/components/schemas/Address'
+        shippingAddress:
+          $ref: '#/components/schemas/Address'
 
-        Address:
-            properties:
-                salutation:
-                    type: string
-                    nullable: true
-                firstName:
-                    type: string
-                    nullable: true
-                lastName:
-                    type: string
-                    nullable: true
-                middleName:
-                    type: string
-                    nullable: true
-                address1:
-                    type: string
-                    nullable: true
-                address2:
-                    type: string
-                    nullable: true
-                address3:
-                    type: string
-                    nullable: true
-                city:
-                    type: string
-                    nullable: true
-                zipCode:
-                    type: string
-                    nullable: true
-                state:
-                    type: string
-                    nullable: true
-                country:
-                    type: string
-                    nullable: true
-                region:
-                    type: string
-                    nullable: true
-                company:
-                    type: string
-                    nullable: true
-                email:
-                    type: string
-                    nullable: true
-                phone:
-                    type: string
-                    nullable: true
-                cellPhone:
-                    type: string
-                    nullable: true
+    Address:
+      properties:
+        salutation:
+          type: string
+          nullable: true
+        firstName:
+          type: string
+          nullable: true
+        lastName:
+          type: string
+          nullable: true
+        middleName:
+          type: string
+          nullable: true
+        address1:
+          type: string
+          nullable: true
+        address2:
+          type: string
+          nullable: true
+        address3:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        zipCode:
+          type: string
+          nullable: true
+        state:
+          type: string
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        region:
+          type: string
+          nullable: true
+        company:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        cellPhone:
+          type: string
+          nullable: true
 
-    parameters:
-        tenantIdentifier:
-            name: X-Tenant-Identifier
-            in: header
-            required: true
-            description: 'Reference of the Tenant.'
-            schema:
-                type: string
-            example: dev-DE
+  parameters:
+    tenantIdentifier:
+      name: X-Tenant-Identifier
+      in: header
+      required: true
+      description: 'Reference of the Tenant.'
+      schema:
+        type: string
+      example: dev-DE
