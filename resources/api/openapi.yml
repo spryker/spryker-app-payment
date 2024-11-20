@@ -7,25 +7,28 @@ info:
         email: support@spryker.com
     title: 'Spryker Payment App API'
     license:
-        name: Proprietary
-
+        name: MIT
+        url: 'https://opensource.org/licenses/MIT'
 servers:
     -   url: 'http://api.payment.spryker.local'
         description: 'Local glue endpoint'
-    -   url: 'https://api.payment-testing.acp.demo-spryker.com/'
+    -   url: 'https://api.payment-testing.acp.demo-spryker.com'
         description: 'Testing glue endpoint'
-    -   url: 'https://api.payment-staging.acp.demo-spryker.com/'
+    -   url: 'https://api.payment-staging.acp.demo-spryker.com'
         description: 'Staging glue endpoint'
-    -   url: 'https://api.payment.acp.spryker.com/'
+    -   url: 'https://api.payment.acp.spryker.com'
         description: 'Production glue endpoint'
 
 paths:
     '/private/initialize-payment':
         post:
+            operationId: 'initializePayment'
             x-spryker:
                 module: PaymentBackendApi
                 controller: InitializePaymentResourceController
             summary: 'Initializes a payment with a third party provider.'
+            security:
+                -   Bearer: [ ]
             parameters:
                 - $ref: '#/components/parameters/tenantIdentifier'
             requestBody:
@@ -46,6 +49,10 @@ paths:
                                 # https://github.com/OAI/OpenAPI-Specification/issues/1706
                                 style: deepObject
                                 explode: true
+
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/InitializePaymentRequest'
             responses:
                 200:
                     description: 'Expected response to a valid request.'
@@ -64,10 +71,13 @@ paths:
 
     '/private/confirm-pre-order-payment':
         post:
+            operationId: 'confirmPreOrderPayment'
             x-spryker:
                 module: PaymentBackendApi
                 controller: ConfirmPreOrderPaymentResourceController
             summary: 'Confirms a Pre-Order Payment (Payment Initialized without an orderReference before the order was persisted) and connects the payment with an order.'
+            security:
+                -   Bearer: [ ]
             parameters:
                 - $ref: '#/components/parameters/tenantIdentifier'
             requestBody:
@@ -96,10 +106,13 @@ paths:
 
     '/private/cancel-pre-order-payment':
         post:
+            operationId: 'cancelPreOrderPayment'
             x-spryker:
                 module: PaymentBackendApi
                 controller: CancelPreOrderPaymentResourceController
             summary: 'Cancels a Pre-Order Payment. The Payment will be deleted and the third party will be informed about the cancellation.'
+            security:
+                -   Bearer: [ ]
             parameters:
                 - $ref: '#/components/parameters/tenantIdentifier'
             requestBody:
@@ -127,10 +140,13 @@ paths:
 
     '/private/payments/transfers':
         post:
+            operationId: 'transfers'
             x-spryker:
                 module: PaymentBackendApi
                 controller: PaymentsTransfersResourceController
             summary: 'Endpoint which will be used by SCOS to transfer money to Merchants or to reverse previously made transfers.'
+            security:
+                -   Bearer: [ ]
             parameters:
                 -   $ref: '#/components/parameters/tenantIdentifier'
             requestBody:
@@ -158,10 +174,13 @@ paths:
 
     '/private/customer':
         post:
+            operationId: 'customer'
             x-spryker:
                 module: PaymentBackendApi
                 controller: CustomerResourceController
             summary: 'Endpoint which will be used by SCOS to get customer details. The customer data could be retrieved from the App DB or via an API call from the PSP depending on the Payment App implementation.'
+            security:
+                -   Bearer: [ ]
             parameters:
                 -   $ref: '#/components/parameters/tenantIdentifier'
             requestBody:
@@ -188,6 +207,13 @@ paths:
                                 type: string
 
 components:
+    securitySchemes:
+        Bearer:
+            type: apiKey
+            in: header
+            name: Authorization
+            description: >-
+                Enter the token with the `Bearer: ` prefix, e.g. "Bearer abcde12345".
     schemas:
         InitializePaymentRequest:
             type: object
@@ -321,9 +347,7 @@ components:
                 localeName:
                     type: string
                     nullable: true
-                    examples:
-                        - en_US
-                        - de_DE
+                    example: en_US
                 countryCode:
                     type: string
                     example: 'DE'
@@ -342,9 +366,7 @@ components:
                     description: 'Total in lowest denominator (cents)'
                 paymentMethod:
                     type: string
-                    examples:
-                        - 'Credit Card'
-                        - 'PayPal'
+                    example: 'Credit Card'
                 items:
                     type: array
                     items:
