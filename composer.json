@@ -16,7 +16,6 @@
         "spryker/log": "^3.0.0",
         "spryker/message-broker": "^1.11.0",
         "spryker/message-broker-aws-extension": "^1.0.0",
-        "spryker/rest-request-validator": "^1.0.0",
         "spryker/router": "^1.19.0",
         "spryker/symfony": "^3.0.0",
         "spryker/transfer": "^3.33.0",
