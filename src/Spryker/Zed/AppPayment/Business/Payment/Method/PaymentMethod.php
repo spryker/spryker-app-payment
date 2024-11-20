@@ -9,6 +9,7 @@ namespace Spryker\Zed\AppPayment\Business\Payment\Method;
 
 use Generated\Shared\Transfer\AddPaymentMethodTransfer;
 use Generated\Shared\Transfer\AppConfigTransfer;
+use Generated\Shared\Transfer\CheckoutConfigurationTransfer;
 use Generated\Shared\Transfer\DeletePaymentMethodTransfer;
 use Generated\Shared\Transfer\EndpointTransfer;
 use Generated\Shared\Transfer\PaymentMethodAppConfigurationTransfer;
@@ -95,13 +96,13 @@ class PaymentMethod
     {
         $paymentMethodAppConfigurationTransfer = $paymentMethodTransfer->getPaymentMethodAppConfiguration();
 
-        if (!$paymentMethodAppConfigurationTransfer) {
+        if (!$paymentMethodAppConfigurationTransfer instanceof PaymentMethodAppConfigurationTransfer) {
             return AppPaymentBackendApiRouteProviderPlugin::ROUTE_INITIALIZE_PAYMENT;
         }
 
         $checkoutConfigurationTransfer = $paymentMethodAppConfigurationTransfer->getCheckoutConfiguration();
 
-        if (!$checkoutConfigurationTransfer) {
+        if (!$checkoutConfigurationTransfer instanceof CheckoutConfigurationTransfer) {
             return AppPaymentBackendApiRouteProviderPlugin::ROUTE_INITIALIZE_PAYMENT;
         }
 
@@ -284,7 +285,7 @@ class PaymentMethod
     protected function getDefaultPaymentMethodAppConfiguration(): PaymentMethodAppConfigurationTransfer
     {
         $paymentMethodAppConfigurationTransfer = new PaymentMethodAppConfigurationTransfer();
-        $paymentMethodAppConfigurationTransfer->setBaseUrl(rtrim($this->appPaymentConfig->getGlueBaseUrl(),'/'));
+        $paymentMethodAppConfigurationTransfer->setBaseUrl(rtrim($this->appPaymentConfig->getGlueBaseUrl(), '/'));
 
         $preOrderPaymetnEndpointTransfer = new EndpointTransfer();
         $preOrderPaymetnEndpointTransfer

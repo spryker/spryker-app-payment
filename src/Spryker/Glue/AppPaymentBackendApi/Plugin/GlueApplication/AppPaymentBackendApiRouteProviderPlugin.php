@@ -28,6 +28,7 @@ class AppPaymentBackendApiRouteProviderPlugin extends AbstractPlugin implements 
      * @var string
      */
     public const ROUTE_INITIALIZE_PAYMENT = '/private/initialize-payment';
+
     /**
      * @var string
      */
