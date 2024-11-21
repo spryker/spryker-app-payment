@@ -78,7 +78,7 @@ class PaymentPreOrder
         }
 
         /** @phpstan-var \Generated\Shared\Transfer\ConfirmPreOrderPaymentResponseTransfer */
-        return $this->getTransactionHandler()->handleTransaction(function () use ($confirmPreOrderPaymentRequestTransfer, $confirmPreOrderPaymentResponseTransfer) {
+        return $this->getTransactionHandler()->handleTransaction(function () use ($confirmPreOrderPaymentRequestTransfer, $confirmPreOrderPaymentResponseTransfer): \Generated\Shared\Transfer\ConfirmPreOrderPaymentResponseTransfer {
             $this->savePayment($confirmPreOrderPaymentRequestTransfer, $confirmPreOrderPaymentResponseTransfer);
 
             // In case of pre-order payment we may have unprocessed webhook requests persisted, and we must process them here
@@ -124,7 +124,7 @@ class PaymentPreOrder
         }
 
         /** @phpstan-var \Generated\Shared\Transfer\CancelPreOrderPaymentResponseTransfer */
-        return $this->getTransactionHandler()->handleTransaction(function () use ($cancelPreOrderPaymentRequestTransfer, $cancelPreOrderPaymentResponseTransfer) {
+        return $this->getTransactionHandler()->handleTransaction(function () use ($cancelPreOrderPaymentRequestTransfer, $cancelPreOrderPaymentResponseTransfer): \Generated\Shared\Transfer\CancelPreOrderPaymentResponseTransfer {
             $this->deletePayment($cancelPreOrderPaymentRequestTransfer);
 
             // In case of pre-order payment we may have unprocessed webhook requests persisted and we must delete them here

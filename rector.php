@@ -13,6 +13,7 @@ use Rector\Set\ValueObject\SetList;
 use Rector\Strict\Rector\Ternary\BooleanInTernaryOperatorRuleFixerRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeFromPropertyTypeRector;
+use Rector\Naming\Rector\Foreach_\RenameForeachValueVariableToMatchMethodCallReturnTypeRector;
 
 return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->paths([
@@ -39,10 +40,12 @@ return static function (RectorConfig $rectorConfig): void {
     ]);
 
     $rectorConfig->skip([
-        // Ignore this rule on the AppRouteProviderPlugin as it breaks the code
-        CallableThisArrayToAnonymousFunctionRector::class => [
-            __DIR__ . '/src/Spryker/Glue/AppPaymentBackendApi/Plugin/GlueApplication/AppPaymentBackendApiRouteProviderPlugin.php',
+        RenameForeachValueVariableToMatchMethodCallReturnTypeRector::class => [
+            __DIR__ . '/src/Spryker/Glue/AppPaymentBackendApi/Mapper/Payment/GlueResponsePaymentMapper.php',
+            __DIR__ . '/src/Spryker/Zed/AppPayment/Business/MessageBroker/RefundPaymentMessageHandler.php',
+            __DIR__ . '/src/Spryker/Zed/AppPayment/Business/Payment/Transfer/PaymentTransfer.php',
         ],
+        // Ignore this rule on the AppRouteProviderPlugin as it breaks the code
         ClassPropertyAssignToConstructorPromotionRector::class => [
             __DIR__ . '/src/Spryker/Glue/AppPaymentBackendApi/Dependency/Facade/AppPaymentBackendApiToAppPaymentFacadeBridge.php',
             __DIR__ . '/src/Spryker/Glue/AppPaymentBackendApi/Dependency/Facade/AppPaymentBackendApiToTranslatorFacadeBridge.php',

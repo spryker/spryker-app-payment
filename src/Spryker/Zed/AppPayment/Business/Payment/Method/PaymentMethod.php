@@ -46,14 +46,14 @@ class PaymentMethod
         $paymentMethodConfigurationRequestTransfer = new PaymentMethodConfigurationRequestTransfer();
         $paymentMethodConfigurationRequestTransfer->setAppConfig($appConfigTransfer);
 
-        $paymentMethodCollectionResponseTransfer = $this->appPaymentPlatformPlugin->configurePaymentMethods($paymentMethodConfigurationRequestTransfer);
+        $paymentMethodConfigurationResponseTransfer = $this->appPaymentPlatformPlugin->configurePaymentMethods($paymentMethodConfigurationRequestTransfer);
 
         // Get current persisted Tenants payment methods
         $persistedPaymentMethodTransfers = $this->appPaymentRepository->getTenantPaymentMethods($tenantIdentifier);
 
         // Get current configured payment methods
         /** @var array<\Generated\Shared\Transfer\PaymentMethodTransfer> $configuredPaymentMethodTransfers */
-        $configuredPaymentMethodTransfers = $paymentMethodCollectionResponseTransfer->getPaymentMethods()->getArrayCopy();
+        $configuredPaymentMethodTransfers = $paymentMethodConfigurationResponseTransfer->getPaymentMethods()->getArrayCopy();
 
         // Add the configuration to the Payment Methods to be able to compare them with the persisted ones.
         $configuredPaymentMethodTransfers = $this->addConfigurationToPaymentMethods($configuredPaymentMethodTransfers);
