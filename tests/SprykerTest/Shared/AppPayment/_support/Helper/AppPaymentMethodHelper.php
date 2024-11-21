@@ -79,6 +79,13 @@ class AppPaymentMethodHelper extends Module
         $paymentMethodAppConfigurationTransfer = new PaymentMethodAppConfigurationTransfer();
         $paymentMethodAppConfigurationTransfer->setBaseUrl($appPaymentConfig->getGlueBaseUrl());
 
+        $preOrderPaymentEndpointTransfer = new EndpointTransfer();
+        $preOrderPaymentEndpointTransfer
+            ->setName('pre-order-payment')
+            ->setPath('/private/pre-order-payment'); // Defined in app_payment_openapi.yml
+
+        $paymentMethodAppConfigurationTransfer->addEndpoint($preOrderPaymentEndpointTransfer);
+
         $authorizationEndpointTransfer = new EndpointTransfer();
         $authorizationEndpointTransfer
             ->setName('authorization')

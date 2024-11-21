@@ -47,17 +47,17 @@ class AppPaymentHelper extends Module
 {
     public function haveCancelPaymentTransfer(array $seed = []): CancelPaymentTransfer
     {
-        return (new CancelPaymentBuilder($seed))->withMessageAttributes()->build();
+        return (new CancelPaymentBuilder($seed))->withMessageAttributes($seed)->build();
     }
 
     public function haveCapturePaymentTransfer(array $seed = []): CapturePaymentTransfer
     {
-        return (new CapturePaymentBuilder($seed))->withMessageAttributes()->build();
+        return (new CapturePaymentBuilder($seed))->withMessageAttributes($seed)->build();
     }
 
     public function haveRefundPaymentTransfer(array $seed = [], array $orderItemIds = []): RefundPaymentTransfer
     {
-        $refundPaymentBuilder = (new RefundPaymentBuilder($seed))->withMessageAttributes();
+        $refundPaymentBuilder = (new RefundPaymentBuilder($seed))->withMessageAttributes($seed);
 
         if (!$orderItemIds) {
             return $refundPaymentBuilder->withOrderItem()->build();
