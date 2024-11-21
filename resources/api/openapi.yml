@@ -447,7 +447,7 @@ components:
           minItems: 1
         additionalPaymentData:
           $ref: '#/components/schemas/PreOrderPaymentAdditionalPaymentData'
-          
+
     OrderData:
       description: 'Order data.'
       type: object
@@ -601,6 +601,7 @@ components:
           nullable: true
         firstName:
           type: string
+          nullable: true
         lastName:
           type: string
           nullable: true
