@@ -57,8 +57,11 @@ Webhooks are piped through this package and extended with the needed Payment or 
 ## Transfer Money
 This is known on the Tenant side as Payout or Reverse Payout. This feature will be used together with merchants (when `spryker/app-merchant`) is also used.
 
-- /private/initialize-payment - Used from the Tenant side to initialize a payment.
-- /private/confirm-pre-order-payment - Used from the Tenant side to confirm pre-order payment after the order was persisted.
+- `/private/initialize-payment` - Used from the Tenant side to initialize a payment.
+- `/private/confirm-pre-order-payment` - Used from the Tenant side to confirm pre-order payment after the order was persisted.
+- `/private/cancel-pre-order-payment` - Used from the Tenant side to cancel pre-order payment after the order was persisted.
+- `/private/payments/transfers` - Used from the Tenant side to do money transfer from the Marketplace to Merchant accounts.
+- `/private/customer` - Used from the Tenant side to get customer details. Usually, used for express-checkout strategies.
 
 ### AppKernel
 - \Spryker\Zed\AppPayment\Communication\Plugin\AppKernel\ConfigurePaymentMethodsConfigurationAfterSavePlugin
@@ -90,6 +93,7 @@ $config[AppConstants::APP_IDENTIFIER] = getenv('APP_IDENTIFIER') ?: 'hello-world
 - \Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface
 - \Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPreOrderPluginInterface
 - \Spryker\Zed\AppPayment\Dependency\Plugin\PaymentTransmissionsRequestExtenderPluginInterface
+- \Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformCustomerPluginInterface
 
 ### AppPaymentPlatformMarketplacePluginInterface
 
@@ -118,6 +122,10 @@ On project side the customer than makes the Payment via the provided JavaScripts
 ### PaymentTransmissionsRequestExtenderPluginInterface
 
 This plugin can be implemented to extend the request data that is send to the PSP App when doing payouts to Merchants. This is usually only needed when the PSP App supports Marketplace capabilities.
+
+### AppPaymentPlatformCustomerPluginInterface
+
+This plugin can be implemented to provide the customer details that the PSP App supports. This is usually only needed when the PSP App supports express-checkout strategies where the customer does not enter the normal checkout flow provided by Spryker. In this case, the Payment Service Provider provides the customer details such as shipping or billing address.
 
 ## Configure the MessageBroker
 
@@ -417,3 +425,29 @@ public function configurePaymentMethods(PaymentMethodConfigurationRequestTransfe
 ```
 
 In this example you would get one PaymentMethod added to SCOS via the AddPaymentMethod message. The PaymentMethod is named "bar" and the provider is named "PaymentProviderName".
+
+
+#### Payment Method Checkout Configuration
+
+Each Payment method can have a different checkout configuration. The checkout configuration is used to configure the payment that is used in the SCOS checkout.
+
+##### Available checkout strategies
+
+- `default` - By default Payment methods use the "default" strategy which means that the payment page is opened in a new window.
+- `embedded` - The payment page is embedded in the SCOS checkout. This is useful when the payment page is provided by the PSP App and the SCOS side wants to embed it in the checkout.
+- `express-checkout` - This option is for example provided by PayPal Express. When the payment method has this strategy the SCOS side renders a button that opens the payment page in a modal.
+
+###### Default strategy
+
+The default strategy is used when no strategy is set. The default strategy is to open the payment page in a new window and will only be opened after the customer has submitted his order. In this strategy, the customer is redirected to the payment page which is called Hosted Payment Page.
+
+There the customer provides what the Payment Service Provider requests and after the payment is done on the hosted payment page the customer is redirected back to the SCOS side and see either the success or failure page.
+
+###### Embedded strategy
+
+The embedded strategy is used when the payment page is provided by the PSP App and the SCOS side wants to embed it in the checkout. This is useful when the PSP App provides a payment page that is designed to be embedded in the SCOS checkout. The payment page will then be included e.g. in the summary page of the checkout.
+
+###### Express Checkout strategy
+
+The express checkout strategy is used when the payment method provides an express checkout. This is useful when the payment method provides a button that opens the payment page in a modal. This is useful when the payment page is provided by the PSP App and the SCOS side wants to open it in a modal. The button can be included in different places such as the Cart Page o a Product Detail Page.
+

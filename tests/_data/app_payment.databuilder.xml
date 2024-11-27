@@ -29,7 +29,7 @@
         <property name="customerEmail" dataBuilderRule="email()"/>
         <property name="customerReference" dataBuilderRule="unique()->uuid()"/>
         <property name="grandTotal" dataBuilderRule="=10000"/>
-        <property name="paymentMethod" dataBuilderRule="=PayPal"/>
+        <property name="paymentMethod" dataBuilderRule="=paypal"/>
     </transfer>
 
     <transfer name="PaymentMethod" strict="true">

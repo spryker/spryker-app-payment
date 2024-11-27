@@ -62,7 +62,7 @@ class CancelPayment
         }
 
         /** @phpstan-var \Generated\Shared\Transfer\CancelPaymentResponseTransfer */
-        return $this->getTransactionHandler()->handleTransaction(function () use ($cancelPaymentRequestTransfer, $cancelPaymentResponseTransfer) {
+        return $this->getTransactionHandler()->handleTransaction(function () use ($cancelPaymentRequestTransfer, $cancelPaymentResponseTransfer): \Generated\Shared\Transfer\CancelPaymentResponseTransfer {
             $this->savePayment($cancelPaymentRequestTransfer->getPaymentOrFail(), $cancelPaymentResponseTransfer->getStatusOrFail());
 
             return $cancelPaymentResponseTransfer;

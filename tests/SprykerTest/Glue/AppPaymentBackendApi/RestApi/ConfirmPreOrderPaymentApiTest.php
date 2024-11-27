@@ -83,6 +83,63 @@ class ConfirmPreOrderPaymentApiTest extends Unit
         $this->tester->seeResponseCodeIs(Response::HTTP_OK);
     }
 
+    /**
+     * Covers the case when the transactionId is a temporary one, and needs to be updated in the spy_payment table.
+     */
+    public function testConfirmPreOrderPaymentPostRequestReturnsHttpResponseCode200WhenTheConfirmPreOrderPaymentImplementationReturnsANewTransactionIdAndThePaymentIsUpdatedWithTheNewTransactionId(): void
+    {
+        // Arrange
+        $preOrderPaymentTransactionId = Uuid::uuid4()->toString();
+        $transactionId = Uuid::uuid4()->toString();
+        $tenantIdentifier = Uuid::uuid4()->toString();
+
+        $this->tester->haveAppConfigForTenant($tenantIdentifier);
+        $paymentTransfer = $this->tester->havePaymentForTransactionId($preOrderPaymentTransactionId, $tenantIdentifier);
+
+        $confirmPreOrderPaymentRequestTransfer = $this->tester->haveConfirmPreOrderPaymentRequestTransfer([
+            ConfirmPreOrderPaymentRequestTransfer::TRANSACTION_ID => $preOrderPaymentTransactionId,
+            ConfirmPreOrderPaymentRequestTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
+            ConfirmPreOrderPaymentRequestTransfer::PAYMENT => $paymentTransfer,
+        ]);
+
+        $confirmPreOrderPaymentRequestTransfer->setOrderData($paymentTransfer->getQuote());
+
+        $confirmPreOrderPaymentResponseTransfer = new ConfirmPreOrderPaymentResponseTransfer();
+        $confirmPreOrderPaymentResponseTransfer
+            ->setIsSuccessful(true)
+            ->setStatus(PaymentStatus::STATUS_CAPTURED);
+
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformConfirmPreOrderPluginInterface::class, [
+            'confirmPreOrderPayment' => function (ConfirmPreOrderPaymentRequestTransfer $confirmPreOrderPaymentRequestTransfer) use ($confirmPreOrderPaymentResponseTransfer, $transactionId) {
+                // Ensure that the AppConfig is always passed to the platform plugin.
+                $this->assertInstanceOf(AppConfigTransfer::class, $confirmPreOrderPaymentRequestTransfer->getAppConfig());
+                $this->assertInstanceOf(PaymentTransfer::class, $confirmPreOrderPaymentRequestTransfer->getPayment());
+
+                // The implementation changes the transactionID. This happens when a Payment is created with a temporary transactionId.
+                $paymentTransfer = $confirmPreOrderPaymentRequestTransfer->getPayment();
+                $paymentTransfer->setTransactionId($transactionId);
+
+                $confirmPreOrderPaymentResponseTransfer->setPayment($paymentTransfer);
+
+                return $confirmPreOrderPaymentResponseTransfer;
+            },
+        ]);
+
+        $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
+
+        // Act
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $confirmPreOrderPaymentRequestTransfer->getTenantIdentifier());
+        $this->tester->addHeader('Content-Type', 'application/json');
+
+        $this->tester->sendPost($this->tester->buildConfirmPreOrderPaymentUrl(), $confirmPreOrderPaymentRequestTransfer->toArray());
+
+        // Assert
+        $this->tester->seeResponseCodeIs(Response::HTTP_OK);
+
+        // Test that the transactionId was updated, and we can find a payment with the new transactionId.
+        $this->tester->seePaymentWithTransactionId($transactionId);
+    }
+
     public function testConfirmPreOrderPaymentPostRequestReturnsHttpResponseCode200WhenThePaymentPlatformHasNotImplementedTheConfirmPreOrderPaymentPlatformPlugin(): void
     {
         // Arrange
@@ -194,7 +251,7 @@ class ConfirmPreOrderPaymentApiTest extends Unit
         $this->tester->seeResponseCodeIs(Response::HTTP_BAD_REQUEST);
     }
 
-    public function testConfirmPreOrderPaymentPostRequestReturnsHttpResponseCode400WhenThePaymentPlatformImplemtationThrowsAnException(): void
+    public function testConfirmPreOrderPaymentPostRequestReturnsHttpResponseCode400WhenThePaymentPlatformImplementationThrowsAnException(): void
     {
         // Arrange
         $transactionId = Uuid::uuid4()->toString();

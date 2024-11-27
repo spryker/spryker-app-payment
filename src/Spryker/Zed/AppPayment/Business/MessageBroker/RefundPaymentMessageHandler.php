@@ -47,11 +47,12 @@ class RefundPaymentMessageHandler implements RefundPaymentMessageHandlerInterfac
             ->setCurrencyCode($refundPaymentTransfer->getCurrencyIsoCodeOrFail())
             ->setPayment($paymentTransfer);
 
-        foreach ($refundPaymentTransfer->getOrderItems() as $orderItem) {
+        /** @phpstan-var \Generated\Shared\Transfer\OrderItemTransfer $orderItemTransfer */
+        foreach ($refundPaymentTransfer->getOrderItems() as $orderItemTransfer) {
             $refundPaymentRequestTransfer->addQuoteItem(
                 (new QuoteItemTransfer())
-                    ->setIdSalesOrderItem((string)$orderItem->getOrderItemId())
-                    ->setSku($orderItem->getSku()),
+                    ->setIdSalesOrderItem((string)$orderItemTransfer->getOrderItemId())
+                    ->setSku($orderItemTransfer->getSku()),
             );
         }
 

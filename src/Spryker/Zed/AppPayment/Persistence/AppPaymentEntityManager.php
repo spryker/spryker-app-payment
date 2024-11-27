@@ -34,7 +34,17 @@ class AppPaymentEntityManager extends AbstractEntityManager implements AppPaymen
 
     public function savePayment(PaymentTransfer $paymentTransfer): PaymentTransfer
     {
-        $spyPayment = $this->getFactory()->createPaymentQuery()->findOneByTransactionId($paymentTransfer->getTransactionIdOrFail());
+        $spyPaymentQuery = $this->getFactory()->createPaymentQuery();
+
+        if ($paymentTransfer->getIdPayment() !== null && $paymentTransfer->getIdPayment() !== '' && $paymentTransfer->getIdPayment() !== '0') {
+            $spyPaymentQuery->filterByIdPayment($paymentTransfer->getIdPayment());
+        }
+
+        if ($paymentTransfer->getIdPayment() === null || $paymentTransfer->getIdPayment() === '' || $paymentTransfer->getIdPayment() === '0') {
+            $spyPaymentQuery->filterByTransactionId($paymentTransfer->getTransactionIdOrFail());
+        }
+
+        $spyPayment = $spyPaymentQuery->findOne();
 
         if ($spyPayment === null) {
             throw new PaymentByTransactionIdNotFoundException($paymentTransfer->getTransactionIdOrFail());

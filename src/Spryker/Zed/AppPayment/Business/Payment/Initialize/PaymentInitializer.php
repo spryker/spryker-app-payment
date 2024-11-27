@@ -14,6 +14,7 @@ use Spryker\Shared\Log\LoggerTrait;
 use Spryker\Zed\AppPayment\AppPaymentConfig;
 use Spryker\Zed\AppPayment\Business\Payment\AppConfig\AppConfigLoader;
 use Spryker\Zed\AppPayment\Business\Payment\Message\MessageSender;
+use Spryker\Zed\AppPayment\Business\Payment\Method\Normalizer\PaymentMethodNormalizer;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentEntityManagerInterface;
@@ -30,6 +31,7 @@ class PaymentInitializer
         protected AppPaymentPlatformPluginInterface $appPaymentPlatformPlugin,
         protected AppPaymentEntityManagerInterface $appPaymentEntityManager,
         protected AppPaymentRepositoryInterface $appPaymentRepository,
+        protected PaymentMethodNormalizer $paymentMethodNormalizer,
         protected MessageSender $messageSender,
         protected AppPaymentConfig $appPaymentConfig,
         protected AppConfigLoader $appConfigLoader
@@ -40,6 +42,7 @@ class PaymentInitializer
     {
         try {
             $initializePaymentRequestTransfer->setAppConfigOrFail($this->appConfigLoader->loadAppConfig($initializePaymentRequestTransfer->getTenantIdentifierOrFail()));
+            $initializePaymentRequestTransfer = $this->normalizePaymentMethod($initializePaymentRequestTransfer);
 
             // In case of a pre-order payment, the payment provider data is already set, and we have to load the previously made payment and pass it to the platform implementation.
             if ($initializePaymentRequestTransfer->getPreOrderPaymentData() !== [] && isset($initializePaymentRequestTransfer->getPreOrderPaymentData()[PaymentTransfer::TRANSACTION_ID])) {
@@ -71,7 +74,7 @@ class PaymentInitializer
         }
 
         /** @phpstan-var \Generated\Shared\Transfer\InitializePaymentResponseTransfer */
-        return $this->getTransactionHandler()->handleTransaction(function () use ($initializePaymentRequestTransfer, $initializePaymentResponseTransfer) {
+        return $this->getTransactionHandler()->handleTransaction(function () use ($initializePaymentRequestTransfer, $initializePaymentResponseTransfer): \Generated\Shared\Transfer\InitializePaymentResponseTransfer {
             // When we have already persisted a payment in the database and this method is called a second time the payment will be set in the request transfer
             // In this case we are in the pre-order payment process and we don't want to save the payment again.
             // When the grandTotal has changed the response will contain a different transactionId as we have persisted in the database because so we need to update
@@ -127,7 +130,7 @@ class PaymentInitializer
         $paymentTransfer = new PaymentTransfer();
         $paymentTransfer
             ->fromArray($initializePaymentResponseTransfer->toArray(), true)
-            ->setTransactionId($initializePaymentResponseTransfer->getTransactionIdOrFail())
+            ->setTransactionId($initializePaymentResponseTransfer->getTransactionId())
             ->setTenantIdentifier($initializePaymentRequestTransfer->getTenantIdentifierOrFail())
             ->setOrderReference($quoteTransfer->getOrderReference()) // Optional for the pre-order payment case.
             ->setQuote($quoteTransfer)
@@ -136,5 +139,13 @@ class PaymentInitializer
             ->setStatus(PaymentStatus::STATUS_NEW);
 
         $this->appPaymentEntityManager->createPayment($paymentTransfer);
+    }
+
+    protected function normalizePaymentMethod(InitializePaymentRequestTransfer $initializePaymentRequestTransfer): InitializePaymentRequestTransfer
+    {
+        $quoteTransfer = $initializePaymentRequestTransfer->getOrderDataOrFail();
+        $quoteTransfer->setPaymentMethod($this->paymentMethodNormalizer->normalizePaymentMethodKey($quoteTransfer->getPaymentMethodOrFail()));
+
+        return $initializePaymentRequestTransfer->setOrderData($quoteTransfer);
     }
 }
