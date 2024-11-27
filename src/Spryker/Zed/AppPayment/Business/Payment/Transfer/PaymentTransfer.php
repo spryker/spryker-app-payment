@@ -82,7 +82,7 @@ class PaymentTransfer
         }
 
         /** @var \Generated\Shared\Transfer\PaymentTransmissionsResponseTransfer $paymentTransmissionsResponseTransfer */
-        $paymentTransmissionsResponseTransfer = $this->getTransactionHandler()->handleTransaction(function () use ($paymentTransmissionsRequestTransfer, $paymentTransmissionsResponseTransfer): \Generated\Shared\Transfer\PaymentTransmissionsResponseTransfer {
+        $paymentTransmissionsResponseTransfer = $this->getTransactionHandler()->handleTransaction(function () use ($paymentTransmissionsRequestTransfer, $paymentTransmissionsResponseTransfer): PaymentTransmissionsResponseTransfer {
             if ($paymentTransmissionsRequestTransfer->getPaymentTransmissions()->count() === 0) {
                 // If there are no payments to transfer, we do not need to save anything. In such case, we most likely filtered out all payment transmission items that were passed.
                 return $paymentTransmissionsResponseTransfer;

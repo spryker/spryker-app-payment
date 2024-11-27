@@ -62,7 +62,7 @@ class AppPaymentBackendApiToAppPaymentFacadeBridge implements AppPaymentBackendA
         return $this->appPaymentFacade->getPaymentCollection($paymentCriteriaTransfer);
     }
 
-    public function customer(CustomerRequestTransfer $customerRequestTransfer): CustomerResponseTransfer
+    public function getCustomer(CustomerRequestTransfer $customerRequestTransfer): CustomerResponseTransfer
     {
         return $this->appPaymentFacade->getCustomer($customerRequestTransfer);
     }

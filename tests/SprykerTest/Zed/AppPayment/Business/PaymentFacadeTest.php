@@ -95,7 +95,7 @@ class PaymentFacadeTest extends Unit
             ->setPaymentMethodKey($paymentMethodKey);
 
         // Act
-        $paymentMethodTransfer = $this->tester->getFacade()->getPaymentMethodByTenantIdentifierAndPaymentMethodKey($paymentMethodCriteriaTransfer);
+        $paymentMethodTransfer = $this->tester->getFacade()->getPaymentMethod($paymentMethodCriteriaTransfer);
 
         // Assert
         $this->assertInstanceOf(PaymentMethodTransfer::class, $paymentMethodTransfer);
@@ -121,7 +121,7 @@ class PaymentFacadeTest extends Unit
             ->setPaymentMethodKey($paymentMethodKey);
 
         // Act
-        $paymentMethodTransfer = $this->tester->getFacade()->getPaymentMethodByTenantIdentifierAndPaymentMethodKey($paymentMethodCriteriaTransfer);
+        $paymentMethodTransfer = $this->tester->getFacade()->getPaymentMethod($paymentMethodCriteriaTransfer);
 
         // Assert
         $this->assertInstanceOf(PaymentMethodTransfer::class, $paymentMethodTransfer);
@@ -145,6 +145,6 @@ class PaymentFacadeTest extends Unit
             ->setPaymentMethodKey($paymentMethodKey);
 
         // Act
-        $this->tester->getFacade()->getPaymentMethodByTenantIdentifierAndPaymentMethodKey($paymentMethodCriteriaTransfer);
+        $this->tester->getFacade()->getPaymentMethod($paymentMethodCriteriaTransfer);
     }
 }

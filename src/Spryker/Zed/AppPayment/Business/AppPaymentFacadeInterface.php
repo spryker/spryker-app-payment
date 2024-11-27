@@ -117,28 +117,6 @@ interface AppPaymentFacadeInterface
 
     /**
      * Specification:
-     * - Sends a `AddPaymentMethod` message when the AppConfiguration is in state NEW.
-     * - Updates the AppConfiguration and sets its state to connected after the `AddPaymentMethod` message was sent.
-     * - When the AppConfiguration is in state CONNECTED the `AddPaymentMethod` message will not be sent.
-     *
-     * @api
-     *
-     * @deprecated Use {@link \Spryker\Zed\AppPayment\Business\AppPaymentFacadeInterface::configurePaymentMethods() } instead
-     */
-    public function sendAddPaymentMethodMessage(AppConfigTransfer $appConfigTransfer): AppConfigTransfer;
-
-    /**
-     * Specification:
-     * - Sends a `DeletePaymentMethod` message when the AppConfiguration is removed.
-     *
-     * @api
-     *
-     * @deprecated Use {@link \Spryker\Zed\AppPayment\Business\AppPaymentFacade::deletePaymentMethods() } instead
-     */
-    public function sendDeletePaymentMethodMessage(AppConfigTransfer $appConfigTransfer): AppConfigTransfer;
-
-    /**
-     * Specification:
      * - Handles the `CancelPayment` message.
      *
      * @api
@@ -223,8 +201,8 @@ interface AppPaymentFacadeInterface
     /**
      * Specification:
      * - Cancels a payment that was made before the order was persisted.
-     * - Loads the `AppConfigTransfer` and adds it to the CancePreOrderPaymentRequestTransfer.
-     * - Loads the `PaymentTransfer` and adds it to the CancePreOrderPaymentRequestTransfer.
+     * - Loads the `AppConfigTransfer` and adds it to the CancelPreOrderPaymentRequestTransfer.
+     * - Loads the `PaymentTransfer` and adds it to the CancelPreOrderPaymentRequestTransfer.
      * - Returns a CancelPreOrderPaymentResponseTransfer.
      *
      * @api
@@ -235,14 +213,17 @@ interface AppPaymentFacadeInterface
 
     /**
      * Specification:
-     * - Loads the payment method by the tenant identifier and payment method key.
+     * - Loads the payment method by various criteria.
+     * - Requires either of the following fields to be set:
+     *  - `PaymentMethodCriteriaTransfer.tenantIdentifier`
+     *  - `PaymentMethodCriteriaTransfer.paymentMethodKey`
      * - Returns a PaymentMethodTransfer
      *
      * @api
      *
      * @throws \Spryker\Zed\AppPayment\Business\Exception\PaymentMethodNotFoundException
      */
-    public function getPaymentMethodByTenantIdentifierAndPaymentMethodKey(PaymentMethodCriteriaTransfer $paymentMethodCriteriaTransfer): PaymentMethodTransfer;
+    public function getPaymentMethod(PaymentMethodCriteriaTransfer $paymentMethodCriteriaTransfer): PaymentMethodTransfer;
 
     /**
      * Specification:

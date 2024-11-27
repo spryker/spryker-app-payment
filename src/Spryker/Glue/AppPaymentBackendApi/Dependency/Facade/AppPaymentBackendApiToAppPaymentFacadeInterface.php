@@ -36,5 +36,5 @@ interface AppPaymentBackendApiToAppPaymentFacadeInterface
 
     public function getPaymentCollection(PaymentCriteriaTransfer $paymentCriteriaTransfer): PaymentCollectionTransfer;
 
-    public function customer(CustomerRequestTransfer $customerRequestTransfer): CustomerResponseTransfer;
+    public function getCustomer(CustomerRequestTransfer $customerRequestTransfer): CustomerResponseTransfer;
 }

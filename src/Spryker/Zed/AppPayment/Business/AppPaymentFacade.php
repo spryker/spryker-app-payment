@@ -86,31 +86,7 @@ class AppPaymentFacade extends AbstractFacade implements AppPaymentFacadeInterfa
      *
      * @inheritDoc
      */
-    public function sendAddPaymentMethodMessage(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
-    {
-        return $this->getFactory()->createPaymentMethod()->configurePaymentMethods($appConfigTransfer);
-    }
-
-    /**
-     * @api
-     *
-     * @inheritDoc
-     */
     public function deletePaymentMethods(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
-    {
-        return $this->getFactory()->createPaymentMethod()->deletePaymentMethods($appConfigTransfer);
-    }
-
-    /**
-     * @api
-     *
-     * @codeCoverageIgnore
-     *
-     * @inheritDoc
-     *
-     * @deprecated Method is used by a deprecated plugin and will be removed as well.
-     */
-    public function sendDeletePaymentMethodMessage(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
     {
         return $this->getFactory()->createPaymentMethod()->deletePaymentMethods($appConfigTransfer);
     }
@@ -186,23 +162,43 @@ class AppPaymentFacade extends AbstractFacade implements AppPaymentFacadeInterfa
         return $this->getFactory()->createPayment()->transferPayments($paymentTransmissionsRequestTransfer);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @api
+     */
     public function confirmPreOrderPayment(
         ConfirmPreOrderPaymentRequestTransfer $confirmPreOrderPaymentRequestTransfer
     ): ConfirmPreOrderPaymentResponseTransfer {
         return $this->getFactory()->createPayment()->confirmPreOrderPayment($confirmPreOrderPaymentRequestTransfer);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @api
+     */
     public function cancelPreOrderPayment(
         CancelPreOrderPaymentRequestTransfer $cancelPreOrderPaymentRequestTransfer
     ): CancelPreOrderPaymentResponseTransfer {
         return $this->getFactory()->createPayment()->cancelPreOrderPayment($cancelPreOrderPaymentRequestTransfer);
     }
 
-    public function getPaymentMethodByTenantIdentifierAndPaymentMethodKey(PaymentMethodCriteriaTransfer $paymentMethodCriteriaTransfer): PaymentMethodTransfer
+    /**
+     * {@inheritDoc}
+     *
+     * @api
+     */
+    public function getPaymentMethod(PaymentMethodCriteriaTransfer $paymentMethodCriteriaTransfer): PaymentMethodTransfer
     {
-        return $this->getFactory()->createPaymentMethodReader()->getPaymentMethodByTenantIdentifierAndPaymentMethodKey($paymentMethodCriteriaTransfer);
+        return $this->getFactory()->createPaymentMethodReader()->getPaymentMethod($paymentMethodCriteriaTransfer);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @api
+     */
     public function getCustomer(CustomerRequestTransfer $customerRequestTransfer): CustomerResponseTransfer
     {
         return $this->getFactory()->createPayment()->getCustomer($customerRequestTransfer);

@@ -45,7 +45,7 @@ class Customer
             $customerResponseTransfer = new CustomerResponseTransfer();
             $customerResponseTransfer
                 ->setIsSuccessful(false)
-                ->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY)
+                ->setStatusCode(Response::HTTP_BAD_REQUEST)
                 ->setMessage(MessageBuilder::getNeitherACustomerNorCustomerPaymentProviderDataIsPresent());
 
             return $customerResponseTransfer;

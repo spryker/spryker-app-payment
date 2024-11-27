@@ -19,7 +19,7 @@ class CustomerResourceController extends AbstractController
     public function postAction(GlueRequestTransfer $glueRequestTransfer): GlueResponseTransfer
     {
         $customerRequestTransfer = $this->getFactory()->createGlueRequestPaymentMapper()->mapGlueRequestTransferToCustomerRequestTransfer($glueRequestTransfer);
-        $customerResponseTransfer = $this->getFactory()->getAppPaymentFacade()->customer($customerRequestTransfer);
+        $customerResponseTransfer = $this->getFactory()->getAppPaymentFacade()->getCustomer($customerRequestTransfer);
 
         return $this->getFactory()->createGlueResponsePaymentMapper()->mapCustomerResponseTransferToSingleResourceGlueResponseTransfer($customerResponseTransfer);
     }
