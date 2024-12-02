@@ -12,6 +12,7 @@ use Generated\Shared\Transfer\CapturePaymentResponseTransfer;
 use Generated\Shared\Transfer\CapturePaymentTransfer;
 use Generated\Shared\Transfer\MessageContextTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
+use Spryker\Shared\Log\LoggerTrait;
 use Spryker\Zed\AppPayment\Business\MessageBroker\TenantIdentifier\TenantIdentifierExtractor;
 use Spryker\Zed\AppPayment\Business\Payment\Capture\PaymentCapturer;
 use Spryker\Zed\AppPayment\Business\Payment\Message\MessageSender;
@@ -20,6 +21,9 @@ use Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface;
 
 class CapturePaymentMessageHandler implements CapturePaymentMessageHandlerInterface
 {
+
+    use LoggerTrait;
+
     public function __construct(
         protected AppPaymentRepositoryInterface $appPaymentRepository,
         protected TenantIdentifierExtractor $tenantIdentifierExtractor,
@@ -33,10 +37,16 @@ class CapturePaymentMessageHandler implements CapturePaymentMessageHandlerInterf
     ): void {
         $tenantIdentifier = $this->tenantIdentifierExtractor->getTenantIdentifierFromMessage($capturePaymentTransfer);
 
-        $paymentTransfer = $this->appPaymentRepository->getPaymentByTenantIdentifierAndOrderReference(
-            $tenantIdentifier,
-            $capturePaymentTransfer->getOrderReferenceOrFail(),
-        );
+        try {
+            $paymentTransfer = $this->appPaymentRepository->getPaymentByTenantIdentifierAndOrderReference(
+                $tenantIdentifier,
+                $capturePaymentTransfer->getOrderReferenceOrFail(),
+            );
+        } catch (PaymentByTenantIdentifierAndOrderReferenceNotFoundException $paymentByTenantIdentifierAndOrderReferenceNotFoundException) {
+            $this->getLogger()->warning($paymentByTenantIdentifierAndOrderReferenceNotFoundException->getMessage());
+
+            return;
+        }
 
         $capturePaymentRequestTransfer = (new CapturePaymentRequestTransfer())
             ->setTransactionId($paymentTransfer->getTransactionIdOrFail())

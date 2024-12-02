@@ -36,10 +36,16 @@ class RefundPaymentMessageHandler implements RefundPaymentMessageHandlerInterfac
     {
         $tenantIdentifier = $this->tenantIdentifierExtractor->getTenantIdentifierFromMessage($refundPaymentTransfer);
 
-        $paymentTransfer = $this->appPaymentRepository->getPaymentByTenantIdentifierAndOrderReference(
-            $tenantIdentifier,
-            $refundPaymentTransfer->getOrderReferenceOrFail(),
-        );
+        try {
+            $paymentTransfer = $this->appPaymentRepository->getPaymentByTenantIdentifierAndOrderReference(
+                $tenantIdentifier,
+                $refundPaymentTransfer->getOrderReferenceOrFail(),
+            );
+        } catch (PaymentByTenantIdentifierAndOrderReferenceNotFoundException $paymentByTenantIdentifierAndOrderReferenceNotFoundException) {
+            $this->getLogger()->warning($paymentByTenantIdentifierAndOrderReferenceNotFoundException->getMessage());
+
+            return;
+        }
 
         $refundPaymentRequestTransfer = (new RefundPaymentRequestTransfer())
             ->setTransactionId($paymentTransfer->getTransactionIdOrFail())
