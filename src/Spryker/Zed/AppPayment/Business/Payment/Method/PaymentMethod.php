@@ -35,11 +35,6 @@ class PaymentMethod
 
     public function configurePaymentMethods(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
     {
-        // Do not send the message(s) when App is in state "disconnected" or when the app is marked as inactive.
-//        if ($appConfigTransfer->getStatus() === AppKernelConfig::APP_STATUS_DISCONNECTED || $appConfigTransfer->getIsActive() === false || !($this->appPaymentPlatformPlugin instanceof AppPaymentPlatformPaymentMethodsPluginInterface)) {
-//            return $appConfigTransfer;
-//        }
-
         if (!($this->appPaymentPlatformPlugin instanceof AppPaymentPlatformPaymentMethodsPluginInterface)) {
             return $appConfigTransfer;
         }
