@@ -18,7 +18,6 @@ use Ramsey\Uuid\Uuid;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
-use Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTenantIdentifierAndOrderReferenceNotFoundException;
 use SprykerTest\AsyncApi\AppPayment\AppPaymentAsyncApiTester;
 use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
 
@@ -144,16 +143,13 @@ class CapturePaymentTest extends Unit
         $this->tester->assertPaymentHasStatus($paymentTransfer, PaymentStatus::STATUS_CAPTURE_REQUESTED);
     }
 
-    #[Skip('changed to warning level log')]
-    public function testHandleCapturePaymentThrowsExceptionWhenPaymentDoesNotExist(): void
+    public function testHandleCapturePaymentDoesNotThrowExceptionWhenPaymentDoesNotExist(): void
     {
         // Arrange
         $tenantIdentifier = Uuid::uuid4()->toString();
         $this->tester->haveAppConfigForTenant($tenantIdentifier);
 
         $capturePaymentTransfer = $this->tester->haveCapturePaymentTransfer(['tenantIdentifier' => $tenantIdentifier, 'orderReference' => Uuid::uuid4()->toString()]);
-
-        $this->expectException(PaymentByTenantIdentifierAndOrderReferenceNotFoundException::class);
 
         // Act
         $this->tester->runMessageReceiveTest($capturePaymentTransfer, 'payment-commands');
