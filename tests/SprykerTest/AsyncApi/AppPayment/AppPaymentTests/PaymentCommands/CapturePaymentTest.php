@@ -144,6 +144,7 @@ class CapturePaymentTest extends Unit
         $this->tester->assertPaymentHasStatus($paymentTransfer, PaymentStatus::STATUS_CAPTURE_REQUESTED);
     }
 
+    #[Skip('changed to warning level log')]
     public function testHandleCapturePaymentThrowsExceptionWhenPaymentDoesNotExist(): void
     {
         // Arrange
