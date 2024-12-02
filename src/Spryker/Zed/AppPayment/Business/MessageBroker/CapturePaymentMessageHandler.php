@@ -22,7 +22,6 @@ use Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTenantIdentifierAndOrd
 
 class CapturePaymentMessageHandler implements CapturePaymentMessageHandlerInterface
 {
-
     use LoggerTrait;
 
     public function __construct(
