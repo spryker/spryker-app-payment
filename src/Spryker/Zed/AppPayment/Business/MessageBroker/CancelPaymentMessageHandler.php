@@ -17,6 +17,7 @@ use Spryker\Zed\AppPayment\Business\Payment\Cancel\CancelPayment;
 use Spryker\Zed\AppPayment\Business\Payment\Message\MessageSender;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface;
+use Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTenantIdentifierAndOrderReferenceNotFoundException;
 
 class CancelPaymentMessageHandler implements CancelPaymentMessageHandlerInterface
 {
