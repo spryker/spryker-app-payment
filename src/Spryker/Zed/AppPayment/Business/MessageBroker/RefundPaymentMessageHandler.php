@@ -19,6 +19,7 @@ use Spryker\Zed\AppPayment\Business\Payment\Message\MessageSender;
 use Spryker\Zed\AppPayment\Business\Payment\Refund\PaymentRefunder;
 use Spryker\Zed\AppPayment\Business\Payment\Refund\PaymentRefundStatus;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface;
+use Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTenantIdentifierAndOrderReferenceNotFoundException;
 
 class RefundPaymentMessageHandler implements RefundPaymentMessageHandlerInterface
 {
@@ -36,10 +37,16 @@ class RefundPaymentMessageHandler implements RefundPaymentMessageHandlerInterfac
     {
         $tenantIdentifier = $this->tenantIdentifierExtractor->getTenantIdentifierFromMessage($refundPaymentTransfer);
 
-        $paymentTransfer = $this->appPaymentRepository->getPaymentByTenantIdentifierAndOrderReference(
-            $tenantIdentifier,
-            $refundPaymentTransfer->getOrderReferenceOrFail(),
-        );
+        try {
+            $paymentTransfer = $this->appPaymentRepository->getPaymentByTenantIdentifierAndOrderReference(
+                $tenantIdentifier,
+                $refundPaymentTransfer->getOrderReferenceOrFail(),
+            );
+        } catch (PaymentByTenantIdentifierAndOrderReferenceNotFoundException $paymentByTenantIdentifierAndOrderReferenceNotFoundException) {
+            $this->getLogger()->warning($paymentByTenantIdentifierAndOrderReferenceNotFoundException->getMessage());
+
+            return;
+        }
 
         $refundPaymentRequestTransfer = (new RefundPaymentRequestTransfer())
             ->setTransactionId($paymentTransfer->getTransactionIdOrFail())
