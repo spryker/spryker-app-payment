@@ -11,14 +11,18 @@ use Generated\Shared\Transfer\CancelPaymentRequestTransfer;
 use Generated\Shared\Transfer\CancelPaymentResponseTransfer;
 use Generated\Shared\Transfer\CancelPaymentTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
+use Spryker\Shared\Log\LoggerTrait;
 use Spryker\Zed\AppPayment\Business\MessageBroker\TenantIdentifier\TenantIdentifierExtractor;
 use Spryker\Zed\AppPayment\Business\Payment\Cancel\CancelPayment;
 use Spryker\Zed\AppPayment\Business\Payment\Message\MessageSender;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface;
+use Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTenantIdentifierAndOrderReferenceNotFoundException;
 
 class CancelPaymentMessageHandler implements CancelPaymentMessageHandlerInterface
 {
+    use LoggerTrait;
+
     public function __construct(
         protected AppPaymentRepositoryInterface $appPaymentRepository,
         protected TenantIdentifierExtractor $tenantIdentifierExtractor,
@@ -32,10 +36,16 @@ class CancelPaymentMessageHandler implements CancelPaymentMessageHandlerInterfac
     ): void {
         $tenantIdentifier = $this->tenantIdentifierExtractor->getTenantIdentifierFromMessage($cancelPaymentTransfer);
 
-        $paymentTransfer = $this->appPaymentRepository->getPaymentByTenantIdentifierAndOrderReference(
-            $tenantIdentifier,
-            $cancelPaymentTransfer->getOrderReferenceOrFail(),
-        );
+        try {
+            $paymentTransfer = $this->appPaymentRepository->getPaymentByTenantIdentifierAndOrderReference(
+                $tenantIdentifier,
+                $cancelPaymentTransfer->getOrderReferenceOrFail(),
+            );
+        } catch (PaymentByTenantIdentifierAndOrderReferenceNotFoundException $paymentByTenantIdentifierAndOrderReferenceNotFoundException) {
+            $this->getLogger()->warning($paymentByTenantIdentifierAndOrderReferenceNotFoundException->getMessage());
+
+            return;
+        }
 
         $cancelPaymentRequestTransfer = (new CancelPaymentRequestTransfer())
             ->setTransactionId($paymentTransfer->getTransactionIdOrFail())
