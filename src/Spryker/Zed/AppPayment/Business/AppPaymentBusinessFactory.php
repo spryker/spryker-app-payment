@@ -35,6 +35,8 @@ use Spryker\Zed\AppPayment\Business\Payment\Webhook\Handler\WebhookHandlerSelect
 use Spryker\Zed\AppPayment\Business\Payment\Webhook\WebhookHandler;
 use Spryker\Zed\AppPayment\Business\Payment\Webhook\WebhookMessageSender;
 use Spryker\Zed\AppPayment\Business\Payment\Webhook\WebhookRequestExtender;
+use Spryker\Zed\AppPayment\Business\Payment\Writer\PaymentWriter;
+use Spryker\Zed\AppPayment\Business\Payment\Writer\PaymentWriterInterface;
 use Spryker\Zed\AppPayment\Business\Redirect\Redirect;
 use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToAppKernelFacadeInterface;
 use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToAppWebhookFacadeInterface;
@@ -63,12 +65,12 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
 
     public function createPaymentInitializer(): PaymentInitializer
     {
-        return new PaymentInitializer($this->getPlatformPlugin(), $this->getEntityManager(), $this->getRepository(), $this->createMessageSender(), $this->getConfig(), $this->createAppConfigLoader());
+        return new PaymentInitializer($this->getPlatformPlugin(), $this->getEntityManager(), $this->getRepository(), $this->createPaymentWriter(), $this->createMessageSender(), $this->getConfig(), $this->createAppConfigLoader());
     }
 
     public function createPaymentPreOrder(): PaymentPreOrder
     {
-        return new PaymentPreOrder($this->getPlatformPlugin(), $this->getRepository(), $this->getEntityManager(), $this->getAppWebhookFacade(), $this->createMessageSender(), $this->getConfig(), $this->createAppConfigLoader());
+        return new PaymentPreOrder($this->getPlatformPlugin(), $this->getRepository(), $this->createPaymentWriter(), $this->getAppWebhookFacade(), $this->createMessageSender(), $this->getConfig(), $this->createAppConfigLoader());
     }
 
     public function createPaymentTransfer(): PaymentTransfer
@@ -118,7 +120,7 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
     public function createPaymentWebhookHandler(): PaymentWebhookHandler
     {
         return new PaymentWebhookHandler(
-            $this->getEntityManager(),
+            $this->createPaymentWriter(),
             $this->createPaymentStatusTransitionValidator(),
         );
     }
@@ -208,7 +210,7 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
         return new CancelPayment(
             $this->getPlatformPlugin(),
             $this->createPaymentStatusTransitionValidator(),
-            $this->getEntityManager(),
+            $this->createPaymentWriter(),
             $this->getConfig(),
             $this->createAppConfigLoader(),
         );
@@ -260,11 +262,16 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
 
     public function createPaymentCapturer(): PaymentCapturer
     {
-        return new PaymentCapturer($this->getPlatformPlugin(), $this->getEntityManager(), $this->getConfig(), $this->createAppConfigLoader());
+        return new PaymentCapturer($this->getPlatformPlugin(), $this->createPaymentWriter(), $this->getConfig(), $this->createAppConfigLoader());
     }
 
     public function createRedirect(): Redirect
     {
         return new Redirect($this->getPlatformPlugin(), $this->getRepository(), $this->getConfig(), $this->createAppConfigLoader());
+    }
+
+    public function createPaymentWriter(): PaymentWriterInterface
+    {
+        return new PaymentWriter($this->getEntityManager(), $this->getRepository());
     }
 }

@@ -32,8 +32,10 @@ use Generated\Shared\Transfer\PaymentTransmissionsRequestTransfer;
 use Generated\Shared\Transfer\PaymentTransmissionsResponseTransfer;
 use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentQuery;
+use Orm\Zed\AppPayment\Persistence\SpyPaymentStatusHistoryQuery;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentTransfer;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentTransferQuery;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Ramsey\Uuid\Uuid;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentEntityManager;
@@ -52,6 +54,20 @@ class AppPaymentHelper extends Module
 
         $this->assertNotNull($paymentEntity, sprintf('Could not find a payment with transaction id "%s".', $transactionId));
         $this->assertSame($expectedState, $paymentEntity->getStatus(), sprintf('Expected payment to be in status "%s" but got "%s"', $expectedState, $paymentEntity->getStatus()));
+    }
+
+    public function assertPaymentStatusHistory(string $expectedPaymentStatus, string $transactionId): void
+    {
+        $spyPaymentStatusHistoryQuery = SpyPaymentStatusHistoryQuery::create()
+            ->filterByTransactionId($transactionId)
+            ->orderByCreatedAt(Criteria::DESC)
+            ->findOne();
+
+        if (!$spyPaymentStatusHistoryQuery) {
+            $this->fail(sprintf('Payment status history not found for transaction id "%s".', $transactionId));
+        }
+
+        $this->assertSame($expectedPaymentStatus, $spyPaymentStatusHistoryQuery->getStatus());
     }
 
     public function havePaymentForTransactionId(

@@ -11,7 +11,6 @@ use Generated\Shared\Transfer\CancelPreOrderPaymentRequestTransfer;
 use Generated\Shared\Transfer\CancelPreOrderPaymentResponseTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentRequestTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentResponseTransfer;
-use Generated\Shared\Transfer\PaymentCollectionDeleteCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 use Generated\Shared\Transfer\WebhookInboxCriteriaTransfer;
 use Spryker\Shared\Log\LoggerTrait;
@@ -19,11 +18,11 @@ use Spryker\Zed\AppPayment\AppPaymentConfig;
 use Spryker\Zed\AppPayment\Business\Payment\AppConfig\AppConfigLoader;
 use Spryker\Zed\AppPayment\Business\Payment\Message\MessageSender;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
+use Spryker\Zed\AppPayment\Business\Payment\Writer\PaymentWriterInterface;
 use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToAppWebhookFacadeInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformCancelPreOrderPluginInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformConfirmPreOrderPluginInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
-use Spryker\Zed\AppPayment\Persistence\AppPaymentEntityManagerInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface;
 use Spryker\Zed\Kernel\Persistence\EntityManager\TransactionTrait;
 use Throwable;
@@ -36,7 +35,7 @@ class PaymentPreOrder
     public function __construct(
         protected AppPaymentPlatformPluginInterface $appPaymentPlatformPlugin,
         protected AppPaymentRepositoryInterface $appPaymentRepository,
-        protected AppPaymentEntityManagerInterface $appPaymentEntityManager,
+        protected PaymentWriterInterface $paymentWriter,
         protected AppPaymentToAppWebhookFacadeInterface $appPaymentToAppWebhookFacade,
         protected MessageSender $messageSender,
         protected AppPaymentConfig $appPaymentConfig,
@@ -79,7 +78,7 @@ class PaymentPreOrder
 
         /** @phpstan-var \Generated\Shared\Transfer\ConfirmPreOrderPaymentResponseTransfer */
         return $this->getTransactionHandler()->handleTransaction(function () use ($confirmPreOrderPaymentRequestTransfer, $confirmPreOrderPaymentResponseTransfer) {
-            $this->savePayment($confirmPreOrderPaymentRequestTransfer, $confirmPreOrderPaymentResponseTransfer);
+            $this->confirm($confirmPreOrderPaymentRequestTransfer, $confirmPreOrderPaymentResponseTransfer);
 
             // In case of pre-order payment we may have unprocessed webhook requests persisted and we must process them here
             $webhookInboxCriteriaTransfer = new WebhookInboxCriteriaTransfer();
@@ -125,9 +124,9 @@ class PaymentPreOrder
 
         /** @phpstan-var \Generated\Shared\Transfer\CancelPreOrderPaymentResponseTransfer */
         return $this->getTransactionHandler()->handleTransaction(function () use ($cancelPreOrderPaymentRequestTransfer, $cancelPreOrderPaymentResponseTransfer) {
-            $this->deletePayment($cancelPreOrderPaymentRequestTransfer);
+            $this->cancel($cancelPreOrderPaymentRequestTransfer);
 
-            // In case of pre-order payment we may have unprocessed webhook requests persisted and we must delete them here
+            // In case of pre-order payment we may have unprocessed webhook requests persisted, and we must delete them here
             $webhookInboxCriteriaTransfer = new WebhookInboxCriteriaTransfer();
 
             // Unprocessed webhooks will be persisted by the transaction id
@@ -139,7 +138,7 @@ class PaymentPreOrder
         });
     }
 
-    protected function savePayment(
+    protected function confirm(
         ConfirmPreOrderPaymentRequestTransfer $confirmPreOrderPaymentRequestTransfer,
         ConfirmPreOrderPaymentResponseTransfer $confirmPreOrderPaymentResponseTransfer
     ): void {
@@ -149,18 +148,17 @@ class PaymentPreOrder
             ->setStatus($confirmPreOrderPaymentResponseTransfer->getStatus())
             ->setQuote($confirmPreOrderPaymentRequestTransfer->getOrderData());
 
-        $this->appPaymentEntityManager->savePayment($paymentTransfer);
+        $this->paymentWriter->updatePayment($paymentTransfer);
     }
 
-    protected function deletePayment(
+    protected function cancel(
         CancelPreOrderPaymentRequestTransfer $cancelPreOrderPaymentRequestTransfer
     ): void {
-        $paymentCollectionDeleteCriteriaTransfer = new PaymentCollectionDeleteCriteriaTransfer();
-        $paymentCollectionDeleteCriteriaTransfer
-            ->setTransactionId($cancelPreOrderPaymentRequestTransfer->getTransactionIdOrFail())
-            ->setTenantIdentifier($cancelPreOrderPaymentRequestTransfer->getTenantIdentifierOrFail());
+        $paymentTransfer = $cancelPreOrderPaymentRequestTransfer->getPaymentOrFail();
+        $paymentTransfer
+            ->setStatus(PaymentStatus::STATUS_CANCELED);
 
-        $this->appPaymentEntityManager->deletePaymentCollection($paymentCollectionDeleteCriteriaTransfer);
+        $this->paymentWriter->updatePayment($paymentTransfer);
     }
 
     protected function sendMessages(

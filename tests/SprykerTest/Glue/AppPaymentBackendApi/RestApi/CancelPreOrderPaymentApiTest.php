@@ -18,6 +18,7 @@ use Generated\Shared\Transfer\WebhookRequestTransfer;
 use Ramsey\Uuid\Uuid;
 use Spryker\Glue\AppPaymentBackendApi\Mapper\Payment\GlueRequestPaymentMapper;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
+use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformCancelPreOrderPluginInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use SprykerTest\Glue\AppPaymentBackendApi\AppPaymentBackendApiTester;
@@ -77,8 +78,47 @@ class CancelPreOrderPaymentApiTest extends Unit
         // Assert
         $this->tester->seeResponseCodeIs(Response::HTTP_OK);
 
-        // The canceled pre-order payment should no longer exists in the database.
-        $this->tester->assertPaymentWithTransactionIdDoesNotExists($transactionId);
+        $this->tester->assertPaymentStatusHistory(PaymentStatus::STATUS_CANCELED, $transactionId);
+    }
+
+    public function testCancelPreOrderPaymentPostRequestReturnsHttpResponseCode200AndPersistsPaymentStatusHistory(): void
+    {
+        // Arrange
+        $transactionId = Uuid::uuid4()->toString();
+
+        $cancelPreOrderPaymentRequestTransfer = $this->tester->haveCancelPreOrderPaymentRequestTransfer([
+            CancelPreOrderPaymentRequestTransfer::TRANSACTION_ID => $transactionId,
+        ]);
+
+        $this->tester->haveAppConfigForTenant($cancelPreOrderPaymentRequestTransfer->getTenantIdentifier());
+        $this->tester->havePaymentForTransactionId($cancelPreOrderPaymentRequestTransfer->getTransactionId(), $cancelPreOrderPaymentRequestTransfer->getTenantIdentifier());
+
+        $cancelPreOrderPaymentResponseTransfer = new CancelPreOrderPaymentResponseTransfer();
+        $cancelPreOrderPaymentResponseTransfer
+            ->setIsSuccessful(true);
+
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformCancelPreOrderPluginInterface::class, [
+            'cancelPreOrderPayment' => function (CancelPreOrderPaymentRequestTransfer $cancelPreOrderPaymentRequestTransfer) use ($cancelPreOrderPaymentResponseTransfer) {
+                // Ensure that the AppConfig is always passed to the platform plugin.
+                $this->assertInstanceOf(AppConfigTransfer::class, $cancelPreOrderPaymentRequestTransfer->getAppConfig());
+                $this->assertInstanceOf(PaymentTransfer::class, $cancelPreOrderPaymentRequestTransfer->getPayment());
+
+                return $cancelPreOrderPaymentResponseTransfer;
+            },
+        ]);
+
+        $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
+
+        // Act
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $cancelPreOrderPaymentRequestTransfer->getTenantIdentifier());
+        $this->tester->addHeader('Content-Type', 'application/json');
+
+        $this->tester->sendPost($this->tester->buildCancelPreOrderPaymentUrl(), $cancelPreOrderPaymentRequestTransfer->toArray());
+
+        // Assert
+        $this->tester->seeResponseCodeIs(Response::HTTP_OK);
+
+        $this->tester->assertPaymentStatusHistory(PaymentStatus::STATUS_CANCELED, $transactionId);
     }
 
     public function testCancelPreOrderPaymentPostRequestReturnsHttpResponseCode200WhenThePaymentPlatformHasNotImplementedTheAppCancelPreOrderPaymentPlatformPlugin(): void

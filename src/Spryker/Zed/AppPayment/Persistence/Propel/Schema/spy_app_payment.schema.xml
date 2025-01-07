@@ -26,6 +26,19 @@
         </behavior>
     </table>
 
+    <table name="spy_payment_status_history" idMethod="native" class="SpyPaymentStatusHistory">
+        <column name="id_payment_status_history" type="INTEGER" required="true" autoIncrement="true" primaryKey="true"/>
+        <column name="tenant_identifier" type="CHAR" size="60"/>
+        <column name="transaction_id" type="CHAR" size="36"/>
+        <column name="order_reference" type="CHAR" size="36"/>
+        <column name="status" type="CHAR" size="64"/>
+
+        <behavior name="timestampable">
+            <parameter name="create_column" value="created_at"/>
+            <parameter name="update_column" value="updated_at"/>
+        </behavior>
+    </table>
+
     <table name="spy_payment_transfer" idMethod="native" class="SpyPaymentTransfer">
         <column name="id_payment_transfer" type="INTEGER" required="true" autoIncrement="true" primaryKey="true"/>
         <column name="tenant_identifier" type="CHAR" size="60"/>

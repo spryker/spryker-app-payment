@@ -49,7 +49,12 @@ class PaymentMapper
         $paymentData = $spyPayment->toArray();
         $paymentData[PaymentTransfer::QUOTE] = $quoteData;
 
-        return $paymentTransfer->fromArray($paymentData, true);
+        $paymentTransfer = $paymentTransfer->fromArray($paymentData, true);
+
+        // Setting the originPayment to be able to compare later if needed.
+        $paymentTransfer->setOriginPayment(clone $paymentTransfer);
+
+        return $paymentTransfer;
     }
 
     public function mapPaymentMethodTransferToPaymentMethodEntity(

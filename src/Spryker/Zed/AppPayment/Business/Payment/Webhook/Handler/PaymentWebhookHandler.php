@@ -13,7 +13,7 @@ use Generated\Shared\Transfer\WebhookResponseTransfer;
 use Spryker\Shared\Log\LoggerTrait;
 use Spryker\Zed\AppPayment\Business\Message\MessageBuilder;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatusTransitionValidator;
-use Spryker\Zed\AppPayment\Persistence\AppPaymentEntityManagerInterface;
+use Spryker\Zed\AppPayment\Business\Payment\Writer\PaymentWriterInterface;
 use Throwable;
 
 class PaymentWebhookHandler implements WebhookHandlerInterface
@@ -21,7 +21,7 @@ class PaymentWebhookHandler implements WebhookHandlerInterface
     use LoggerTrait;
 
     public function __construct(
-        protected AppPaymentEntityManagerInterface $appPaymentEntityManager,
+        protected PaymentWriterInterface $paymentWriter,
         protected PaymentStatusTransitionValidator $paymentStatusTransitionValidator
     ) {
     }
@@ -53,7 +53,7 @@ class PaymentWebhookHandler implements WebhookHandlerInterface
         $paymentTransfer->setStatus($webhookResponseTransfer->getPaymentStatus());
 
         try {
-            $this->appPaymentEntityManager->savePayment($paymentTransfer);
+            $this->paymentWriter->updatePayment($paymentTransfer);
         } catch (Throwable $throwable) {
             $this->getLogger()->error($throwable->getMessage(), [
                 PaymentTransfer::TRANSACTION_ID => $paymentTransfer->getTransactionIdOrFail(),

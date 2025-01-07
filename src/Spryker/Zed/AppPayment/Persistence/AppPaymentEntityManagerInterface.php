@@ -16,7 +16,7 @@ interface AppPaymentEntityManagerInterface
 {
     public function createPayment(PaymentTransfer $paymentTransfer): PaymentTransfer;
 
-    public function savePayment(PaymentTransfer $paymentTransfer): PaymentTransfer;
+    public function updatePayment(PaymentTransfer $paymentTransfer): PaymentTransfer;
 
     public function savePaymentTransfer(PaymentTransmissionTransfer $paymentTransmissionTransfer): PaymentTransmissionTransfer;
 
@@ -29,4 +29,6 @@ interface AppPaymentEntityManagerInterface
     ): void;
 
     public function updatePaymentTransactionId(PaymentTransfer $paymentTransfer, string $transactionId): void;
+
+    public function savePaymentStatusHistory(PaymentTransfer $paymentTransfer): void;
 }

@@ -199,6 +199,7 @@
         <property name="redirectCancelUrl" type="string"/>
         <property name="additionalPaymentData" type="array" associative="true" singular="additionalPaymentDatum"/>
         <property name="details" type="string"/>
+        <property name="originPayment" type="Payment" description="This is the origin payment right after fetching from DB or after creation. It an be used to compare after it may have been changed."/>
     </transfer>
 
     <transfer name="PaymentRefund" strict="true">

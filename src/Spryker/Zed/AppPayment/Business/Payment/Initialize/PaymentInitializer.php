@@ -15,6 +15,7 @@ use Spryker\Zed\AppPayment\AppPaymentConfig;
 use Spryker\Zed\AppPayment\Business\Payment\AppConfig\AppConfigLoader;
 use Spryker\Zed\AppPayment\Business\Payment\Message\MessageSender;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
+use Spryker\Zed\AppPayment\Business\Payment\Writer\PaymentWriterInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentEntityManagerInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface;
@@ -30,6 +31,7 @@ class PaymentInitializer
         protected AppPaymentPlatformPluginInterface $appPaymentPlatformPlugin,
         protected AppPaymentEntityManagerInterface $appPaymentEntityManager,
         protected AppPaymentRepositoryInterface $appPaymentRepository,
+        protected PaymentWriterInterface $paymentWriter,
         protected MessageSender $messageSender,
         protected AppPaymentConfig $appPaymentConfig,
         protected AppConfigLoader $appConfigLoader
@@ -73,7 +75,7 @@ class PaymentInitializer
         /** @phpstan-var \Generated\Shared\Transfer\InitializePaymentResponseTransfer */
         return $this->getTransactionHandler()->handleTransaction(function () use ($initializePaymentRequestTransfer, $initializePaymentResponseTransfer) {
             // When we have already persisted a payment in the database and this method is called a second time the payment will be set in the request transfer
-            // In this case we are in the pre-order payment process and we don't want to save the payment again.
+            // In this case we are in the pre-order payment process, and we don't want to save the payment again.
             // When the grandTotal has changed the response will contain a different transactionId as we have persisted in the database because so we need to update
             if ($initializePaymentRequestTransfer->getPayment() instanceof PaymentTransfer) {
                 // Nothing has changed so we can step out here
@@ -135,6 +137,6 @@ class PaymentInitializer
             ->setRedirectCancelUrl($initializePaymentRequestTransfer->getRedirectCancelUrl())
             ->setStatus(PaymentStatus::STATUS_NEW);
 
-        $this->appPaymentEntityManager->createPayment($paymentTransfer);
+        $this->paymentWriter->createPayment($paymentTransfer);
     }
 }

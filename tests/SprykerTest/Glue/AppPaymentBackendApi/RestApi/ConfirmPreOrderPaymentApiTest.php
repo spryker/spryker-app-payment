@@ -83,6 +83,48 @@ class ConfirmPreOrderPaymentApiTest extends Unit
         $this->tester->seeResponseCodeIs(Response::HTTP_OK);
     }
 
+    public function testConfirmPreOrderPaymentPostRequestReturnsHttpResponseCode200NadPersistsPaymentStatusHistory(): void
+    {
+        // Arrange
+        $transactionId = Uuid::uuid4()->toString();
+
+        $confirmPreOrderPaymentRequestTransfer = $this->tester->haveConfirmPreOrderPaymentRequestTransfer([
+            ConfirmPreOrderPaymentRequestTransfer::TRANSACTION_ID => $transactionId,
+        ]);
+
+        $this->tester->haveAppConfigForTenant($confirmPreOrderPaymentRequestTransfer->getTenantIdentifier());
+        $paymentTransfer = $this->tester->havePaymentForTransactionId($confirmPreOrderPaymentRequestTransfer->getTransactionId(), $confirmPreOrderPaymentRequestTransfer->getTenantIdentifier());
+
+        $confirmPreOrderPaymentRequestTransfer->setOrderData($paymentTransfer->getQuote());
+
+        $confirmPreOrderPaymentResponseTransfer = new ConfirmPreOrderPaymentResponseTransfer();
+        $confirmPreOrderPaymentResponseTransfer
+            ->setIsSuccessful(true)
+            ->setStatus(PaymentStatus::STATUS_AUTHORIZED);
+
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformConfirmPreOrderPluginInterface::class, [
+            'confirmPreOrderPayment' => function (ConfirmPreOrderPaymentRequestTransfer $confirmPreOrderPaymentRequestTransfer) use ($confirmPreOrderPaymentResponseTransfer) {
+                // Ensure that the AppConfig is always passed to the platform plugin.
+                $this->assertInstanceOf(AppConfigTransfer::class, $confirmPreOrderPaymentRequestTransfer->getAppConfig());
+                $this->assertInstanceOf(PaymentTransfer::class, $confirmPreOrderPaymentRequestTransfer->getPayment());
+
+                return $confirmPreOrderPaymentResponseTransfer;
+            },
+        ]);
+
+        $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
+
+        // Act
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $confirmPreOrderPaymentRequestTransfer->getTenantIdentifier());
+        $this->tester->addHeader('Content-Type', 'application/json');
+
+        $this->tester->sendPost($this->tester->buildConfirmPreOrderPaymentUrl(), $confirmPreOrderPaymentRequestTransfer->toArray());
+
+        // Assert
+        $this->tester->seeResponseCodeIs(Response::HTTP_OK);
+        $this->tester->assertPaymentStatusHistory(PaymentStatus::STATUS_AUTHORIZED, $transactionId);
+    }
+
     public function testConfirmPreOrderPaymentPostRequestReturnsHttpResponseCode200WhenThePaymentPlatformHasNotImplementedTheConfirmPreOrderPaymentPlatformPlugin(): void
     {
         // Arrange

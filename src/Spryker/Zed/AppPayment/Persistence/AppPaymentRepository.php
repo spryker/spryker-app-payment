@@ -56,12 +56,27 @@ class AppPaymentRepository extends AbstractRepository implements AppPaymentRepos
      */
     public function getPaymentByTenantIdentifierAndOrderReference(string $tenantIdentifier, string $orderReference): PaymentTransfer
     {
-        $spyPayment = $this->getFactory()->createPaymentQuery()->filterByTenantIdentifier($tenantIdentifier)
+        $spyPayment = $this->getFactory()->createPaymentQuery()
+            ->filterByTenantIdentifier($tenantIdentifier)
             ->filterByOrderReference($orderReference)
             ->findOne();
 
         if ($spyPayment === null) {
             throw new PaymentByTenantIdentifierAndOrderReferenceNotFoundException($tenantIdentifier, $orderReference);
+        }
+
+        return $this->mapPaymentEntityToPaymentTransfer($spyPayment);
+    }
+
+    public function findPaymentByTenantIdentifierAndOrderReference(string $tenantIdentifier, string $orderReference): ?PaymentTransfer
+    {
+        $spyPayment = $this->getFactory()->createPaymentQuery()
+            ->filterByTenantIdentifier($tenantIdentifier)
+            ->filterByOrderReference($orderReference)
+            ->findOne();
+
+        if ($spyPayment === null) {
+            return null;
         }
 
         return $this->mapPaymentEntityToPaymentTransfer($spyPayment);
