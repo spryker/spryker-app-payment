@@ -10,11 +10,14 @@ namespace Spryker\Zed\AppPayment\Persistence\Propel\Payment\Mapper;
 use Generated\Shared\Transfer\PaymentCollectionTransfer;
 use Generated\Shared\Transfer\PaymentMethodTransfer;
 use Generated\Shared\Transfer\PaymentRefundTransfer;
+use Generated\Shared\Transfer\PaymentStatusHistoryCollectionTransfer;
+use Generated\Shared\Transfer\PaymentStatusHistoryTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 use Orm\Zed\AppPayment\Persistence\SpyPayment;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentMethod;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentRefund;
+use Orm\Zed\AppPayment\Persistence\SpyPaymentStatusHistory;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentTransfer;
 use Propel\Runtime\Collection\Collection;
 
@@ -130,5 +133,30 @@ class PaymentMapper
         $paymentTransmissionData[PaymentTransmissionTransfer::ITEM_REFERENCES] = explode(',', (string)$spyPaymentTransfer->getItemReferences());
 
         return $paymentTransmissionTransfer->fromArray($paymentTransmissionData, true);
+    }
+
+    /**
+     * @param \Propel\Runtime\Collection\Collection<\Orm\Zed\AppPayment\Persistence\SpyPaymentStatusHistory> $collection
+     */
+    public function mapPaymentStatusHistoryEntitiesToPaymentStatusHistoryCollectionTransfer(
+        Collection $collection,
+        PaymentStatusHistoryCollectionTransfer $paymentStatusHistoryCollectionTransfer
+    ): PaymentStatusHistoryCollectionTransfer {
+        foreach ($collection as $paymentStatusHistoryEntity) {
+            $paymentStatusHistoryCollectionTransfer->addPaymentStatusHistory(
+                $this->mapPaymentStatusHistoryEntityToPaymentStatusHistoryTransfer($paymentStatusHistoryEntity, new PaymentStatusHistoryTransfer()),
+            );
+        }
+
+        return $paymentStatusHistoryCollectionTransfer;
+    }
+
+    public function mapPaymentStatusHistoryEntityToPaymentStatusHistoryTransfer(
+        SpyPaymentStatusHistory $spyPaymentStatusHistory,
+        PaymentStatusHistoryTransfer $paymentStatusHistoryTransfer
+    ): PaymentStatusHistoryTransfer {
+        $paymentStatusHistoryTransfer->fromArray($spyPaymentStatusHistory->toArray(), true);
+
+        return $paymentStatusHistoryTransfer;
     }
 }

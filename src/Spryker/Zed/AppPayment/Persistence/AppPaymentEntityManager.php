@@ -111,6 +111,7 @@ class AppPaymentEntityManager extends AbstractEntityManager implements AppPaymen
     {
         $spyPaymentStatusHistory = new SpyPaymentStatusHistory();
         $spyPaymentStatusHistory->fromArray($paymentTransfer->toArray());
+
         $spyPaymentStatusHistory->save();
     }
 }

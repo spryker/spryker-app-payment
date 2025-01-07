@@ -8,8 +8,6 @@
 namespace Spryker\Zed\AppPayment\Business\Payment\Message;
 
 use ArrayObject;
-use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
-use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
 use Generated\Shared\Transfer\MessageContextTransfer;
 use Generated\Shared\Transfer\PaymentAuthorizationFailedTransfer;
 use Generated\Shared\Transfer\PaymentAuthorizedTransfer;
@@ -101,19 +99,16 @@ class MessageSender extends AbstractMessageSender
     }
 
     public function sendPaymentCreatedMessage(
-        InitializePaymentRequestTransfer $initializePaymentRequestTransfer,
-        InitializePaymentResponseTransfer $initializePaymentResponseTransfer
+        PaymentTransfer $paymentTransfer
     ): void {
-        $quoteTransfer = $initializePaymentRequestTransfer->getOrderDataOrFail();
-
         $paymentCreatedTransfer = new PaymentCreatedTransfer();
-        $paymentCreatedTransfer->fromArray($initializePaymentResponseTransfer->toArray(), true);
+        $paymentCreatedTransfer->fromArray($paymentTransfer->toArray(), true);
         $paymentCreatedTransfer
-            ->setEntityReference($quoteTransfer->getOrderReference())
-            ->setPaymentReference($initializePaymentResponseTransfer->getTransactionIdOrFail());
+            ->setEntityReference($paymentTransfer->getOrderReference())
+            ->setPaymentReference($paymentTransfer->getTransactionIdOrFail());
 
         $paymentCreatedTransfer->setMessageAttributes($this->getMessageAttributes(
-            $initializePaymentRequestTransfer->getTenantIdentifierOrFail(),
+            $paymentTransfer->getTenantIdentifierOrFail(),
             $paymentCreatedTransfer::class,
         ));
 

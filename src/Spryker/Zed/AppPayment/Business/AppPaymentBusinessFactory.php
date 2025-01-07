@@ -272,6 +272,6 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
 
     public function createPaymentWriter(): PaymentWriterInterface
     {
-        return new PaymentWriter($this->getEntityManager(), $this->getRepository());
+        return new PaymentWriter($this->getEntityManager(), $this->getRepository(), $this->createMessageSender());
     }
 }

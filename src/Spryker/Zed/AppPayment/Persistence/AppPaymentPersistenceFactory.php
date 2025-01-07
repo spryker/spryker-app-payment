@@ -10,6 +10,7 @@ namespace Spryker\Zed\AppPayment\Persistence;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentMethodQuery;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentQuery;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentRefundQuery;
+use Orm\Zed\AppPayment\Persistence\SpyPaymentStatusHistoryQuery;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentTransferQuery;
 use Spryker\Zed\AppPayment\Persistence\Propel\Payment\Mapper\PaymentMapper;
 use Spryker\Zed\Kernel\Persistence\AbstractPersistenceFactory;
@@ -44,5 +45,10 @@ class AppPaymentPersistenceFactory extends AbstractPersistenceFactory
     public function createPaymentMapper(): PaymentMapper
     {
         return new PaymentMapper();
+    }
+
+    public function createPaymentStatusHistoryQuery(): SpyPaymentStatusHistoryQuery
+    {
+        return new SpyPaymentStatusHistoryQuery();
     }
 }

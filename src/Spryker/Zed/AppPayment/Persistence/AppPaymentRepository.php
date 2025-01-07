@@ -11,6 +11,8 @@ use Generated\Shared\Transfer\PaymentCollectionTransfer;
 use Generated\Shared\Transfer\PaymentCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentMethodTransfer;
 use Generated\Shared\Transfer\PaymentRefundTransfer;
+use Generated\Shared\Transfer\PaymentStatusHistoryCollectionTransfer;
+use Generated\Shared\Transfer\PaymentStatusHistoryCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 use Orm\Zed\AppPayment\Persistence\SpyPayment;
@@ -35,6 +37,29 @@ class AppPaymentRepository extends AbstractRepository implements AppPaymentRepos
 
         return $this->getFactory()->createPaymentMapper()
             ->mapPaymentEntitiesToPaymentCollectionTransfer($paymentCollection, new PaymentCollectionTransfer());
+    }
+
+    public function getPaymentStatusHistoryCollection(
+        PaymentStatusHistoryCriteriaTransfer $paymentStatusHistoryCriteriaTransfer
+    ): PaymentStatusHistoryCollectionTransfer {
+        $spyPaymentStatusHistoryQuery = $this->getFactory()->createPaymentStatusHistoryQuery();
+
+        if ($paymentStatusHistoryCriteriaTransfer->getTransactionId() !== null && $paymentStatusHistoryCriteriaTransfer->getTransactionId() !== '' && $paymentStatusHistoryCriteriaTransfer->getTransactionId() !== '0') {
+            $spyPaymentStatusHistoryQuery->filterByTransactionId($paymentStatusHistoryCriteriaTransfer->getTransactionId());
+        }
+
+        if ($paymentStatusHistoryCriteriaTransfer->getTenantIdentifier() !== null && $paymentStatusHistoryCriteriaTransfer->getTenantIdentifier() !== '' && $paymentStatusHistoryCriteriaTransfer->getTenantIdentifier() !== '0') {
+            $spyPaymentStatusHistoryQuery->filterByTenantIdentifier($paymentStatusHistoryCriteriaTransfer->getTenantIdentifier());
+        }
+
+        if ($paymentStatusHistoryCriteriaTransfer->getOrderReference() !== null && $paymentStatusHistoryCriteriaTransfer->getOrderReference() !== '' && $paymentStatusHistoryCriteriaTransfer->getOrderReference() !== '0') {
+            $spyPaymentStatusHistoryQuery->filterByOrderReference($paymentStatusHistoryCriteriaTransfer->getOrderReference());
+        }
+
+        $collection = $spyPaymentStatusHistoryQuery->find();
+
+        return $this->getFactory()->createPaymentMapper()
+            ->mapPaymentStatusHistoryEntitiesToPaymentStatusHistoryCollectionTransfer($collection, new PaymentStatusHistoryCollectionTransfer());
     }
 
     /**
@@ -63,20 +88,6 @@ class AppPaymentRepository extends AbstractRepository implements AppPaymentRepos
 
         if ($spyPayment === null) {
             throw new PaymentByTenantIdentifierAndOrderReferenceNotFoundException($tenantIdentifier, $orderReference);
-        }
-
-        return $this->mapPaymentEntityToPaymentTransfer($spyPayment);
-    }
-
-    public function findPaymentByTenantIdentifierAndOrderReference(string $tenantIdentifier, string $orderReference): ?PaymentTransfer
-    {
-        $spyPayment = $this->getFactory()->createPaymentQuery()
-            ->filterByTenantIdentifier($tenantIdentifier)
-            ->filterByOrderReference($orderReference)
-            ->findOne();
-
-        if ($spyPayment === null) {
-            return null;
         }
 
         return $this->mapPaymentEntityToPaymentTransfer($spyPayment);

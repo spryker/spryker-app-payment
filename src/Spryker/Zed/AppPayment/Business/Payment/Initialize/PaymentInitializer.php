@@ -91,8 +91,7 @@ class PaymentInitializer
                 return $initializePaymentResponseTransfer;
             }
 
-            $this->savePayment($initializePaymentRequestTransfer, $initializePaymentResponseTransfer);
-            $this->messageSender->sendPaymentCreatedMessage($initializePaymentRequestTransfer, $initializePaymentResponseTransfer);
+            $this->createPayment($initializePaymentRequestTransfer, $initializePaymentResponseTransfer);
 
             return $initializePaymentResponseTransfer;
         });
@@ -120,7 +119,7 @@ class PaymentInitializer
         return $initializePaymentResponseTransfer;
     }
 
-    protected function savePayment(
+    protected function createPayment(
         InitializePaymentRequestTransfer $initializePaymentRequestTransfer,
         InitializePaymentResponseTransfer $initializePaymentResponseTransfer
     ): void {

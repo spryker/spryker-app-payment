@@ -7,7 +7,9 @@
 
 namespace Spryker\Zed\AppPayment\Business\Payment\Writer;
 
+use Generated\Shared\Transfer\PaymentStatusHistoryCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
+use Spryker\Zed\AppPayment\Business\Payment\Message\MessageSender;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentEntityManagerInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface;
 
@@ -15,7 +17,8 @@ class PaymentWriter implements PaymentWriterInterface
 {
     public function __construct(
         protected AppPaymentEntityManagerInterface $appPaymentEntityManager,
-        protected AppPaymentRepositoryInterface $appPaymentRepository
+        protected AppPaymentRepositoryInterface $appPaymentRepository,
+        protected MessageSender $messageSender
     ) {
     }
 
@@ -23,14 +26,50 @@ class PaymentWriter implements PaymentWriterInterface
     {
         $this->persistStatusHistory($paymentTransfer);
 
-        return $this->appPaymentEntityManager->createPayment($paymentTransfer);
+        $paymentTransfer = $this->appPaymentEntityManager->createPayment($paymentTransfer);
+        $paymentTransfer = $this->addPaymentStatusHistoryToDetails($paymentTransfer);
+
+        $this->messageSender->sendPaymentCreatedMessage($paymentTransfer);
+
+        return $paymentTransfer;
     }
 
     public function updatePayment(PaymentTransfer $paymentTransfer): PaymentTransfer
     {
         $this->persistStatusHistory($paymentTransfer);
 
-        return $this->appPaymentEntityManager->updatePayment($paymentTransfer);
+        $paymentTransfer = $this->appPaymentEntityManager->updatePayment($paymentTransfer);
+        $paymentTransfer = $this->addPaymentStatusHistoryToDetails($paymentTransfer);
+
+        $this->messageSender->sendPaymentUpdatedMessage($paymentTransfer);
+
+        return $paymentTransfer;
+    }
+
+    protected function addPaymentStatusHistoryToDetails(PaymentTransfer $paymentTransfer): PaymentTransfer
+    {
+        $paymentStatusHistoryCriteriaTransfer = new PaymentStatusHistoryCriteriaTransfer();
+        $paymentStatusHistoryCriteriaTransfer
+            ->setTransactionId($paymentTransfer->getTransactionIdOrFail());
+
+        $paymentStatusHistoryCollection = $this->appPaymentRepository->getPaymentStatusHistoryCollection($paymentStatusHistoryCriteriaTransfer);
+
+        $paymentStatusHistories = [];
+
+        foreach ($paymentStatusHistoryCollection->getPaymentStatusHistory() as $paymentStatusHistoryTransfer) {
+            $paymentStatusHistories[] = [
+                'status' => $paymentStatusHistoryTransfer->getStatus(),
+                'created' => $paymentStatusHistoryTransfer->getCreatedAt(),
+            ];
+        }
+
+        $details = $paymentTransfer->getDetails() ?? '{}';
+        $detailsArray = json_decode($details, true);
+        $detailsArray['paymentStatusHistory'] = $paymentStatusHistories;
+
+        $paymentTransfer->setDetails((string)json_encode($detailsArray));
+
+        return $paymentTransfer;
     }
 
     protected function persistStatusHistory(PaymentTransfer $paymentTransfer): void
