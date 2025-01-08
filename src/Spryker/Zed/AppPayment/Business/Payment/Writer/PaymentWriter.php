@@ -58,26 +58,15 @@ class PaymentWriter implements PaymentWriterInterface
         $details = $paymentTransfer->getDetails() ?? '{}';
         $detailsArray = json_decode($details, true);
 
-        /**
-         * We need to create a table like structure on the receiving side as we can only display key: value pairs.
-         *
-         * @example
-         * | External status "new" | 2025-01-01 12:00:00 |
-         * | External status "authorized" | 2025-01-01 12:00:01 |
-         *
-         * For this, we pad the status key with spaces to have a fixed length.
-         */
-        $padLength = 50; // Includes 18 characters for "External status """.
-
         $paymentStatusHistoryTransfers = $paymentStatusHistoryCollectionTransfer->getPaymentStatusHistory();
 
         foreach ($paymentStatusHistoryTransfers as $paymentStatusHistoryTransfer) {
             $statusText = sprintf('External status "%s"', $paymentStatusHistoryTransfer->getStatus());
+
             $dateTime = new DateTime($paymentStatusHistoryTransfer->getCreatedAtOrFail());
             $formattedDateTime = $dateTime->format('Y-m-d H:i:s');
-            $paddedDateTime = str_pad($formattedDateTime, $padLength - mb_strlen($statusText), ' ', STR_PAD_LEFT);
 
-            $detailsArray[$statusText] = $paddedDateTime;
+            $detailsArray[$statusText] = $formattedDateTime;
         }
 
         $paymentTransfer->setDetails((string)json_encode($detailsArray));
