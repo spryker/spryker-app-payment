@@ -7,6 +7,7 @@
 
 namespace Spryker\Zed\AppPayment\Business\Payment\Writer;
 
+use DateTime;
 use Generated\Shared\Transfer\PaymentStatusHistoryCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 use Spryker\Zed\AppPayment\Business\Payment\Message\MessageSender;
@@ -66,15 +67,17 @@ class PaymentWriter implements PaymentWriterInterface
          *
          * For this, we pad the status key with spaces to have a fixed length.
          */
-        $minLengthOfStatusKey = 50; // Includes 18 characters for "External status """.
+        $padLength = 50; // Includes 18 characters for "External status """.
 
         $paymentStatusHistoryTransfers = $paymentStatusHistoryCollectionTransfer->getPaymentStatusHistory();
 
         foreach ($paymentStatusHistoryTransfers as $paymentStatusHistoryTransfer) {
             $statusText = sprintf('External status "%s"', $paymentStatusHistoryTransfer->getStatus());
-            $statusText = str_pad($statusText, $minLengthOfStatusKey, ' ');
+            $dateTime = new DateTime($paymentStatusHistoryTransfer->getCreatedAtOrFail());
+            $formattedDateTime = $dateTime->format('Y-m-d H:i:s');
+            $paddedDateTime = str_pad($formattedDateTime, $padLength - mb_strlen($statusText), ' ', STR_PAD_LEFT);
 
-            $detailsArray[$statusText] = $paymentStatusHistoryTransfer->getCreatedAt();
+            $detailsArray[$statusText] = $paddedDateTime;
         }
 
         $paymentTransfer->setDetails((string)json_encode($detailsArray));
