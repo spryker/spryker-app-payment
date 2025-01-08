@@ -52,11 +52,13 @@ class PaymentWriter implements PaymentWriterInterface
         $paymentStatusHistoryCriteriaTransfer
             ->setTransactionId($paymentTransfer->getTransactionIdOrFail());
 
-        $paymentStatusHistoryCollection = $this->appPaymentRepository->getPaymentStatusHistoryCollection($paymentStatusHistoryCriteriaTransfer);
+        $paymentStatusHistoryCollectionTransfer = $this->appPaymentRepository->getPaymentStatusHistoryCollection($paymentStatusHistoryCriteriaTransfer);
 
         $paymentStatusHistories = [];
 
-        foreach ($paymentStatusHistoryCollection->getPaymentStatusHistory() as $paymentStatusHistoryTransfer) {
+        $paymentStatusHistoryTransfers = $paymentStatusHistoryCollectionTransfer->getPaymentStatusHistory();
+
+        foreach ($paymentStatusHistoryTransfers as $paymentStatusHistoryTransfer) {
             $paymentStatusHistories[] = [
                 'status' => $paymentStatusHistoryTransfer->getStatus(),
                 'created' => $paymentStatusHistoryTransfer->getCreatedAt(),
