@@ -31,14 +31,21 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PaymentGlueBackendApiHelper extends SprykerGlueBackendApiHelper
 {
+    public function sendPost(string $url, array $parameters = [], ?string $content = null): Response
+    {
+        return $this->executeRequest($url, 'POST', $parameters, $content);
+    }
+
     /**
      * @param array<mixed, mixed>|string $parameters
      */
-    protected function executeRequest(string $url, string $method, array $parameters = []): Response
+    protected function executeRequest(string $url, string $method, array $parameters = [], ?string $content = null): Response
     {
         $this->addHeader('Accept', 'application/json');
 
-        $request = Request::create($url, strtolower($method), $parameters, [], [], [], $parameters !== [] ? json_encode($parameters, JSON_PRESERVE_ZERO_FRACTION | JSON_THROW_ON_ERROR) : null);
+        $content = $content ?? ($parameters ? json_encode($parameters, JSON_PRESERVE_ZERO_FRACTION | JSON_THROW_ON_ERROR) : null);
+
+        $request = Request::create($url, strtolower($method), $parameters, [], [], [], $content);
         $request = $this->removeServerAndHeaderDefaults($request);
 
         $request->headers->add($this->headers);
@@ -142,7 +149,10 @@ class PaymentGlueBackendApiHelper extends SprykerGlueBackendApiHelper
     public function seeResponseContainsErrorMessage(string $expectedErrorMessage): void
     {
         $response = json_decode($this->getResponse()->getContent(), true);
-        if (!isset($response['errors'])) {
+
+        $errors = $this->getErrorsFromResponse($response);
+
+        if (!$errors) {
             $this->fail('Response does not contain errors.');
         }
 
@@ -150,20 +160,39 @@ class PaymentGlueBackendApiHelper extends SprykerGlueBackendApiHelper
 
         $errorMessages = [];
 
-        foreach ($response['errors'] as $error) {
-            if ($error['message'] === $expectedErrorMessage) {
+        foreach ($errors as $error) {
+            if ($error === $expectedErrorMessage) {
                 $foundMessage = true;
 
                 break;
             }
 
-            $errorMessages[] = $error['message'];
+            $errorMessages[] = $error;
         }
 
         $this->assertTrue(
             $foundMessage,
             sprintf('Expected to see the error message "%s" in the response, but it was not found. Error messages: "%s"', $expectedErrorMessage, implode('', $errorMessages)),
         );
+    }
+
+    protected function getErrorsFromResponse(array $response): array
+    {
+        $errors = [];
+
+        if (isset($response['errors'])) {
+            foreach ($response['errors'] as $error) {
+                $errors[] = $error['message'];
+            }
+
+            return $errors;
+        }
+
+        foreach ($response as $item) {
+            $errors[] = $item['message'];
+        }
+
+        return $errors;
     }
 
     /**

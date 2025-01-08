@@ -70,7 +70,7 @@ class AppPaymentMethodHelper extends Module
     }
 
     /**
-     * @see {@link PaymentMethod::getDefaultPaymentMethodAppConfiguration()}
+     * @see {@link PaymentMethod::getDefaultPaymentMethodAppConfiguration()} this helper method always has to be aligned with the actual implementation.
      */
     public function getDefaultPaymentMethodAppConfiguration(): PaymentMethodAppConfigurationTransfer
     {
@@ -78,6 +78,13 @@ class AppPaymentMethodHelper extends Module
 
         $paymentMethodAppConfigurationTransfer = new PaymentMethodAppConfigurationTransfer();
         $paymentMethodAppConfigurationTransfer->setBaseUrl($appPaymentConfig->getGlueBaseUrl());
+
+        $preOrderPaymentEndpointTransfer = new EndpointTransfer();
+        $preOrderPaymentEndpointTransfer
+            ->setName('pre-order-payment')
+            ->setPath('/private/pre-order-payment'); // Defined in app_payment_openapi.yml
+
+        $paymentMethodAppConfigurationTransfer->addEndpoint($preOrderPaymentEndpointTransfer);
 
         $authorizationEndpointTransfer = new EndpointTransfer();
         $authorizationEndpointTransfer
@@ -88,8 +95,15 @@ class AppPaymentMethodHelper extends Module
 
         $authorizationEndpointTransfer = new EndpointTransfer();
         $authorizationEndpointTransfer
-            ->setName('pre-order')
+            ->setName('pre-order-confirmation')
             ->setPath('/private/confirm-pre-order-payment'); // Defined in app_payment_openapi.yml
+
+        $paymentMethodAppConfigurationTransfer->addEndpoint($authorizationEndpointTransfer);
+
+        $authorizationEndpointTransfer = new EndpointTransfer();
+        $authorizationEndpointTransfer
+            ->setName('pre-order-cancellation')
+            ->setPath('/private/cancel-pre-order-payment'); // Defined in app_payment_openapi.yml
 
         $paymentMethodAppConfigurationTransfer->addEndpoint($authorizationEndpointTransfer);
 
@@ -97,6 +111,13 @@ class AppPaymentMethodHelper extends Module
         $transferEndpointTransfer
             ->setName('transfer')
             ->setPath('/private/payments/transfers'); // Defined in app_payment_openapi.yml
+
+        $paymentMethodAppConfigurationTransfer->addEndpoint($transferEndpointTransfer);
+
+        $transferEndpointTransfer = new EndpointTransfer();
+        $transferEndpointTransfer
+            ->setName('customer')
+            ->setPath('/private/customer'); // Defined in app_payment_openapi.yml
 
         $paymentMethodAppConfigurationTransfer->addEndpoint($transferEndpointTransfer);
 

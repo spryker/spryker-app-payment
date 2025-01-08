@@ -5,7 +5,7 @@
  * For full license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace SprykerTest\AsyncApi\AppPayment\PaymentTests\PaymentMethodCommands;
+namespace SprykerTest\AsyncApi\AppPayment\AppPaymentTests\PaymentMethodCommands;
 
 use Codeception\Stub;
 use Codeception\Test\Unit;
@@ -21,7 +21,6 @@ use Spryker\Zed\AppKernel\AppKernelDependencyProvider;
 use Spryker\Zed\AppKernel\Business\AppKernelFacade;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Communication\Plugin\AppKernel\ConfigurePaymentMethodsConfigurationAfterSavePlugin;
-use Spryker\Zed\AppPayment\Communication\Plugin\AppKernel\SendAddPaymentMethodMessageConfigurationAfterSavePlugin;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPaymentMethodsPluginInterface;
 use SprykerTest\AsyncApi\AppPayment\AppPaymentAsyncApiTester;
 use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
@@ -32,7 +31,7 @@ use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
  * @group SprykerTest
  * @group AsyncApi
  * @group AppPayment
- * @group PaymentTests
+ * @group AppPaymentTests
  * @group PaymentMethodCommands
  * @group AddPaymentMethodTest
  * Add your own group annotations below this line
@@ -163,117 +162,31 @@ class AddPaymentMethodTest extends Unit
         $this->tester->assertMessageWasEmittedOnChannel($addPaymentMethodTransfer, 'payment-method-commands');
     }
 
-    public function testAddPaymentMethodMessageIsNotSendWhenAppConfigStateIsDisconnected(): void
+    public function testGivenAppHasConfiguredPaymentMethodWhenTheAppIsDisconnectedThenThePaymentMethodIsDeletedAndADeletePaymentMethodMessageIsSent(): void
     {
         // Arrange
+        $tenantIdentififer = Uuid::uuid4()->toString();
+
+        $paymentMethodTransfer = $this->tester->havePaymentMethodPersisted([
+            PaymentMethodTransfer::TENANT_IDENTIFIER => $tenantIdentififer,
+        ]);
+
         $this->tester->setDependency(AppKernelDependencyProvider::PLUGIN_CONFIGURATION_BEFORE_SAVE_PLUGINS, []);
         $this->tester->setDependency(AppKernelDependencyProvider::PLUGIN_CONFIGURATION_AFTER_SAVE_PLUGINS, [new ConfigurePaymentMethodsConfigurationAfterSavePlugin()]);
 
+        $deletePaymentMethodTransfer = $this->tester->haveDeletePaymentMethodTransfer($paymentMethodTransfer->toArray());
+
         $appConfigTransfer = new AppConfigTransfer();
         $appConfigTransfer
             ->setConfig(['business_model' => 'foo', 'my' => 'app', 'configuration' => 'data', 'mode' => 'test'])
-            ->setTenantIdentifier(Uuid::uuid4()->toString())
+            ->setTenantIdentifier($tenantIdentififer)
             ->setStatus(AppKernelConfig::APP_STATUS_DISCONNECTED);
 
+        // Act
         $appKernelFacade = new AppKernelFacade();
         $appKernelFacade->saveConfig($appConfigTransfer);
 
         // Assert
-        $this->tester->assertMessageWasNotSent(AddPaymentMethodTransfer::class);
-    }
-
-    /**
-     * @deprecated Can be removed with next major release.
-     */
-    public function testAddPaymentMethodMessageIsSendWhenAppConfigIsNew(): void
-    {
-        // Arrange
-        $this->tester->setDependency(AppKernelDependencyProvider::PLUGIN_CONFIGURATION_BEFORE_SAVE_PLUGINS, []);
-        $this->tester->setDependency(AppKernelDependencyProvider::PLUGIN_CONFIGURATION_AFTER_SAVE_PLUGINS, [new SendAddPaymentMethodMessageConfigurationAfterSavePlugin()]);
-
-        $addPaymentMethodTransfer = $this->tester->haveAddPaymentMethodTransfer();
-
-        $appConfigTransfer = new AppConfigTransfer();
-        $appConfigTransfer
-            ->setConfig(['business_model' => 'foo', 'my' => 'app', 'configuration' => 'data', 'mode' => 'test'])
-            ->setTenantIdentifier(Uuid::uuid4()->toString())
-            ->setIsActive(true);
-
-        $appKernelFacade = new AppKernelFacade();
-        $appKernelFacade->saveConfig($appConfigTransfer);
-
-        // Assert
-        $this->tester->assertMessageWasEmittedOnChannel($addPaymentMethodTransfer, 'payment-method-commands');
-    }
-
-    /**
-     * @deprecated Can be removed with next major release.
-     */
-    public function testAddPaymentMethodMessageIsSendWhenAppConfigIsNewDeprecated(): void
-    {
-        // Arrange
-        $this->tester->setDependency(AppKernelDependencyProvider::PLUGIN_CONFIGURATION_BEFORE_SAVE_PLUGINS, []);
-        $this->tester->setDependency(AppKernelDependencyProvider::PLUGIN_CONFIGURATION_AFTER_SAVE_PLUGINS, [new SendAddPaymentMethodMessageConfigurationAfterSavePlugin()]);
-
-        $addPaymentMethodTransfer = $this->tester->haveAddPaymentMethodTransfer();
-
-        $appConfigTransfer = new AppConfigTransfer();
-        $appConfigTransfer
-            ->setConfig(['business_model' => 'foo', 'my' => 'app', 'configuration' => 'data', 'mode' => 'test'])
-            ->setTenantIdentifier(Uuid::uuid4()->toString())
-            ->setIsActive(true);
-
-        $appKernelFacade = new AppKernelFacade();
-        $appKernelFacade->saveConfig($appConfigTransfer);
-
-        // Assert
-        $this->tester->assertMessageWasEmittedOnChannel($addPaymentMethodTransfer, 'payment-method-commands');
-    }
-
-    /**
-     * @deprecated Can be removed with next major release.
-     */
-    public function testAddPaymentMethodMessageIsSendWhenAppConfigIsConnectedDeprecated(): void
-    {
-        // Arrange
-        $this->tester->setDependency(AppKernelDependencyProvider::PLUGIN_CONFIGURATION_BEFORE_SAVE_PLUGINS, []);
-        $this->tester->setDependency(AppKernelDependencyProvider::PLUGIN_CONFIGURATION_AFTER_SAVE_PLUGINS, [new SendAddPaymentMethodMessageConfigurationAfterSavePlugin()]);
-
-        $addPaymentMethodTransfer = $this->tester->haveAddPaymentMethodTransfer();
-
-        $appConfigTransfer = new AppConfigTransfer();
-        $appConfigTransfer
-            ->setConfig(['business_model' => 'foo', 'my' => 'app', 'configuration' => 'data', 'mode' => 'test'])
-            ->setTenantIdentifier(Uuid::uuid4()->toString())
-            ->setIsActive(true)
-            ->setStatus(AppKernelConfig::APP_STATUS_CONNECTED);
-
-        $appKernelFacade = new AppKernelFacade();
-        $appKernelFacade->saveConfig($appConfigTransfer);
-
-        // Assert
-        $this->tester->assertMessageWasEmittedOnChannel($addPaymentMethodTransfer, 'payment-method-commands');
-    }
-
-    /**
-     * @deprecated Can be removed with next major release.
-     */
-    public function testAddPaymentMethodMessageIsNotSendWhenAppConfigStateIsDisconnectedDeprecated(): void
-    {
-        // Arrange
-        $this->tester->setDependency(AppKernelDependencyProvider::PLUGIN_CONFIGURATION_BEFORE_SAVE_PLUGINS, []);
-        $this->tester->setDependency(AppKernelDependencyProvider::PLUGIN_CONFIGURATION_AFTER_SAVE_PLUGINS, [new SendAddPaymentMethodMessageConfigurationAfterSavePlugin()]);
-
-        $appConfigTransfer = new AppConfigTransfer();
-        $appConfigTransfer
-            ->setConfig(['business_model' => 'foo', 'my' => 'app', 'configuration' => 'data', 'mode' => 'test'])
-            ->setTenantIdentifier(Uuid::uuid4()->toString())
-            ->setStatus(AppKernelConfig::APP_STATUS_DISCONNECTED);
-
-        $appKernelFacade = new AppKernelFacade();
-        $appKernelFacade->saveConfig($appConfigTransfer);
-
-        // Assert
-        $this->tester->assertMessageWasNotSent(AddPaymentMethodTransfer::class);
+        $this->tester->assertMessageWasEmittedOnChannel($deletePaymentMethodTransfer, 'payment-method-commands');
     }
 }

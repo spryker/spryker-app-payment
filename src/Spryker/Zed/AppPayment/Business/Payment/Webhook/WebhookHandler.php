@@ -62,7 +62,7 @@ class WebhookHandler
         }
 
         /** @phpstan-var \Generated\Shared\Transfer\WebhookResponseTransfer */
-        return $this->getTransactionHandler()->handleTransaction(function () use ($webhookRequestTransfer, $webhookResponseTransfer) {
+        return $this->getTransactionHandler()->handleTransaction(function () use ($webhookRequestTransfer, $webhookResponseTransfer): \Generated\Shared\Transfer\WebhookResponseTransfer {
             $webhookResponseTransfer = $this->webhookHandlerSelector
                 ->selectWebhookHandler($webhookRequestTransfer)
                 ->handleWebhook($webhookRequestTransfer, $webhookResponseTransfer);

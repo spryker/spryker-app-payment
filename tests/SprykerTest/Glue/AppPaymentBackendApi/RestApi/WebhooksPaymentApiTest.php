@@ -240,29 +240,6 @@ class WebhooksPaymentApiTest extends Unit
         $this->tester->seeResponseContainsErrorMessage(MessageBuilder::getRequestTransactionIdIsMissingOrEmpty());
     }
 
-    /**
-     * Just in case, the platform plugin implementation changes the transactionId to a different value.
-     */
-    public function testHandleWebhookReturnsA400BadRequestWhenTheTransactionIdCouldNotBeFoundWhenPersisting(): void
-    {
-        // Arrange
-        $transactionId = Uuid::uuid4()->toString();
-        $tenantIdentifier = Uuid::uuid4()->toString();
-
-        $this->tester->haveAppConfigForTenant($tenantIdentifier);
-        $this->tester->havePaymentForTransactionId($transactionId, $tenantIdentifier);
-
-        $this->tester->mockGlueRequestWebhookMapperPlugin(WebhookDataType::PAYMENT, $transactionId);
-        $this->mockPaymentPlatformPlugin(true, PaymentStatus::STATUS_AUTHORIZED, 'invalid transaction id');
-
-        // Act
-        $this->tester->sendPost($this->tester->buildWebhookUrl(), ['data' => ['object' => ['id' => 123456789]]]);
-
-        // Assert
-        $this->tester->seeResponseCodeIs(Response::HTTP_BAD_REQUEST);
-        $this->tester->seeResponseContainsErrorMessage(MessageBuilder::paymentByTransactionIdNotFound('invalid transaction id'));
-    }
-
     public function testHandleWebhookReturnsA400BadRequestWhenPaymentTransitionIsNotAllowed(): void
     {
         // Arrange

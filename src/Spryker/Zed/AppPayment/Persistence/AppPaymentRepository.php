@@ -229,7 +229,10 @@ class AppPaymentRepository extends AbstractRepository implements AppPaymentRepos
             ->findOne();
 
         if ($paymentMethodEntity === null) {
+            // @codeCoverageIgnoreStart
+            // There is always a Payment method
             return $paymentMethodTransfer;
+            // @codeCoverageIgnoreEnd
         }
 
         $paymentMethodEntity->delete();

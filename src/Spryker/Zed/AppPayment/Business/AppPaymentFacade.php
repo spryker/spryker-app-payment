@@ -14,11 +14,15 @@ use Generated\Shared\Transfer\CancelPreOrderPaymentResponseTransfer;
 use Generated\Shared\Transfer\CapturePaymentTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentRequestTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentResponseTransfer;
+use Generated\Shared\Transfer\CustomerRequestTransfer;
+use Generated\Shared\Transfer\CustomerResponseTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
 use Generated\Shared\Transfer\PaymentCollectionDeleteCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentCollectionTransfer;
 use Generated\Shared\Transfer\PaymentCriteriaTransfer;
+use Generated\Shared\Transfer\PaymentMethodCriteriaTransfer;
+use Generated\Shared\Transfer\PaymentMethodTransfer;
 use Generated\Shared\Transfer\PaymentPageRequestTransfer;
 use Generated\Shared\Transfer\PaymentPageResponseTransfer;
 use Generated\Shared\Transfer\PaymentTransmissionsRequestTransfer;
@@ -82,27 +86,7 @@ class AppPaymentFacade extends AbstractFacade implements AppPaymentFacadeInterfa
      *
      * @inheritDoc
      */
-    public function sendAddPaymentMethodMessage(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
-    {
-        return $this->getFactory()->createPaymentMethod()->configurePaymentMethods($appConfigTransfer);
-    }
-
-    /**
-     * @api
-     *
-     * @inheritDoc
-     */
     public function deletePaymentMethods(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
-    {
-        return $this->getFactory()->createPaymentMethod()->deletePaymentMethods($appConfigTransfer);
-    }
-
-    /**
-     * @api
-     *
-     * @inheritDoc
-     */
-    public function sendDeletePaymentMethodMessage(AppConfigTransfer $appConfigTransfer): AppConfigTransfer
     {
         return $this->getFactory()->createPaymentMethod()->deletePaymentMethods($appConfigTransfer);
     }
@@ -178,15 +162,45 @@ class AppPaymentFacade extends AbstractFacade implements AppPaymentFacadeInterfa
         return $this->getFactory()->createPayment()->transferPayments($paymentTransmissionsRequestTransfer);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @api
+     */
     public function confirmPreOrderPayment(
         ConfirmPreOrderPaymentRequestTransfer $confirmPreOrderPaymentRequestTransfer
     ): ConfirmPreOrderPaymentResponseTransfer {
         return $this->getFactory()->createPayment()->confirmPreOrderPayment($confirmPreOrderPaymentRequestTransfer);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @api
+     */
     public function cancelPreOrderPayment(
         CancelPreOrderPaymentRequestTransfer $cancelPreOrderPaymentRequestTransfer
     ): CancelPreOrderPaymentResponseTransfer {
         return $this->getFactory()->createPayment()->cancelPreOrderPayment($cancelPreOrderPaymentRequestTransfer);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @api
+     */
+    public function getPaymentMethod(PaymentMethodCriteriaTransfer $paymentMethodCriteriaTransfer): PaymentMethodTransfer
+    {
+        return $this->getFactory()->createPaymentMethodReader()->getPaymentMethod($paymentMethodCriteriaTransfer);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @api
+     */
+    public function getCustomer(CustomerRequestTransfer $customerRequestTransfer): CustomerResponseTransfer
+    {
+        return $this->getFactory()->createPayment()->getCustomer($customerRequestTransfer);
     }
 }

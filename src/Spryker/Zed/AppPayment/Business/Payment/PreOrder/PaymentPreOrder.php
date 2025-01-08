@@ -77,10 +77,10 @@ class PaymentPreOrder
         }
 
         /** @phpstan-var \Generated\Shared\Transfer\ConfirmPreOrderPaymentResponseTransfer */
-        return $this->getTransactionHandler()->handleTransaction(function () use ($confirmPreOrderPaymentRequestTransfer, $confirmPreOrderPaymentResponseTransfer) {
+        return $this->getTransactionHandler()->handleTransaction(function () use ($confirmPreOrderPaymentRequestTransfer, $confirmPreOrderPaymentResponseTransfer): ConfirmPreOrderPaymentResponseTransfer {
             $this->confirm($confirmPreOrderPaymentRequestTransfer, $confirmPreOrderPaymentResponseTransfer);
 
-            // In case of pre-order payment we may have unprocessed webhook requests persisted and we must process them here
+            // In case of pre-order payment we may have unprocessed webhook requests persisted, and we must process them here
             $webhookInboxCriteriaTransfer = new WebhookInboxCriteriaTransfer();
 
             // Unprocessed webhooks will be persisted by the transaction id
@@ -123,7 +123,7 @@ class PaymentPreOrder
         }
 
         /** @phpstan-var \Generated\Shared\Transfer\CancelPreOrderPaymentResponseTransfer */
-        return $this->getTransactionHandler()->handleTransaction(function () use ($cancelPreOrderPaymentRequestTransfer, $cancelPreOrderPaymentResponseTransfer) {
+        return $this->getTransactionHandler()->handleTransaction(function () use ($cancelPreOrderPaymentRequestTransfer, $cancelPreOrderPaymentResponseTransfer): CancelPreOrderPaymentResponseTransfer {
             $this->cancel($cancelPreOrderPaymentRequestTransfer);
 
             // In case of pre-order payment we may have unprocessed webhook requests persisted, and we must delete them here
@@ -148,6 +148,11 @@ class PaymentPreOrder
             ->setStatus($confirmPreOrderPaymentResponseTransfer->getStatus())
             ->setQuote($confirmPreOrderPaymentRequestTransfer->getOrderData());
 
+        // Covers the case when the implementation alters the payment transfer
+        if ($confirmPreOrderPaymentResponseTransfer->getPayment() instanceof PaymentTransfer) {
+            $paymentTransfer->fromArray($confirmPreOrderPaymentResponseTransfer->getPayment()->modifiedToArray());
+        }
+
         $this->paymentWriter->updatePayment($paymentTransfer);
     }
 
@@ -166,8 +171,6 @@ class PaymentPreOrder
         ConfirmPreOrderPaymentResponseTransfer $confirmPreOrderPaymentResponseTransfer
     ): void {
         $paymentTransfer = $confirmPreOrderPaymentRequestTransfer->getPaymentOrFail();
-
-        $this->messageSender->sendPaymentUpdatedMessage($paymentTransfer);
 
         if ($confirmPreOrderPaymentResponseTransfer->getIsSuccessful() === true) {
             $this->messageSender->sendPaymentAuthorizedMessage($paymentTransfer);

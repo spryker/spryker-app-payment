@@ -23,6 +23,7 @@ use Generated\Shared\Transfer\PaymentUpdatedTransfer;
 use Generated\Shared\Transfer\QuoteItemTransfer;
 use Generated\Shared\Transfer\QuoteTransfer;
 use Spryker\Shared\Kernel\Transfer\TransferInterface;
+use Spryker\Zed\AppPayment\AppPaymentConfig;
 
 class MessageSender extends AbstractMessageSender
 {
@@ -101,6 +102,18 @@ class MessageSender extends AbstractMessageSender
     public function sendPaymentCreatedMessage(
         PaymentTransfer $paymentTransfer
     ): void {
+        // It may be that payment gets created without having either of the following. (PreOrderPayment)
+        // In this case, we do send a PaymentUpdated message later. E.g. when ConfirmPreOrderPayment is made
+        if (($paymentTransfer->getOrderReference() === null || $paymentTransfer->getOrderReference() === '' || $paymentTransfer->getOrderReference() === '0') && ($paymentTransfer->getTransactionId() === null || $paymentTransfer->getTransactionId() === '' || $paymentTransfer->getTransactionId() === '0')) {
+            return;
+        }
+
+        $transactionId = $paymentTransfer->getTransactionIdOrFail();
+
+        if (str_starts_with($transactionId, AppPaymentConfig::IGNORE_PAYMENT_CREATED_MESSAGE_SENDING_TRANSACTION_ID_PREFIX)) {
+            return;
+        }
+
         $paymentCreatedTransfer = new PaymentCreatedTransfer();
         $paymentCreatedTransfer->fromArray($paymentTransfer->toArray(), true);
         $paymentCreatedTransfer
@@ -120,7 +133,8 @@ class MessageSender extends AbstractMessageSender
         $paymentUpdatedTransfer = new PaymentUpdatedTransfer();
         $paymentUpdatedTransfer
             ->setEntityReference($paymentTransfer->getOrderReference())
-            ->setPaymentReference($paymentTransfer->getTransactionIdOrFail());
+            ->setPaymentReference($paymentTransfer->getTransactionIdOrFail())
+            ->setDetails($paymentTransfer->getDetailsOrFail());
 
         $paymentUpdatedTransfer->setMessageAttributes($this->getMessageAttributes(
             $paymentTransfer->getTenantIdentifierOrFail(),

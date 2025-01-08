@@ -14,11 +14,15 @@ use Generated\Shared\Transfer\CancelPreOrderPaymentResponseTransfer;
 use Generated\Shared\Transfer\CapturePaymentTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentRequestTransfer;
 use Generated\Shared\Transfer\ConfirmPreOrderPaymentResponseTransfer;
+use Generated\Shared\Transfer\CustomerRequestTransfer;
+use Generated\Shared\Transfer\CustomerResponseTransfer;
 use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
 use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
 use Generated\Shared\Transfer\PaymentCollectionDeleteCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentCollectionTransfer;
 use Generated\Shared\Transfer\PaymentCriteriaTransfer;
+use Generated\Shared\Transfer\PaymentMethodCriteriaTransfer;
+use Generated\Shared\Transfer\PaymentMethodTransfer;
 use Generated\Shared\Transfer\PaymentPageRequestTransfer;
 use Generated\Shared\Transfer\PaymentPageResponseTransfer;
 use Generated\Shared\Transfer\PaymentTransmissionsRequestTransfer;
@@ -113,28 +117,6 @@ interface AppPaymentFacadeInterface
 
     /**
      * Specification:
-     * - Sends a `AddPaymentMethod` message when the AppConfiguration is in state NEW.
-     * - Updates the AppConfiguration and sets its state to connected after the `AddPaymentMethod` message was sent.
-     * - When the AppConfiguration is in state CONNECTED the `AddPaymentMethod` message will not be sent.
-     *
-     * @api
-     *
-     * @deprecated Use {@link \Spryker\Zed\AppPayment\Business\AppPaymentFacadeInterface::configurePaymentMethods() } instead
-     */
-    public function sendAddPaymentMethodMessage(AppConfigTransfer $appConfigTransfer): AppConfigTransfer;
-
-    /**
-     * Specification:
-     * - Sends a `DeletePaymentMethod` message when the AppConfiguration is removed.
-     *
-     * @api
-     *
-     * @deprecated Use {@link \Spryker\Zed\AppPayment\Business\AppPaymentFacade::deletePaymentMethods() } instead
-     */
-    public function sendDeletePaymentMethodMessage(AppConfigTransfer $appConfigTransfer): AppConfigTransfer;
-
-    /**
-     * Specification:
      * - Handles the `CancelPayment` message.
      *
      * @api
@@ -219,8 +201,8 @@ interface AppPaymentFacadeInterface
     /**
      * Specification:
      * - Cancels a payment that was made before the order was persisted.
-     * - Loads the `AppConfigTransfer` and adds it to the CancePreOrderPaymentRequestTransfer.
-     * - Loads the `PaymentTransfer` and adds it to the CancePreOrderPaymentRequestTransfer.
+     * - Loads the `AppConfigTransfer` and adds it to the CancelPreOrderPaymentRequestTransfer.
+     * - Loads the `PaymentTransfer` and adds it to the CancelPreOrderPaymentRequestTransfer.
      * - Returns a CancelPreOrderPaymentResponseTransfer.
      *
      * @api
@@ -228,4 +210,29 @@ interface AppPaymentFacadeInterface
     public function cancelPreOrderPayment(
         CancelPreOrderPaymentRequestTransfer $cancelPreOrderPaymentRequestTransfer
     ): CancelPreOrderPaymentResponseTransfer;
+
+    /**
+     * Specification:
+     * - Loads the payment method by various criteria.
+     * - Requires either of the following fields to be set:
+     *  - `PaymentMethodCriteriaTransfer.tenantIdentifier`
+     *  - `PaymentMethodCriteriaTransfer.paymentMethodKey`
+     * - Returns a PaymentMethodTransfer
+     *
+     * @api
+     *
+     * @throws \Spryker\Zed\AppPayment\Business\Exception\PaymentMethodNotFoundException
+     */
+    public function getPaymentMethod(PaymentMethodCriteriaTransfer $paymentMethodCriteriaTransfer): PaymentMethodTransfer;
+
+    /**
+     * Specification:
+     * - Loads the `AppConfigTransfer` and adds it to the CustomerRequestTransfer.
+     * - Returns a CustomerResponseTransfer.
+     *
+     * @api
+     */
+    public function getCustomer(
+        CustomerRequestTransfer $customerRequestTransfer
+    ): CustomerResponseTransfer;
 }
