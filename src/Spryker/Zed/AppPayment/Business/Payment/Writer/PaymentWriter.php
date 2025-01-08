@@ -54,20 +54,28 @@ class PaymentWriter implements PaymentWriterInterface
 
         $paymentStatusHistoryCollectionTransfer = $this->appPaymentRepository->getPaymentStatusHistoryCollection($paymentStatusHistoryCriteriaTransfer);
 
-        $paymentStatusHistories = [];
+        $details = $paymentTransfer->getDetails() ?? '{}';
+        $detailsArray = json_decode($details, true);
+
+        /**
+         * We need to create a table like structure on the receiving side as we can only display key: value pairs.
+         *
+         * @example
+         * | External status "new" | 2025-01-01 12:00:00 |
+         * | External status "authorized" | 2025-01-01 12:00:01 |
+         *
+         * For this, we pad the status key with spaces to have a fixed length.
+         */
+        $minLengthOfStatusKey = 50; // Includes 18 characters for "External status """.
 
         $paymentStatusHistoryTransfers = $paymentStatusHistoryCollectionTransfer->getPaymentStatusHistory();
 
         foreach ($paymentStatusHistoryTransfers as $paymentStatusHistoryTransfer) {
-            $paymentStatusHistories[] = [
-                'status' => $paymentStatusHistoryTransfer->getStatus(),
-                'created' => $paymentStatusHistoryTransfer->getCreatedAt(),
-            ];
-        }
+            $statusText = sprintf('External status "%s"', $paymentStatusHistoryTransfer->getStatus());
+            $statusText = str_pad($statusText, $minLengthOfStatusKey, ' ');
 
-        $details = $paymentTransfer->getDetails() ?? '{}';
-        $detailsArray = json_decode($details, true);
-        $detailsArray['paymentStatusHistory'] = $paymentStatusHistories;
+            $detailsArray[$statusText] = $paymentStatusHistoryTransfer->getCreatedAt();
+        }
 
         $paymentTransfer->setDetails((string)json_encode($detailsArray));
 
