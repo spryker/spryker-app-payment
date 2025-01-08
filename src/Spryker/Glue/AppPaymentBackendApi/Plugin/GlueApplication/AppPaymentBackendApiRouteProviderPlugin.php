@@ -7,8 +7,6 @@
 
 namespace Spryker\Glue\AppPaymentBackendApi\Plugin\GlueApplication;
 
-use Generated\Shared\Transfer\GlueRequestTransfer;
-use Generated\Shared\Transfer\GlueResponseTransfer;
 use Spryker\Glue\AppPaymentBackendApi\Controller\CancelPreOrderPaymentResourceController;
 use Spryker\Glue\AppPaymentBackendApi\Controller\ConfirmPreOrderPaymentResourceController;
 use Spryker\Glue\AppPaymentBackendApi\Controller\CustomerResourceController;
@@ -72,9 +70,7 @@ class AppPaymentBackendApiRouteProviderPlugin extends AbstractPlugin implements 
     {
         return (new Route(static::ROUTE_INITIALIZE_PAYMENT))
             ->setDefaults([
-                '_controller' => static function (GlueRequestTransfer $glueRequestTransfer): GlueResponseTransfer {
-                    return (new InitializePaymentResourceController())->postAction($glueRequestTransfer);
-                },
+                '_controller' => [InitializePaymentResourceController::class, 'postAction'],
                 '_resourceName' => 'Payment',
                 '_method' => 'post',
             ])
@@ -85,9 +81,7 @@ class AppPaymentBackendApiRouteProviderPlugin extends AbstractPlugin implements 
     {
         return (new Route(static::ROUTE_PRE_ORDER_PAYMENT))
             ->setDefaults([
-                '_controller' => static function (GlueRequestTransfer $glueRequestTransfer): GlueResponseTransfer {
-                    return (new PreOrderPaymentResourceController())->postAction($glueRequestTransfer);
-                },
+                '_controller' => [PreOrderPaymentResourceController::class, 'postAction'],
                 '_resourceName' => 'Payment',
                 '_method' => 'post',
             ])
@@ -98,9 +92,7 @@ class AppPaymentBackendApiRouteProviderPlugin extends AbstractPlugin implements 
     {
         return (new Route(static::ROUTE_CONFIRM_PRE_ORDER_PAYMENT))
             ->setDefaults([
-                '_controller' => static function (GlueRequestTransfer $glueRequestTransfer): GlueResponseTransfer {
-                    return (new ConfirmPreOrderPaymentResourceController())->postAction($glueRequestTransfer);
-                },
+                '_controller' => [ConfirmPreOrderPaymentResourceController::class, 'postAction'],
                 '_resourceName' => 'Payment',
                 '_method' => 'post',
             ])
@@ -111,9 +103,7 @@ class AppPaymentBackendApiRouteProviderPlugin extends AbstractPlugin implements 
     {
         return (new Route(static::ROUTE_CANCEL_PRE_ORDER_PAYMENT))
             ->setDefaults([
-                '_controller' => static function (GlueRequestTransfer $glueRequestTransfer): GlueResponseTransfer {
-                    return (new CancelPreOrderPaymentResourceController())->postAction($glueRequestTransfer);
-                },
+                '_controller' => [CancelPreOrderPaymentResourceController::class, 'postAction'],
                 '_resourceName' => 'Payment',
                 '_method' => 'post',
             ])
@@ -124,9 +114,7 @@ class AppPaymentBackendApiRouteProviderPlugin extends AbstractPlugin implements 
     {
         return (new Route(static::ROUTE_PAYMENTS_TRANSFERS))
             ->setDefaults([
-                '_controller' => static function (GlueRequestTransfer $glueRequestTransfer): GlueResponseTransfer {
-                    return (new PaymentsTransfersResourceController())->postAction($glueRequestTransfer);
-                },
+                '_controller' => [PaymentsTransfersResourceController::class, 'postAction'],
                 '_resourceName' => 'payments-transfers',
                 '_method' => 'post',
             ])
@@ -137,9 +125,7 @@ class AppPaymentBackendApiRouteProviderPlugin extends AbstractPlugin implements 
     {
         return (new Route(static::ROUTE_CUSTOMER))
             ->setDefaults([
-                '_controller' => static function (GlueRequestTransfer $glueRequestTransfer): GlueResponseTransfer {
-                    return (new CustomerResourceController())->postAction($glueRequestTransfer);
-                },
+                '_controller' => [CustomerResourceController::class, 'postAction'],
                 '_resourceName' => 'customer',
                 '_method' => 'post',
             ])

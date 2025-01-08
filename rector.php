@@ -40,6 +40,10 @@ return static function (RectorConfig $rectorConfig): void {
     ]);
 
     $rectorConfig->skip([
+        // Ignore this rule on the PaymentBackendApiRouteProviderPlugin as it breaks the code
+        CallableThisArrayToAnonymousFunctionRector::class => [
+            __DIR__ . '/src/Spryker/Glue/AppPaymentBackendApi/Plugin/GlueApplication/AppPaymentBackendApiRouteProviderPlugin.php',
+        ],
         RenameForeachValueVariableToMatchMethodCallReturnTypeRector::class => [
             __DIR__ . '/src/Spryker/Glue/AppPaymentBackendApi/Mapper/Payment/GlueResponsePaymentMapper.php',
             __DIR__ . '/src/Spryker/Zed/AppPayment/Business/MessageBroker/RefundPaymentMessageHandler.php',
