@@ -5,7 +5,7 @@
  * For full license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace SprykerTest\AsyncApi\AppPayment\PaymentTests\PaymentEvents;
+namespace SprykerTest\AsyncApi\AppPayment\AppPaymentTests\PaymentEvents;
 
 use Codeception\Test\Unit;
 use Generated\Shared\Transfer\WebhookRequestTransfer;
@@ -21,7 +21,7 @@ use SprykerTest\AsyncApi\AppPayment\AppPaymentAsyncApiTester;
  * @group SprykerTest
  * @group AsyncApi
  * @group AppPayment
- * @group PaymentTests
+ * @group AppPaymentTests
  * @group PaymentEvents
  * @group PaymentCapturedTest
  * Add your own group annotations below this line

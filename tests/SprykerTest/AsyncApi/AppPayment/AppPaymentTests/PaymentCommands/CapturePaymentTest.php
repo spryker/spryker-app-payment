@@ -5,7 +5,7 @@
  * For full license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace SprykerTest\AsyncApi\AppPayment\PaymentTests\PaymentCommands;
+namespace SprykerTest\AsyncApi\AppPayment\AppPaymentTests\PaymentCommands;
 
 use Codeception\Stub;
 use Codeception\Test\Unit;
@@ -27,7 +27,7 @@ use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
  * @group SprykerTest
  * @group AsyncApi
  * @group AppPayment
- * @group PaymentTests
+ * @group AppPaymentTests
  * @group PaymentCommands
  * @group CapturePaymentTest
  * Add your own group annotations below this line
