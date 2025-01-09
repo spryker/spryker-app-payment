@@ -14,8 +14,8 @@ use Spryker\Shared\Log\LoggerTrait;
 use Spryker\Zed\AppPayment\AppPaymentConfig;
 use Spryker\Zed\AppPayment\Business\Payment\AppConfig\AppConfigLoader;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
+use Spryker\Zed\AppPayment\Business\Payment\Writer\PaymentWriterInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
-use Spryker\Zed\AppPayment\Persistence\AppPaymentEntityManagerInterface;
 use Spryker\Zed\Kernel\Persistence\EntityManager\TransactionTrait;
 use Throwable;
 
@@ -26,7 +26,7 @@ class PaymentCapturer
 
     public function __construct(
         protected AppPaymentPlatformPluginInterface $appPaymentPlatformPlugin,
-        protected AppPaymentEntityManagerInterface $appPaymentEntityManager,
+        protected PaymentWriterInterface $paymentWriter,
         protected AppPaymentConfig $appPaymentConfig,
         protected AppConfigLoader $appConfigLoader
     ) {
@@ -60,6 +60,6 @@ class PaymentCapturer
     protected function savePayment(PaymentTransfer $paymentTransfer, string $status): void
     {
         $paymentTransfer->setStatus($status);
-        $this->appPaymentEntityManager->savePayment($paymentTransfer);
+        $this->paymentWriter->updatePayment($paymentTransfer);
     }
 }

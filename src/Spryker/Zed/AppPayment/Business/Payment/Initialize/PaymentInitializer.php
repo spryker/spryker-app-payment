@@ -16,6 +16,7 @@ use Spryker\Zed\AppPayment\Business\Payment\AppConfig\AppConfigLoader;
 use Spryker\Zed\AppPayment\Business\Payment\Message\MessageSender;
 use Spryker\Zed\AppPayment\Business\Payment\Method\Normalizer\PaymentMethodNormalizer;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
+use Spryker\Zed\AppPayment\Business\Payment\Writer\PaymentWriterInterface;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentEntityManagerInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface;
@@ -31,6 +32,7 @@ class PaymentInitializer
         protected AppPaymentPlatformPluginInterface $appPaymentPlatformPlugin,
         protected AppPaymentEntityManagerInterface $appPaymentEntityManager,
         protected AppPaymentRepositoryInterface $appPaymentRepository,
+        protected PaymentWriterInterface $paymentWriter,
         protected PaymentMethodNormalizer $paymentMethodNormalizer,
         protected MessageSender $messageSender,
         protected AppPaymentConfig $appPaymentConfig,
@@ -74,9 +76,9 @@ class PaymentInitializer
         }
 
         /** @phpstan-var \Generated\Shared\Transfer\InitializePaymentResponseTransfer */
-        return $this->getTransactionHandler()->handleTransaction(function () use ($initializePaymentRequestTransfer, $initializePaymentResponseTransfer): \Generated\Shared\Transfer\InitializePaymentResponseTransfer {
+        return $this->getTransactionHandler()->handleTransaction(function () use ($initializePaymentRequestTransfer, $initializePaymentResponseTransfer): InitializePaymentResponseTransfer {
             // When we have already persisted a payment in the database and this method is called a second time the payment will be set in the request transfer
-            // In this case we are in the pre-order payment process and we don't want to save the payment again.
+            // In this case we are in the pre-order payment process, and we don't want to save the payment again.
             // When the grandTotal has changed the response will contain a different transactionId as we have persisted in the database because so we need to update
             if ($initializePaymentRequestTransfer->getPayment() instanceof PaymentTransfer) {
                 // Nothing has changed so we can step out here
@@ -92,8 +94,7 @@ class PaymentInitializer
                 return $initializePaymentResponseTransfer;
             }
 
-            $this->savePayment($initializePaymentRequestTransfer, $initializePaymentResponseTransfer);
-            $this->messageSender->sendPaymentCreatedMessage($initializePaymentRequestTransfer, $initializePaymentResponseTransfer);
+            $this->createPayment($initializePaymentRequestTransfer, $initializePaymentResponseTransfer);
 
             return $initializePaymentResponseTransfer;
         });
@@ -121,7 +122,7 @@ class PaymentInitializer
         return $initializePaymentResponseTransfer;
     }
 
-    protected function savePayment(
+    protected function createPayment(
         InitializePaymentRequestTransfer $initializePaymentRequestTransfer,
         InitializePaymentResponseTransfer $initializePaymentResponseTransfer
     ): void {
@@ -138,7 +139,7 @@ class PaymentInitializer
             ->setRedirectCancelUrl($initializePaymentRequestTransfer->getRedirectCancelUrl())
             ->setStatus(PaymentStatus::STATUS_NEW);
 
-        $this->appPaymentEntityManager->createPayment($paymentTransfer);
+        $this->paymentWriter->createPayment($paymentTransfer);
     }
 
     protected function normalizePaymentMethod(InitializePaymentRequestTransfer $initializePaymentRequestTransfer): InitializePaymentRequestTransfer

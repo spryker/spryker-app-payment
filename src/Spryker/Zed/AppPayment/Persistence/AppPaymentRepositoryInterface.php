@@ -11,11 +11,17 @@ use Generated\Shared\Transfer\PaymentCollectionTransfer;
 use Generated\Shared\Transfer\PaymentCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentMethodTransfer;
 use Generated\Shared\Transfer\PaymentRefundTransfer;
+use Generated\Shared\Transfer\PaymentStatusHistoryCriteriaTransfer;
+use Generated\Shared\Transfer\PaymentStatusHistoryTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 
 interface AppPaymentRepositoryInterface
 {
     public function getPaymentCollection(PaymentCriteriaTransfer $paymentCriteriaTransfer): PaymentCollectionTransfer;
+
+    public function getPaymentStatusHistory(
+        PaymentStatusHistoryCriteriaTransfer $paymentStatusHistoryCriteriaTransfer
+    ): PaymentStatusHistoryTransfer;
 
     /**
      * @throws \Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTransactionIdNotFoundException

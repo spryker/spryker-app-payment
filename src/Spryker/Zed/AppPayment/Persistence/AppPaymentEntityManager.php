@@ -14,6 +14,7 @@ use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 use Orm\Zed\AppPayment\Persistence\SpyPayment;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentQuery;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentRefund;
+use Orm\Zed\AppPayment\Persistence\SpyPaymentStatusHistory;
 use Orm\Zed\AppPayment\Persistence\SpyPaymentTransfer;
 use Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTransactionIdNotFoundException;
 use Spryker\Zed\AppPayment\Persistence\Exception\RefundByRefundIdNotFoundException;
@@ -32,7 +33,7 @@ class AppPaymentEntityManager extends AbstractEntityManager implements AppPaymen
         return $this->getFactory()->createPaymentMapper()->mapPaymentEntityToPaymentTransfer($spyPayment, $paymentTransfer);
     }
 
-    public function savePayment(PaymentTransfer $paymentTransfer): PaymentTransfer
+    public function updatePayment(PaymentTransfer $paymentTransfer): PaymentTransfer
     {
         $spyPaymentQuery = $this->getFactory()->createPaymentQuery();
 
@@ -114,5 +115,13 @@ class AppPaymentEntityManager extends AbstractEntityManager implements AppPaymen
         $spyPaymentEntity
             ?->setTransactionId($transactionId)
             ?->save();
+    }
+
+    public function savePaymentStatusHistory(PaymentTransfer $paymentTransfer): void
+    {
+        $spyPaymentStatusHistory = new SpyPaymentStatusHistory();
+        $spyPaymentStatusHistory->fromArray($paymentTransfer->toArray());
+
+        $spyPaymentStatusHistory->save();
     }
 }

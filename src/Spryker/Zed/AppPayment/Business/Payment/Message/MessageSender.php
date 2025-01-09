@@ -8,8 +8,6 @@
 namespace Spryker\Zed\AppPayment\Business\Payment\Message;
 
 use ArrayObject;
-use Generated\Shared\Transfer\InitializePaymentRequestTransfer;
-use Generated\Shared\Transfer\InitializePaymentResponseTransfer;
 use Generated\Shared\Transfer\MessageContextTransfer;
 use Generated\Shared\Transfer\PaymentAuthorizationFailedTransfer;
 use Generated\Shared\Transfer\PaymentAuthorizedTransfer;
@@ -102,31 +100,28 @@ class MessageSender extends AbstractMessageSender
     }
 
     public function sendPaymentCreatedMessage(
-        InitializePaymentRequestTransfer $initializePaymentRequestTransfer,
-        InitializePaymentResponseTransfer $initializePaymentResponseTransfer
+        PaymentTransfer $paymentTransfer
     ): void {
-        $quoteTransfer = $initializePaymentRequestTransfer->getOrderDataOrFail();
-
         // It may be that payment gets created without having either of the following. (PreOrderPayment)
         // In this case, we do send a PaymentUpdated message later. E.g. when ConfirmPreOrderPayment is made
-        if (!$quoteTransfer->getOrderReference() && ($initializePaymentResponseTransfer->getTransactionId() === null || $initializePaymentResponseTransfer->getTransactionId() === '' || $initializePaymentResponseTransfer->getTransactionId() === '0')) {
+        if (($paymentTransfer->getOrderReference() === null || $paymentTransfer->getOrderReference() === '' || $paymentTransfer->getOrderReference() === '0') && ($paymentTransfer->getTransactionId() === null || $paymentTransfer->getTransactionId() === '' || $paymentTransfer->getTransactionId() === '0')) {
             return;
         }
 
-        $transactionId = $initializePaymentResponseTransfer->getTransactionIdOrFail();
+        $transactionId = $paymentTransfer->getTransactionIdOrFail();
 
         if (str_starts_with($transactionId, AppPaymentConfig::IGNORE_PAYMENT_CREATED_MESSAGE_SENDING_TRANSACTION_ID_PREFIX)) {
             return;
         }
 
         $paymentCreatedTransfer = new PaymentCreatedTransfer();
-        $paymentCreatedTransfer->fromArray($initializePaymentResponseTransfer->toArray(), true);
+        $paymentCreatedTransfer->fromArray($paymentTransfer->toArray(), true);
         $paymentCreatedTransfer
-            ->setEntityReference($quoteTransfer->getOrderReference())
-            ->setPaymentReference($initializePaymentResponseTransfer->getTransactionId());
+            ->setEntityReference($paymentTransfer->getOrderReference())
+            ->setPaymentReference($paymentTransfer->getTransactionIdOrFail());
 
         $paymentCreatedTransfer->setMessageAttributes($this->getMessageAttributes(
-            $initializePaymentRequestTransfer->getTenantIdentifierOrFail(),
+            $paymentTransfer->getTenantIdentifierOrFail(),
             $paymentCreatedTransfer::class,
         ));
 

@@ -18,6 +18,7 @@ use GuzzleHttp\RequestOptions;
 use Ramsey\Uuid\Uuid;
 use Spryker\Glue\AppPaymentBackendApi\Mapper\Payment\GlueRequestPaymentMapper;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
+use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use SprykerTest\Glue\AppPaymentBackendApi\AppPaymentBackendApiTester;
 use SprykerTest\Shared\Testify\Helper\DependencyHelperTrait;
@@ -76,6 +77,41 @@ class InitializePaymentApiTest extends Unit
 
         $this->tester->assertPaymentWithTransactionIdExists($transactionId);
         $this->tester->assertSamePaymentQuoteAndRequestQuote($transactionId, $initializePaymentRequestTransfer->getOrderData());
+    }
+
+    public function testInitializePaymentPostRequestReturnsHttpResponseCode200AndPersistsPaymentStatusHistory(): void
+    {
+        // Arrange
+        $transactionId = Uuid::uuid4()->toString();
+
+        $initializePaymentRequestTransfer = $this->tester->haveInitializePaymentRequestTransfer();
+        $this->tester->haveAppConfigForTenant($initializePaymentRequestTransfer->getTenantIdentifier());
+
+        $initializePaymentResponseTransfer = new InitializePaymentResponseTransfer();
+        $initializePaymentResponseTransfer
+            ->setIsSuccessful(true)
+            ->setTransactionId($transactionId);
+
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
+            'initializePayment' => function (InitializePaymentRequestTransfer $initializePaymentRequestTransfer) use ($initializePaymentResponseTransfer) {
+                // Ensure that the AppConfig is always passed to the platform plugin.
+                $this->assertInstanceOf(AppConfigTransfer::class, $initializePaymentRequestTransfer->getAppConfig());
+
+                return $initializePaymentResponseTransfer;
+            },
+        ]);
+
+        $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
+
+        // Act
+        $this->tester->addHeader(GlueRequestPaymentMapper::HEADER_TENANT_IDENTIFIER, $initializePaymentRequestTransfer->getTenantIdentifier());
+        $this->tester->addHeader('Content-Type', 'application/json');
+
+        $response = $this->tester->sendPost($this->tester->buildPaymentUrl(), [RequestOptions::FORM_PARAMS => $initializePaymentRequestTransfer->toArray()]);
+
+        // Assert
+        $this->tester->seeResponseCodeIs(Response::HTTP_OK);
+        $this->tester->assertPaymentStatusHistory(PaymentStatus::STATUS_NEW, $initializePaymentResponseTransfer->getTransactionId());
     }
 
     public function testInitializePaymentPostRequestReturnsHttpResponseCode200AndForwardsAdditionalPaymentDataToThePlatformImplementation(): void

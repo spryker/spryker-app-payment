@@ -5,15 +5,12 @@
  * Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
  */
 
-use Rector\CodeQuality\Rector\Array_\CallableThisArrayToAnonymousFunctionRector;
-use Rector\CodeQuality\Rector\If_\ConsecutiveNullCompareReturnsToNullCoalesceQueueRector;
 use Rector\Config\RectorConfig;
+use Rector\Naming\Rector\Foreach_\RenameForeachValueVariableToMatchExprVariableRector;
+use Rector\Naming\Rector\Foreach_\RenameForeachValueVariableToMatchMethodCallReturnTypeRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Set\ValueObject\SetList;
-use Rector\Strict\Rector\Ternary\BooleanInTernaryOperatorRuleFixerRector;
-use Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeFromPropertyTypeRector;
-use Rector\Naming\Rector\Foreach_\RenameForeachValueVariableToMatchMethodCallReturnTypeRector;
 
 return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->paths([
@@ -40,27 +37,30 @@ return static function (RectorConfig $rectorConfig): void {
     ]);
 
     $rectorConfig->skip([
+        RenameForeachValueVariableToMatchExprVariableRector::class => [
+            'src/Spryker/Zed/AppPayment/Business/Payment/Writer/PaymentWriter.php',
+        ],
         RenameForeachValueVariableToMatchMethodCallReturnTypeRector::class => [
-            __DIR__ . '/src/Spryker/Glue/AppPaymentBackendApi/Mapper/Payment/GlueResponsePaymentMapper.php',
-            __DIR__ . '/src/Spryker/Zed/AppPayment/Business/MessageBroker/RefundPaymentMessageHandler.php',
-            __DIR__ . '/src/Spryker/Zed/AppPayment/Business/Payment/Transfer/PaymentTransfer.php',
+            'src/Spryker/Glue/AppPaymentBackendApi/Mapper/Payment/GlueResponsePaymentMapper.php',
+            'src/Spryker/Zed/AppPayment/Business/MessageBroker/RefundPaymentMessageHandler.php',
+            'src/Spryker/Zed/AppPayment/Business/Payment/Transfer/PaymentTransfer.php',
         ],
         // Ignore this rule on the AppRouteProviderPlugin as it breaks the code
         ClassPropertyAssignToConstructorPromotionRector::class => [
-            __DIR__ . '/src/Spryker/Glue/AppPaymentBackendApi/Dependency/Facade/AppPaymentBackendApiToAppPaymentFacadeBridge.php',
-            __DIR__ . '/src/Spryker/Glue/AppPaymentBackendApi/Dependency/Facade/AppPaymentBackendApiToTranslatorFacadeBridge.php',
-            __DIR__ . '/src/Spryker/Zed/AppPayment/Dependency/Facade/AppPaymentToAppKernelFacadeBridge.php',
-            __DIR__ . '/src/Spryker/Zed/AppPayment/Dependency/Facade/AppPaymentToMessageBrokerFacadeBridge.php',
-            __DIR__ . '/src/Spryker/Zed/AppPayment/Dependency/Facade/AppPaymentToAppWebhookFacadeBridge.php',
-            __DIR__ . '/src/Spryker/Zed/AppPayment/Dependency/Service/AppPaymentToUtilEncodingServiceBridge.php',
+            'src/Spryker/Glue/AppPaymentBackendApi/Dependency/Facade/AppPaymentBackendApiToAppPaymentFacadeBridge.php',
+            'src/Spryker/Glue/AppPaymentBackendApi/Dependency/Facade/AppPaymentBackendApiToTranslatorFacadeBridge.php',
+            'src/Spryker/Zed/AppPayment/Dependency/Facade/AppPaymentToAppKernelFacadeBridge.php',
+            'src/Spryker/Zed/AppPayment/Dependency/Facade/AppPaymentToMessageBrokerFacadeBridge.php',
+            'src/Spryker/Zed/AppPayment/Dependency/Facade/AppPaymentToAppWebhookFacadeBridge.php',
+            'src/Spryker/Zed/AppPayment/Dependency/Service/AppPaymentToUtilEncodingServiceBridge.php',
         ],
         AddParamTypeFromPropertyTypeRector::class => [
-            __DIR__ . '/src/Spryker/Glue/AppPaymentBackendApi/Dependency/Facade/AppPaymentBackendApiToAppPaymentFacadeBridge.php',
-            __DIR__ . '/src/Spryker/Glue/AppPaymentBackendApi/Dependency/Facade/AppPaymentBackendApiToTranslatorFacadeBridge.php',
-            __DIR__ . '/src/Spryker/Zed/AppPayment/Dependency/Facade/AppPaymentToAppKernelFacadeBridge.php',
-            __DIR__ . '/src/Spryker/Zed/AppPayment/Dependency/Facade/AppPaymentToMessageBrokerFacadeBridge.php',
-            __DIR__ . '/src/Spryker/Zed/AppPayment/Dependency/Facade/AppPaymentToAppWebhookFacadeBridge.php',
-            __DIR__ . '/src/Spryker/Zed/AppPayment/Dependency/Service/AppPaymentToUtilEncodingServiceBridge.php',
+            'src/Spryker/Glue/AppPaymentBackendApi/Dependency/Facade/AppPaymentBackendApiToAppPaymentFacadeBridge.php',
+            'src/Spryker/Glue/AppPaymentBackendApi/Dependency/Facade/AppPaymentBackendApiToTranslatorFacadeBridge.php',
+            'src/Spryker/Zed/AppPayment/Dependency/Facade/AppPaymentToAppKernelFacadeBridge.php',
+            'src/Spryker/Zed/AppPayment/Dependency/Facade/AppPaymentToMessageBrokerFacadeBridge.php',
+            'src/Spryker/Zed/AppPayment/Dependency/Facade/AppPaymentToAppWebhookFacadeBridge.php',
+            'src/Spryker/Zed/AppPayment/Dependency/Service/AppPaymentToUtilEncodingServiceBridge.php',
         ],
     ]);
 };

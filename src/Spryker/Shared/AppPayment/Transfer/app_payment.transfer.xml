@@ -204,6 +204,8 @@
         <property name="redirectCancelUrl" type="string"/>
         <property name="additionalPaymentData" type="array" associative="true" singular="additionalPaymentDatum"/>
         <property name="details" type="string"/>
+        <property name="originPayment" type="Payment" description="This is the origin payment right after fetching from DB or after creation. It an be used to compare after it may have been changed."/>
+        <property name="paymentStatusHistory" type="PaymentStatusHistory" description="The history of all states this payment had."/>
     </transfer>
 
     <transfer name="PaymentRefund" strict="true">
@@ -416,15 +418,30 @@
     <transfer name="PaymentCreated" strict="true">
         <property name="entityReference" type="string"/>
         <property name="paymentReference" type="string"/>
-        <property name="details" type="string"/>
+        <property name="details" type="string" description="A JSON representation of payment details such as PSP specific data and payment status history data"/>
         <property name="messageAttributes" type="MessageAttributes"/>
     </transfer>
 
     <transfer name="PaymentUpdated" strict="true">
         <property name="entityReference" type="string"/>
         <property name="paymentReference" type="string"/>
-        <property name="details" type="string"/>
+        <property name="details" type="string" description="A JSON representation of payment details such as PSP specific data and payment status history data"/>
         <property name="messageAttributes" type="MessageAttributes"/>
+    </transfer>
+
+    <transfer name="PaymentStatusHistory" strict="true">
+        <property name="paymentStates" type="PaymentStatus[]" singular="paymentState"/>
+    </transfer>
+
+    <transfer name="PaymentStatusHistoryCriteria" strict="true">
+        <property name="tenantIdentifier" type="string"/>
+        <property name="transactionId" type="string"/>
+        <property name="orderReference" type="string"/>
+    </transfer>
+
+    <transfer name="PaymentStatus" strict="true">
+        <property name="status" type="string"/>
+        <property name="createdAt" type="string"/>
     </transfer>
 
     <transfer name="MessageContext" strict="true">

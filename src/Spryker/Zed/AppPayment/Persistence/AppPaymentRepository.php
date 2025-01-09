@@ -11,6 +11,8 @@ use Generated\Shared\Transfer\PaymentCollectionTransfer;
 use Generated\Shared\Transfer\PaymentCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentMethodTransfer;
 use Generated\Shared\Transfer\PaymentRefundTransfer;
+use Generated\Shared\Transfer\PaymentStatusHistoryCriteriaTransfer;
+use Generated\Shared\Transfer\PaymentStatusHistoryTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 use Orm\Zed\AppPayment\Persistence\SpyPayment;
@@ -37,6 +39,29 @@ class AppPaymentRepository extends AbstractRepository implements AppPaymentRepos
             ->mapPaymentEntitiesToPaymentCollectionTransfer($paymentCollection, new PaymentCollectionTransfer());
     }
 
+    public function getPaymentStatusHistory(
+        PaymentStatusHistoryCriteriaTransfer $paymentStatusHistoryCriteriaTransfer
+    ): PaymentStatusHistoryTransfer {
+        $spyPaymentStatusHistoryQuery = $this->getFactory()->createPaymentStatusHistoryQuery();
+
+        if ($paymentStatusHistoryCriteriaTransfer->getTransactionId() !== null && $paymentStatusHistoryCriteriaTransfer->getTransactionId() !== '' && $paymentStatusHistoryCriteriaTransfer->getTransactionId() !== '0') {
+            $spyPaymentStatusHistoryQuery->filterByTransactionId($paymentStatusHistoryCriteriaTransfer->getTransactionId());
+        }
+
+        if ($paymentStatusHistoryCriteriaTransfer->getTenantIdentifier() !== null && $paymentStatusHistoryCriteriaTransfer->getTenantIdentifier() !== '' && $paymentStatusHistoryCriteriaTransfer->getTenantIdentifier() !== '0') {
+            $spyPaymentStatusHistoryQuery->filterByTenantIdentifier($paymentStatusHistoryCriteriaTransfer->getTenantIdentifier());
+        }
+
+        if ($paymentStatusHistoryCriteriaTransfer->getOrderReference() !== null && $paymentStatusHistoryCriteriaTransfer->getOrderReference() !== '' && $paymentStatusHistoryCriteriaTransfer->getOrderReference() !== '0') {
+            $spyPaymentStatusHistoryQuery->filterByOrderReference($paymentStatusHistoryCriteriaTransfer->getOrderReference());
+        }
+
+        $collection = $spyPaymentStatusHistoryQuery->find();
+
+        return $this->getFactory()->createPaymentMapper()
+            ->mapPaymentStatusHistoryEntitiesToPaymentStatusHistoryTransfer($collection, new PaymentStatusHistoryTransfer());
+    }
+
     /**
      * @throws \Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTransactionIdNotFoundException
      */
@@ -56,7 +81,8 @@ class AppPaymentRepository extends AbstractRepository implements AppPaymentRepos
      */
     public function getPaymentByTenantIdentifierAndOrderReference(string $tenantIdentifier, string $orderReference): PaymentTransfer
     {
-        $spyPayment = $this->getFactory()->createPaymentQuery()->filterByTenantIdentifier($tenantIdentifier)
+        $spyPayment = $this->getFactory()->createPaymentQuery()
+            ->filterByTenantIdentifier($tenantIdentifier)
             ->filterByOrderReference($orderReference)
             ->findOne();
 
