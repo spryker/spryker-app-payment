@@ -11,8 +11,8 @@ use Generated\Shared\Transfer\PaymentCollectionTransfer;
 use Generated\Shared\Transfer\PaymentCriteriaTransfer;
 use Generated\Shared\Transfer\PaymentMethodTransfer;
 use Generated\Shared\Transfer\PaymentRefundTransfer;
-use Generated\Shared\Transfer\PaymentStatusHistoryCollectionTransfer;
 use Generated\Shared\Transfer\PaymentStatusHistoryCriteriaTransfer;
+use Generated\Shared\Transfer\PaymentStatusHistoryTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 use Orm\Zed\AppPayment\Persistence\SpyPayment;
@@ -39,9 +39,9 @@ class AppPaymentRepository extends AbstractRepository implements AppPaymentRepos
             ->mapPaymentEntitiesToPaymentCollectionTransfer($paymentCollection, new PaymentCollectionTransfer());
     }
 
-    public function getPaymentStatusHistoryCollection(
+    public function getPaymentStatusHistory(
         PaymentStatusHistoryCriteriaTransfer $paymentStatusHistoryCriteriaTransfer
-    ): PaymentStatusHistoryCollectionTransfer {
+    ): PaymentStatusHistoryTransfer {
         $spyPaymentStatusHistoryQuery = $this->getFactory()->createPaymentStatusHistoryQuery();
 
         if ($paymentStatusHistoryCriteriaTransfer->getTransactionId() !== null && $paymentStatusHistoryCriteriaTransfer->getTransactionId() !== '' && $paymentStatusHistoryCriteriaTransfer->getTransactionId() !== '0') {
@@ -59,7 +59,7 @@ class AppPaymentRepository extends AbstractRepository implements AppPaymentRepos
         $collection = $spyPaymentStatusHistoryQuery->find();
 
         return $this->getFactory()->createPaymentMapper()
-            ->mapPaymentStatusHistoryEntitiesToPaymentStatusHistoryCollectionTransfer($collection, new PaymentStatusHistoryCollectionTransfer());
+            ->mapPaymentStatusHistoryEntitiesToPaymentStatusHistoryTransfer($collection, new PaymentStatusHistoryTransfer());
     }
 
     /**

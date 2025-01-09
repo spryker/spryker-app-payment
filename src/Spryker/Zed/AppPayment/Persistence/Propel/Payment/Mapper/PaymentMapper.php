@@ -10,8 +10,8 @@ namespace Spryker\Zed\AppPayment\Persistence\Propel\Payment\Mapper;
 use Generated\Shared\Transfer\PaymentCollectionTransfer;
 use Generated\Shared\Transfer\PaymentMethodTransfer;
 use Generated\Shared\Transfer\PaymentRefundTransfer;
-use Generated\Shared\Transfer\PaymentStatusHistoryCollectionTransfer;
 use Generated\Shared\Transfer\PaymentStatusHistoryTransfer;
+use Generated\Shared\Transfer\PaymentStatusTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 use Generated\Shared\Transfer\PaymentTransmissionTransfer;
 use Orm\Zed\AppPayment\Persistence\SpyPayment;
@@ -138,25 +138,23 @@ class PaymentMapper
     /**
      * @param \Propel\Runtime\Collection\Collection<\Orm\Zed\AppPayment\Persistence\SpyPaymentStatusHistory> $collection
      */
-    public function mapPaymentStatusHistoryEntitiesToPaymentStatusHistoryCollectionTransfer(
+    public function mapPaymentStatusHistoryEntitiesToPaymentStatusHistoryTransfer(
         Collection $collection,
-        PaymentStatusHistoryCollectionTransfer $paymentStatusHistoryCollectionTransfer
-    ): PaymentStatusHistoryCollectionTransfer {
+        PaymentStatusHistoryTransfer $paymentStatusHistoryTransfer
+    ): PaymentStatusHistoryTransfer {
         foreach ($collection as $paymentStatusHistoryEntity) {
-            $paymentStatusHistoryCollectionTransfer->addPaymentStatusHistory(
-                $this->mapPaymentStatusHistoryEntityToPaymentStatusHistoryTransfer($paymentStatusHistoryEntity, new PaymentStatusHistoryTransfer()),
+            $paymentStatusHistoryTransfer->addPaymentState(
+                $this->mapPaymentStatusHistoryEntityToPaymentStatusTransfer($paymentStatusHistoryEntity, new PaymentStatusTransfer()),
             );
         }
 
-        return $paymentStatusHistoryCollectionTransfer;
+        return $paymentStatusHistoryTransfer;
     }
 
-    public function mapPaymentStatusHistoryEntityToPaymentStatusHistoryTransfer(
+    public function mapPaymentStatusHistoryEntityToPaymentStatusTransfer(
         SpyPaymentStatusHistory $spyPaymentStatusHistory,
-        PaymentStatusHistoryTransfer $paymentStatusHistoryTransfer
-    ): PaymentStatusHistoryTransfer {
-        $paymentStatusHistoryTransfer->fromArray($spyPaymentStatusHistory->toArray(), true);
-
-        return $paymentStatusHistoryTransfer;
+        PaymentStatusTransfer $paymentStatusTransfer
+    ): PaymentStatusTransfer {
+        return $paymentStatusTransfer->fromArray($spyPaymentStatusHistory->toArray(), true);
     }
 }

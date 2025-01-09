@@ -53,17 +53,17 @@ class PaymentWriter implements PaymentWriterInterface
         $paymentStatusHistoryCriteriaTransfer
             ->setTransactionId($paymentTransfer->getTransactionIdOrFail());
 
-        $paymentStatusHistoryCollectionTransfer = $this->appPaymentRepository->getPaymentStatusHistoryCollection($paymentStatusHistoryCriteriaTransfer);
+        $paymentStatusHistoryTransfer = $this->appPaymentRepository->getPaymentStatusHistory($paymentStatusHistoryCriteriaTransfer);
 
         $details = $paymentTransfer->getDetails() ?? '{}';
         $detailsArray = json_decode($details, true);
 
-        $paymentStatusHistoryTransfers = $paymentStatusHistoryCollectionTransfer->getPaymentStatusHistory();
+        $paymentStatusTransfers = $paymentStatusHistoryTransfer->getPaymentStates();
 
-        foreach ($paymentStatusHistoryTransfers as $paymentStatusHistoryTransfer) {
-            $statusText = sprintf('External status "%s"', $paymentStatusHistoryTransfer->getStatus());
+        foreach ($paymentStatusTransfers as $paymentStatusTransfer) {
+            $statusText = sprintf('External status "%s"', $paymentStatusTransfer->getStatus());
 
-            $dateTime = new DateTime($paymentStatusHistoryTransfer->getCreatedAtOrFail());
+            $dateTime = new DateTime($paymentStatusTransfer->getCreatedAtOrFail());
             $formattedDateTime = $dateTime->format('Y-m-d H:i:s');
 
             $detailsArray[$statusText] = $formattedDateTime;
