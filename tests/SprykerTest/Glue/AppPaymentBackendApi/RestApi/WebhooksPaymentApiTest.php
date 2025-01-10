@@ -15,6 +15,7 @@ use Generated\Shared\Transfer\WebhookRequestTransfer;
 use Generated\Shared\Transfer\WebhookResponseTransfer;
 use Ramsey\Uuid\Uuid;
 use Spryker\Glue\AppWebhookBackendApi\AppWebhookBackendApiDependencyProvider;
+use Spryker\Zed\AppKernel\AppKernelConfig;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Business\Message\MessageBuilder;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
@@ -50,6 +51,25 @@ class WebhooksPaymentApiTest extends Unit
         $this->getDependencyHelper()->setDependency(AppWebhookDependencyProvider::PLUGINS_WEBHOOK_HANDLER, [
             new PaymentWebhookHandlerPlugin(),
         ]);
+    }
+
+    public function testGivenTheAppIsMarkedAsDisconnectedWhenTheWebhookIsHandledThenAFailedWebhookResponseIsReturnedAndTheResponseStatusIs403ForbiddenAndTheResponseMessageIndicatesTheDisconnectedApp(): void
+    {
+        // Arrange
+        $transactionId = Uuid::uuid4()->toString();
+        $tenantIdentifier = Uuid::uuid4()->toString();
+
+        $this->tester->haveAppConfigForTenant($tenantIdentifier, [], true, AppKernelConfig::APP_STATUS_DISCONNECTED);
+        $this->tester->havePaymentForTransactionId($transactionId, $tenantIdentifier);
+
+        $this->tester->mockGlueRequestWebhookMapperPlugin(WebhookDataType::PAYMENT, $transactionId);
+
+        // Act
+        $response = $this->tester->sendPost($this->tester->buildWebhookUrl(), ['data' => ['object' => ['id' => 123456789]]]);
+
+        // Assert
+        $this->tester->seeResponseCodeIs(Response::HTTP_FORBIDDEN);
+        $this->tester->assertStringContainsString(MessageBuilder::tenantIsDisconnected(), $response->getContent());
     }
 
     public function testGivenPaymentInStateNewWhenThePlatformPluginReturnsASuccessfulWebhookResponseTransferAndAuthorizedStatusThenPaymentIsMovedToAuthorized(): void

@@ -7,15 +7,18 @@
 
 namespace Spryker\Zed\AppPayment\Business\Payment\Webhook;
 
+use Generated\Shared\Transfer\AppConfigTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 use Generated\Shared\Transfer\WebhookRequestTransfer;
 use Generated\Shared\Transfer\WebhookResponseTransfer;
 use InvalidArgumentException;
 use Spryker\Shared\Log\LoggerTrait;
+use Spryker\Zed\AppKernel\AppKernelConfig;
 use Spryker\Zed\AppPayment\Business\Message\MessageBuilder;
 use Spryker\Zed\AppPayment\Business\Payment\Webhook\Handler\WebhookHandlerSelector;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
 use Spryker\Zed\Kernel\Persistence\EntityManager\TransactionTrait;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 class WebhookHandler
@@ -35,6 +38,12 @@ class WebhookHandler
     {
         try {
             $webhookRequestTransfer = $this->extendWebhookRequestTransfer($webhookRequestTransfer);
+
+            $webhookResponseTransfer = $this->validateWebhookRequest($webhookRequestTransfer, $webhookResponseTransfer);
+
+            if ($webhookResponseTransfer->getIsSuccessful() === false) {
+                return $webhookResponseTransfer;
+            }
 
             if ($webhookRequestTransfer->getAbortHandling() === true) {
                 // This will result in a 200 OK Response send back to the caller of the webhook endpoint.
@@ -87,5 +96,21 @@ class WebhookHandler
         }
 
         throw new InvalidArgumentException(MessageBuilder::getRequestTransactionIdIsMissingOrEmpty());
+    }
+
+    private function validateWebhookRequest(
+        WebhookRequestTransfer $webhookRequestTransfer,
+        WebhookResponseTransfer $webhookResponseTransfer
+    ): WebhookResponseTransfer {
+        $appConfigTransfer = $webhookRequestTransfer->getAppConfig();
+
+        if (!$appConfigTransfer instanceof AppConfigTransfer || $appConfigTransfer->getStatus() === AppKernelConfig::APP_STATUS_DISCONNECTED) {
+            $webhookResponseTransfer
+                ->setIsSuccessful(false)
+                ->setHttpStatusCode(Response::HTTP_FORBIDDEN)
+                ->setMessage(MessageBuilder::tenantIsDisconnected());
+        }
+
+        return $webhookResponseTransfer;
     }
 }
