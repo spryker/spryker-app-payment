@@ -80,4 +80,9 @@ class MessageBuilder
     {
         return sprintf('Could not find a payment transfer with the transfer id "%s"', $transferId);
     }
+
+    public static function tenantIsDisconnected(): string
+    {
+        return 'Tenant is disconnected.';
+    }
 }

@@ -19,6 +19,7 @@ use Generated\Shared\Transfer\RefundPaymentRequestTransfer;
 use Generated\Shared\Transfer\RefundPaymentResponseTransfer;
 use Generated\Shared\Transfer\RefundPaymentTransfer;
 use Ramsey\Uuid\Uuid;
+use Spryker\Zed\AppKernel\AppKernelConfig;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Business\Payment\Refund\PaymentRefundStatus;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
@@ -42,6 +43,27 @@ class RefundPaymentTest extends Unit
     use DependencyHelperTrait;
 
     protected AppPaymentAsyncApiTester $tester;
+
+    public function testGivenTheAppIsMarkedAsDisconnectedWhenTheMessageHandlerIsExecutedThenThePaymentStatusIsNotChangedAndNoMessageIsSent(): void
+    {
+        // Arrange
+        $tenantIdentifier = Uuid::uuid4()->toString();
+        $transactionId = Uuid::uuid4()->toString();
+        $refundId = Uuid::uuid4()->toString();
+        $this->tester->haveAppConfigForTenant($tenantIdentifier, [], true, AppKernelConfig::APP_STATUS_DISCONNECTED);
+        $paymentTransfer = $this->tester->havePaymentForTransactionId($transactionId, $tenantIdentifier, PaymentStatus::STATUS_CAPTURED);
+
+        $refundPaymentTransfer = $this->tester->haveRefundPaymentTransfer([
+            MessageAttributesTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
+            RefundPaymentTransfer::ORDER_REFERENCE => $paymentTransfer->getOrderReference(),
+        ]);
+
+        // Act: This will trigger the MessageHandlerPlugin for this message.
+        $this->tester->runMessageReceiveTest($refundPaymentTransfer, 'payment-commands');
+
+        // Assert
+        $this->tester->assertMessageWasNotSent(PaymentRefundedTransfer::class);
+    }
 
     public function testRefundPaymentMessageSendsPaymentRefundedMessageAndCreatesPaymentRefundWhenPaymentIsInCapturedState(): void
     {

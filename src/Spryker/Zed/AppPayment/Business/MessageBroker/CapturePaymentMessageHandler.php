@@ -17,34 +17,29 @@ use Spryker\Zed\AppPayment\Business\MessageBroker\TenantIdentifier\TenantIdentif
 use Spryker\Zed\AppPayment\Business\Payment\Capture\PaymentCapturer;
 use Spryker\Zed\AppPayment\Business\Payment\Message\MessageSender;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
+use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToAppKernelFacadeInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface;
-use Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTenantIdentifierAndOrderReferenceNotFoundException;
 
-class CapturePaymentMessageHandler implements CapturePaymentMessageHandlerInterface
+class CapturePaymentMessageHandler extends AbstractPaymentMessageHandler implements CapturePaymentMessageHandlerInterface
 {
     use LoggerTrait;
 
     public function __construct(
         protected AppPaymentRepositoryInterface $appPaymentRepository,
         protected TenantIdentifierExtractor $tenantIdentifierExtractor,
+        protected AppPaymentToAppKernelFacadeInterface $appPaymentToAppKernelFacade,
         protected PaymentCapturer $paymentCapturer,
         protected MessageSender $messageSender
     ) {
+        parent::__construct($appPaymentRepository, $tenantIdentifierExtractor, $this->appPaymentToAppKernelFacade);
     }
 
     public function handleCapturePayment(
         CapturePaymentTransfer $capturePaymentTransfer
     ): void {
-        $tenantIdentifier = $this->tenantIdentifierExtractor->getTenantIdentifierFromMessage($capturePaymentTransfer);
+        $paymentTransfer = $this->getPayment($capturePaymentTransfer);
 
-        try {
-            $paymentTransfer = $this->appPaymentRepository->getPaymentByTenantIdentifierAndOrderReference(
-                $tenantIdentifier,
-                $capturePaymentTransfer->getOrderReferenceOrFail(),
-            );
-        } catch (PaymentByTenantIdentifierAndOrderReferenceNotFoundException $paymentByTenantIdentifierAndOrderReferenceNotFoundException) {
-            $this->getLogger()->warning($paymentByTenantIdentifierAndOrderReferenceNotFoundException->getMessage());
-
+        if (!$paymentTransfer instanceof PaymentTransfer) {
             return;
         }
 

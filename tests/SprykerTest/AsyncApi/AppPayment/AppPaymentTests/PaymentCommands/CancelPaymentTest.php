@@ -17,6 +17,7 @@ use Generated\Shared\Transfer\PaymentCanceledTransfer;
 use Generated\Shared\Transfer\PaymentCancellationFailedTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 use Ramsey\Uuid\Uuid;
+use Spryker\Zed\AppKernel\AppKernelConfig;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
@@ -39,6 +40,26 @@ class CancelPaymentTest extends Unit
     use DependencyHelperTrait;
 
     protected AppPaymentAsyncApiTester $tester;
+
+    public function testGivenTheAppIsMarkedAsDisconnectedWhenTheMessageHandlerIsExecutedThenThePaymentStatusIsNotChangedAndNoMessageIsSent(): void
+    {
+        // Arrange
+        $tenantIdentifier = Uuid::uuid4()->toString();
+        $transactionId = Uuid::uuid4()->toString();
+
+        $this->tester->haveAppConfigForTenant($tenantIdentifier, [], true, AppKernelConfig::APP_STATUS_DISCONNECTED);
+
+        $paymentTransfer = $this->tester->havePaymentForTransactionId($transactionId, $tenantIdentifier, PaymentStatus::STATUS_NEW);
+
+        $cancelPaymentTransfer = $this->tester->haveCancelPaymentTransfer(['tenantIdentifier' => $tenantIdentifier, 'orderReference' => $paymentTransfer->getOrderReference()]);
+
+        // Act: This will trigger the MessageHandlerPlugin for this message.
+        $this->tester->runMessageReceiveTest($cancelPaymentTransfer, 'payment-commands');
+
+        // Assert
+        $this->tester->assertPaymentHasStatus($paymentTransfer, PaymentStatus::STATUS_NEW);
+        $this->tester->assertMessageWasNotSent(PaymentCanceledTransfer::class);
+    }
 
     /**
      * Cancellable states are all states before a payment is captured. When a payment is captured, it cannot be cancelled anymore and only the refund operation is possible.

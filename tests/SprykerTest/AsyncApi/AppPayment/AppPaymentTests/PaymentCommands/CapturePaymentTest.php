@@ -13,8 +13,10 @@ use Exception;
 use Generated\Shared\Transfer\AppConfigTransfer;
 use Generated\Shared\Transfer\CapturePaymentRequestTransfer;
 use Generated\Shared\Transfer\CapturePaymentResponseTransfer;
+use Generated\Shared\Transfer\PaymentCapturedTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 use Ramsey\Uuid\Uuid;
+use Spryker\Zed\AppKernel\AppKernelConfig;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
 use Spryker\Zed\AppPayment\Dependency\Plugin\AppPaymentPlatformPluginInterface;
@@ -37,6 +39,24 @@ class CapturePaymentTest extends Unit
     use DependencyHelperTrait;
 
     protected AppPaymentAsyncApiTester $tester;
+
+    public function testGivenTheAppIsMarkedAsDisconnectedWhenTheMessageHandlerIsExecutedThenThePaymentStatusIsNotChangedAndNoMessageIsSent(): void
+    {
+        // Arrange
+        $tenantIdentifier = Uuid::uuid4()->toString();
+        $transactionId = Uuid::uuid4()->toString();
+        $this->tester->haveAppConfigForTenant($tenantIdentifier, [], true, AppKernelConfig::APP_STATUS_DISCONNECTED);
+        $paymentTransfer = $this->tester->havePaymentForTransactionId($transactionId, $tenantIdentifier, PaymentStatus::STATUS_NEW);
+
+        $capturePaymentTransfer = $this->tester->haveCapturePaymentTransfer(['tenantIdentifier' => $tenantIdentifier, 'orderReference' => $paymentTransfer->getOrderReference()]);
+
+        // Act: This will trigger the MessageHandlerPlugin for this message.
+        $this->tester->runMessageReceiveTest($capturePaymentTransfer, 'payment-commands');
+
+        // Assert
+        $this->tester->assertPaymentHasStatus($paymentTransfer, PaymentStatus::STATUS_NEW);
+        $this->tester->assertMessageWasNotSent(PaymentCapturedTransfer::class);
+    }
 
     public function testHandleCapturePaymentMessageUpdatesPaymentToCapturedRequested(): void
     {
