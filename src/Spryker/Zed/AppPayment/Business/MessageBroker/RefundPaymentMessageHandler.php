@@ -18,33 +18,28 @@ use Spryker\Zed\AppPayment\Business\MessageBroker\TenantIdentifier\TenantIdentif
 use Spryker\Zed\AppPayment\Business\Payment\Message\MessageSender;
 use Spryker\Zed\AppPayment\Business\Payment\Refund\PaymentRefunder;
 use Spryker\Zed\AppPayment\Business\Payment\Refund\PaymentRefundStatus;
+use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToAppKernelFacadeInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface;
-use Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTenantIdentifierAndOrderReferenceNotFoundException;
 
-class RefundPaymentMessageHandler implements RefundPaymentMessageHandlerInterface
+class RefundPaymentMessageHandler extends AbstractPaymentMessageHandler implements RefundPaymentMessageHandlerInterface
 {
     use LoggerTrait;
 
     public function __construct(
         protected AppPaymentRepositoryInterface $appPaymentRepository,
         protected TenantIdentifierExtractor $tenantIdentifierExtractor,
+        protected AppPaymentToAppKernelFacadeInterface $appPaymentToAppKernelFacade,
         protected PaymentRefunder $paymentRefunder,
         protected MessageSender $messageSender
     ) {
+        parent::__construct($appPaymentRepository, $tenantIdentifierExtractor, $this->appPaymentToAppKernelFacade);
     }
 
     public function handleRefundPayment(RefundPaymentTransfer $refundPaymentTransfer): void
     {
-        $tenantIdentifier = $this->tenantIdentifierExtractor->getTenantIdentifierFromMessage($refundPaymentTransfer);
+        $paymentTransfer = $this->getPayment($refundPaymentTransfer);
 
-        try {
-            $paymentTransfer = $this->appPaymentRepository->getPaymentByTenantIdentifierAndOrderReference(
-                $tenantIdentifier,
-                $refundPaymentTransfer->getOrderReferenceOrFail(),
-            );
-        } catch (PaymentByTenantIdentifierAndOrderReferenceNotFoundException $paymentByTenantIdentifierAndOrderReferenceNotFoundException) {
-            $this->getLogger()->warning($paymentByTenantIdentifierAndOrderReferenceNotFoundException->getMessage());
-
+        if (!$paymentTransfer instanceof PaymentTransfer) {
             return;
         }
 
@@ -73,13 +68,13 @@ class RefundPaymentMessageHandler implements RefundPaymentMessageHandlerInterfac
 
             $this->getLogger()->error(sprintf(
                 'Refund payment attempt failed for tenant "%s" for orderReference "%s" and order items [%s] with message "%s".',
-                $tenantIdentifier,
+                $paymentTransfer->getTransactionIdOrFail(),
                 $paymentTransfer->getOrderReference(),
                 implode(', ', $refundOrderItemIds),
                 $refundPaymentResponseTransfer->getMessage(),
             ), [
                 RefundPaymentRequestTransfer::TRANSACTION_ID => $refundPaymentRequestTransfer->getTransactionIdOrFail(),
-                PaymentTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
+                PaymentTransfer::TENANT_IDENTIFIER => $paymentTransfer->getTenantIdentifierOrFail(),
             ]);
         }
 

@@ -210,6 +210,7 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
         return new CancelPaymentMessageHandler(
             $this->getRepository(),
             $this->createTenantIdentifierExtractor(),
+            $this->getAppKernelFacade(),
             $this->createCancelPayment(),
             $this->createMessageSender(),
         );
@@ -231,6 +232,7 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
         return new CapturePaymentMessageHandler(
             $this->getRepository(),
             $this->createTenantIdentifierExtractor(),
+            $this->getAppKernelFacade(),
             $this->createPaymentCapturer(),
             $this->createMessageSender(),
         );
@@ -241,6 +243,7 @@ class AppPaymentBusinessFactory extends AbstractBusinessFactory
         return new RefundPaymentMessageHandler(
             $this->getRepository(),
             $this->createTenantIdentifierExtractor(),
+            $this->getAppKernelFacade(),
             $this->createPaymentRefunder(),
             $this->createMessageSender(),
         );

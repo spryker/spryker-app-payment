@@ -16,34 +16,29 @@ use Spryker\Zed\AppPayment\Business\MessageBroker\TenantIdentifier\TenantIdentif
 use Spryker\Zed\AppPayment\Business\Payment\Cancel\CancelPayment;
 use Spryker\Zed\AppPayment\Business\Payment\Message\MessageSender;
 use Spryker\Zed\AppPayment\Business\Payment\Status\PaymentStatus;
+use Spryker\Zed\AppPayment\Dependency\Facade\AppPaymentToAppKernelFacadeInterface;
 use Spryker\Zed\AppPayment\Persistence\AppPaymentRepositoryInterface;
-use Spryker\Zed\AppPayment\Persistence\Exception\PaymentByTenantIdentifierAndOrderReferenceNotFoundException;
 
-class CancelPaymentMessageHandler implements CancelPaymentMessageHandlerInterface
+class CancelPaymentMessageHandler extends AbstractPaymentMessageHandler implements CancelPaymentMessageHandlerInterface
 {
     use LoggerTrait;
 
     public function __construct(
         protected AppPaymentRepositoryInterface $appPaymentRepository,
         protected TenantIdentifierExtractor $tenantIdentifierExtractor,
+        protected AppPaymentToAppKernelFacadeInterface $appPaymentToAppKernelFacade,
         protected CancelPayment $cancelPayment,
         protected MessageSender $messageSender
     ) {
+        parent::__construct($appPaymentRepository, $tenantIdentifierExtractor, $this->appPaymentToAppKernelFacade);
     }
 
     public function handleCancelPayment(
         CancelPaymentTransfer $cancelPaymentTransfer
     ): void {
-        $tenantIdentifier = $this->tenantIdentifierExtractor->getTenantIdentifierFromMessage($cancelPaymentTransfer);
+        $paymentTransfer = $this->getPayment($cancelPaymentTransfer);
 
-        try {
-            $paymentTransfer = $this->appPaymentRepository->getPaymentByTenantIdentifierAndOrderReference(
-                $tenantIdentifier,
-                $cancelPaymentTransfer->getOrderReferenceOrFail(),
-            );
-        } catch (PaymentByTenantIdentifierAndOrderReferenceNotFoundException $paymentByTenantIdentifierAndOrderReferenceNotFoundException) {
-            $this->getLogger()->warning($paymentByTenantIdentifierAndOrderReferenceNotFoundException->getMessage());
-
+        if (!$paymentTransfer instanceof PaymentTransfer) {
             return;
         }
 

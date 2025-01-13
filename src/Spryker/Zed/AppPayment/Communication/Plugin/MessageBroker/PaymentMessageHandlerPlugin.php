@@ -7,7 +7,9 @@
 
 namespace Spryker\Zed\AppPayment\Communication\Plugin\MessageBroker;
 
+use Generated\Shared\Transfer\CancelPaymentTransfer;
 use Generated\Shared\Transfer\CapturePaymentTransfer;
+use Generated\Shared\Transfer\RefundPaymentTransfer;
 use Spryker\Zed\Kernel\Communication\AbstractPlugin;
 use Spryker\Zed\MessageBrokerExtension\Dependency\Plugin\MessageHandlerPluginInterface;
 
@@ -16,16 +18,24 @@ use Spryker\Zed\MessageBrokerExtension\Dependency\Plugin\MessageHandlerPluginInt
  *
  * @api
  *
- * @deprecated Use {@link \Spryker\Zed\AppPayment\Communication\Plugin\MessageBroker\PaymentMessageHandlerPlugin} instead. This one will be removed with the next major
- *
  * @method \Spryker\Zed\AppPayment\Business\AppPaymentFacadeInterface getFacade()
  * @method \Spryker\Zed\AppPayment\AppPaymentConfig getConfig()
  */
-class CapturePaymentMessageHandlerPlugin extends AbstractPlugin implements MessageHandlerPluginInterface
+class PaymentMessageHandlerPlugin extends AbstractPlugin implements MessageHandlerPluginInterface
 {
     public function onCapturePayment(CapturePaymentTransfer $capturePaymentTransfer): void
     {
         $this->getFacade()->handleCapturePayment($capturePaymentTransfer);
+    }
+
+    public function onCancelPayment(CancelPaymentTransfer $cancelPaymentTransfer): void
+    {
+        $this->getFacade()->handleCancelPayment($cancelPaymentTransfer);
+    }
+
+    public function onRefundPayment(RefundPaymentTransfer $refundPaymentTransfer): void
+    {
+        $this->getFacade()->handleRefundPayment($refundPaymentTransfer);
     }
 
     /**
@@ -40,6 +50,14 @@ class CapturePaymentMessageHandlerPlugin extends AbstractPlugin implements Messa
     {
         yield CapturePaymentTransfer::class => function (CapturePaymentTransfer $capturePaymentTransfer): void {
             $this->onCapturePayment($capturePaymentTransfer);
+        };
+
+        yield CancelPaymentTransfer::class => function (CancelPaymentTransfer $cancelPaymentTransfer): void {
+            $this->onCancelPayment($cancelPaymentTransfer);
+        };
+
+        yield RefundPaymentTransfer::class => function (RefundPaymentTransfer $refundPaymentTransfer): void {
+            $this->onRefundPayment($refundPaymentTransfer);
         };
     }
 }

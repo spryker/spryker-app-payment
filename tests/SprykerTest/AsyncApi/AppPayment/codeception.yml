@@ -41,9 +41,9 @@ suites:
                     \Spryker\Zed\TestifyAsyncApi\Business\Codeception\Helper\AsyncApiHelper:
                         asyncapi: resources/api/asyncapi.yml
                         handlers:
-                            - \Spryker\Zed\AppPayment\Communication\Plugin\MessageBroker\CancelPaymentMessageHandlerPlugin
-                            - \Spryker\Zed\AppPayment\Communication\Plugin\MessageBroker\CapturePaymentMessageHandlerPlugin
-                            - \Spryker\Zed\AppPayment\Communication\Plugin\MessageBroker\RefundPaymentMessageHandlerPlugin
+                            - \Spryker\Zed\AppPayment\Communication\Plugin\MessageBroker\PaymentMessageHandlerPlugin
+#                            - \Spryker\Zed\AppPayment\Communication\Plugin\MessageBroker\CapturePaymentMessageHandlerPlugin
+#                            - \Spryker\Zed\AppPayment\Communication\Plugin\MessageBroker\RefundPaymentMessageHandlerPlugin
                 - \SprykerTest\Shared\AppPayment\Helper\AppPaymentHelper
                 - \SprykerTest\Shared\AppPayment\Helper\AppPaymentRefundHelper
                 - \SprykerTest\Shared\AppPayment\Helper\AppPaymentAssertionHelper

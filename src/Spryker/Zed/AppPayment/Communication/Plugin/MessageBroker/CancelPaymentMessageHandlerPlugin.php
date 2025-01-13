@@ -16,6 +16,8 @@ use Spryker\Zed\MessageBrokerExtension\Dependency\Plugin\MessageHandlerPluginInt
  *
  * @api
  *
+ * @deprecated Use {@link \Spryker\Zed\AppPayment\Communication\Plugin\MessageBroker\PaymentMessageHandlerPlugin} instead. This one will be removed with the next major
+ *
  * @method \Spryker\Zed\AppPayment\Business\AppPaymentFacadeInterface getFacade()
  * @method \Spryker\Zed\AppPayment\AppPaymentConfig getConfig()
  */
