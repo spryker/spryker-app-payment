@@ -21,4 +21,10 @@ class AppPaymentAssertionHelper extends Module
         $updatedPaymentTransfer = $this->getPaymentHelper()->getPaymentTransferByTransactionId($paymentTransfer->getTransactionId());
         $this->assertEquals($expectedStatus, $updatedPaymentTransfer->getStatus(), sprintf('Expected payment to have status "%s" but status "%s" was found.', $expectedStatus, $updatedPaymentTransfer->getStatus()));
     }
+
+    public function assertPaymentHasDetails(PaymentTransfer $paymentTransfer, string $expectedDetails): void
+    {
+        $updatedPaymentTransfer = $this->getPaymentHelper()->getPaymentTransferByTransactionId($paymentTransfer->getTransactionId());
+        $this->assertEquals($expectedDetails, $updatedPaymentTransfer->getDetails(), sprintf('Expected payment to have details "%s" but details "%s" was found.', $expectedDetails, $updatedPaymentTransfer->getDetails()));
+    }
 }

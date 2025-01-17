@@ -15,6 +15,7 @@ use Generated\Shared\Transfer\MessageAttributesTransfer;
 use Generated\Shared\Transfer\PaymentRefundedTransfer;
 use Generated\Shared\Transfer\PaymentRefundFailedTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
+use Generated\Shared\Transfer\PaymentUpdatedTransfer;
 use Generated\Shared\Transfer\RefundPaymentRequestTransfer;
 use Generated\Shared\Transfer\RefundPaymentResponseTransfer;
 use Generated\Shared\Transfer\RefundPaymentTransfer;
@@ -100,6 +101,48 @@ class RefundPaymentTest extends Unit
         // Assert
         $this->tester->assertPaymentRefundIsInStatus($refundId, PaymentRefundStatus::SUCCEEDED);
         $this->tester->assertMessageWasSent(PaymentRefundedTransfer::class);
+    }
+
+    public function testRefundPaymentMessageSendsPaymentRefundedMessageAndCreatesPaymentRefundWhenPaymentIsInCapturedStateAndPersistsDetailsFromTheImplementationReturnedPaymentAndSendsAPaymentUpdatedMessage(): void
+    {
+        // Arrange
+        $tenantIdentifier = Uuid::uuid4()->toString();
+        $transactionId = Uuid::uuid4()->toString();
+        $refundId = Uuid::uuid4()->toString();
+        $this->tester->haveAppConfigForTenant($tenantIdentifier);
+        $paymentTransfer = $this->tester->havePaymentForTransactionId($transactionId, $tenantIdentifier, PaymentStatus::STATUS_CAPTURED);
+
+        $refundPaymentTransfer = $this->tester->haveRefundPaymentTransfer([
+            MessageAttributesTransfer::TENANT_IDENTIFIER => $tenantIdentifier,
+            RefundPaymentTransfer::ORDER_REFERENCE => $paymentTransfer->getOrderReference(),
+        ]);
+        $refundPaymentResponseTransfer = (new RefundPaymentResponseTransfer())
+            ->setIsSuccessful(true)
+            ->setRefundId($refundId)
+            ->setStatus(PaymentRefundStatus::SUCCEEDED);
+
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
+            'refundPayment' => function (RefundPaymentRequestTransfer $refundPaymentRequestTransfer) use ($refundPaymentResponseTransfer, $paymentTransfer) {
+                $this->assertInstanceOf(AppConfigTransfer::class, $refundPaymentRequestTransfer->getAppConfig());
+                $this->assertInstanceOf(PaymentTransfer::class, $refundPaymentRequestTransfer->getPayment());
+
+                $paymentTransfer->setDetails('{"foo":"bar"}');
+                $refundPaymentResponseTransfer->setPayment($paymentTransfer);
+
+                return $refundPaymentResponseTransfer;
+            },
+        ]);
+
+        $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
+
+        // Act: This will trigger the MessageHandlerPlugin for this message.
+        $this->tester->runMessageReceiveTest($refundPaymentTransfer, 'payment-commands');
+
+        // Assert
+        $this->tester->assertPaymentRefundIsInStatus($refundId, PaymentRefundStatus::SUCCEEDED);
+        $this->tester->assertPaymentHasDetails($paymentTransfer, '{"foo":"bar"}');
+        $this->tester->assertMessageWasSent(PaymentRefundedTransfer::class);
+        $this->tester->assertMessageWasSent(PaymentUpdatedTransfer::class);
     }
 
     /**

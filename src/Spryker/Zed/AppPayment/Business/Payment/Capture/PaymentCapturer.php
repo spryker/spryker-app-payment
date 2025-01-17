@@ -50,8 +50,10 @@ class PaymentCapturer
         }
 
         /** @phpstan-var \Generated\Shared\Transfer\CapturePaymentResponseTransfer */
-        return $this->getTransactionHandler()->handleTransaction(function () use ($capturePaymentRequestTransfer, $capturePaymentResponseTransfer): \Generated\Shared\Transfer\CapturePaymentResponseTransfer {
-            $this->savePayment($capturePaymentRequestTransfer->getPaymentOrFail(), $capturePaymentResponseTransfer->getStatusOrFail());
+        return $this->getTransactionHandler()->handleTransaction(function () use ($capturePaymentRequestTransfer, $capturePaymentResponseTransfer): CapturePaymentResponseTransfer {
+            $paymentTransfer = $capturePaymentResponseTransfer->getPayment() ?? $capturePaymentRequestTransfer->getPaymentOrFail();
+
+            $this->savePayment($paymentTransfer, $capturePaymentResponseTransfer->getStatusOrFail());
 
             return $capturePaymentResponseTransfer;
         });
