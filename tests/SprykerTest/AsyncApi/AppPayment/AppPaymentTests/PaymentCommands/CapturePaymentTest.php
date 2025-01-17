@@ -15,6 +15,7 @@ use Generated\Shared\Transfer\CapturePaymentRequestTransfer;
 use Generated\Shared\Transfer\CapturePaymentResponseTransfer;
 use Generated\Shared\Transfer\PaymentCapturedTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
+use Generated\Shared\Transfer\PaymentUpdatedTransfer;
 use Ramsey\Uuid\Uuid;
 use Spryker\Zed\AppKernel\AppKernelConfig;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
@@ -89,6 +90,44 @@ class CapturePaymentTest extends Unit
 
         // Assert
         $this->tester->assertPaymentHasStatus($paymentTransfer, PaymentStatus::STATUS_CAPTURE_REQUESTED);
+    }
+
+    public function testHandleCapturePaymentMessageUpdatesPaymentToCapturedRequestedAndPersistsDetailsFromTheImplementationReturnedPayment(): void
+    {
+        // Arrange
+        $tenantIdentifier = Uuid::uuid4()->toString();
+        $transactionId = Uuid::uuid4()->toString();
+        $this->tester->haveAppConfigForTenant($tenantIdentifier);
+        $paymentTransfer = $this->tester->havePaymentForTransactionId($transactionId, $tenantIdentifier);
+
+        $capturePaymentTransfer = $this->tester->haveCapturePaymentTransfer(['tenantIdentifier' => $tenantIdentifier, 'orderReference' => $paymentTransfer->getOrderReference()]);
+
+        $capturePaymentResponseTransfer = (new CapturePaymentResponseTransfer())
+            ->setIsSuccessful(true)
+            ->setTransactionId($transactionId)
+            ->setStatus(PaymentStatus::STATUS_CAPTURE_REQUESTED);
+
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
+            'capturePayment' => function (CapturePaymentRequestTransfer $capturePaymentRequestTransfer) use ($capturePaymentResponseTransfer, $paymentTransfer) {
+                $this->assertInstanceOf(AppConfigTransfer::class, $capturePaymentRequestTransfer->getAppConfig());
+                $this->assertInstanceOf(PaymentTransfer::class, $capturePaymentRequestTransfer->getPayment());
+
+                $paymentTransfer->setDetails('{"foo":"bar"}');
+                $capturePaymentResponseTransfer->setPayment($paymentTransfer);
+
+                return $capturePaymentResponseTransfer;
+            },
+        ]);
+
+        $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
+
+        // Act: This will trigger the MessageHandlerPlugin for this message.
+        $this->tester->runMessageReceiveTest($capturePaymentTransfer, 'payment-commands');
+
+        // Assert
+        $this->tester->assertPaymentHasStatus($paymentTransfer, PaymentStatus::STATUS_CAPTURE_REQUESTED);
+        $this->tester->assertPaymentHasDetails($paymentTransfer, '{"foo":"bar"}');
+        $this->tester->assertMessageWasSent(PaymentUpdatedTransfer::class);
     }
 
     /**

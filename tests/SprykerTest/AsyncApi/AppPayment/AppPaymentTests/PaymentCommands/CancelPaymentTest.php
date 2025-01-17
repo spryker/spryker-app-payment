@@ -16,6 +16,7 @@ use Generated\Shared\Transfer\CancelPaymentResponseTransfer;
 use Generated\Shared\Transfer\PaymentCanceledTransfer;
 use Generated\Shared\Transfer\PaymentCancellationFailedTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
+use Generated\Shared\Transfer\PaymentUpdatedTransfer;
 use Ramsey\Uuid\Uuid;
 use Spryker\Zed\AppKernel\AppKernelConfig;
 use Spryker\Zed\AppPayment\AppPaymentDependencyProvider;
@@ -97,6 +98,45 @@ class CancelPaymentTest extends Unit
         // Assert
         $this->tester->assertPaymentHasStatus($paymentTransfer, PaymentStatus::STATUS_CANCELED);
         $this->tester->assertMessageWasSent(PaymentCanceledTransfer::class);
+    }
+
+    public function testCancelPaymentMessageUpdatesPaymentToPaymentCancelledWhenPaymentIsInCancellableStateAndPersistsPaymentDetailsFromTheImplementationReturnedPayment(): void
+    {
+        // Arrange
+        $tenantIdentifier = Uuid::uuid4()->toString();
+        $transactionId = Uuid::uuid4()->toString();
+        $this->tester->haveAppConfigForTenant($tenantIdentifier);
+        $paymentTransfer = $this->tester->havePaymentForTransactionId($transactionId, $tenantIdentifier, PaymentStatus::STATUS_NEW);
+
+        $cancelPaymentTransfer = $this->tester->haveCancelPaymentTransfer(['tenantIdentifier' => $tenantIdentifier, 'orderReference' => $paymentTransfer->getOrderReference()]);
+
+        $cancelPaymentResponseTransfer = (new CancelPaymentResponseTransfer())
+            ->setIsSuccessful(true)
+            ->setTransactionId($transactionId)
+            ->setStatus(PaymentStatus::STATUS_CANCELED);
+
+        $platformPluginMock = Stub::makeEmpty(AppPaymentPlatformPluginInterface::class, [
+            'cancelPayment' => function (CancelPaymentRequestTransfer $cancelPaymentRequestTransfer) use ($cancelPaymentResponseTransfer, $paymentTransfer) {
+                $this->assertInstanceOf(AppConfigTransfer::class, $cancelPaymentRequestTransfer->getAppConfig());
+                $this->assertInstanceOf(PaymentTransfer::class, $cancelPaymentRequestTransfer->getPayment());
+
+                $paymentTransfer->setDetails('{"foo":"bar"}');
+                $cancelPaymentResponseTransfer->setPayment($paymentTransfer);
+
+                return $cancelPaymentResponseTransfer;
+            },
+        ]);
+
+        $this->getDependencyHelper()->setDependency(AppPaymentDependencyProvider::PLUGIN_PLATFORM, $platformPluginMock);
+
+        // Act: This will trigger the MessageHandlerPlugin for this message.
+        $this->tester->runMessageReceiveTest($cancelPaymentTransfer, 'payment-commands');
+
+        // Assert
+        $this->tester->assertPaymentHasStatus($paymentTransfer, PaymentStatus::STATUS_CANCELED);
+        $this->tester->assertPaymentHasDetails($paymentTransfer, '{"foo":"bar"}');
+        $this->tester->assertMessageWasSent(PaymentCanceledTransfer::class);
+        $this->tester->assertMessageWasSent(PaymentUpdatedTransfer::class);
     }
 
     public function testCancelPaymentMessageDoesNotUpdatePaymentStatusWhenPaymentIsNotInCancellableStateAndSendsPaymentCancellationFailedMessage(): void
