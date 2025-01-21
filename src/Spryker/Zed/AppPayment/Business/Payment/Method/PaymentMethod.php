@@ -82,7 +82,7 @@ class PaymentMethod
             ->setName($paymentMethodTransfer->getNameOrFail())
             ->setProviderName($paymentMethodTransfer->getProviderNameOrFail())
             // @deprecated This line can be removed when all PSP Apps are updated.
-            ->setPaymentAuthorizationEndpoint(sprintf('%s/%s', rtrim($this->appPaymentConfig->getGlueBaseUrl(), '/'), $this->getRouteName($paymentMethodTransfer)))
+            ->setPaymentAuthorizationEndpoint(sprintf('%s%s', rtrim($this->appPaymentConfig->getGlueBaseUrl(), '/'), $this->getRouteName($paymentMethodTransfer)))
             ->setPaymentMethodAppConfiguration($paymentMethodTransfer->getPaymentMethodAppConfigurationOrFail());
 
         $this->appPaymentRepository->savePaymentMethod($paymentMethodTransfer, $appConfigTransfer->getTenantIdentifierOrFail());
