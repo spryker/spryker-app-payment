@@ -58,16 +58,16 @@ class AppPaymentHelper extends Module
 
     public function assertPaymentStatusHistory(string $expectedPaymentStatus, string $transactionId): void
     {
-        $spyPaymentStatusHistoryQuery = SpyPaymentStatusHistoryQuery::create()
+        $spyPaymentStatusHistoryEntity = SpyPaymentStatusHistoryQuery::create()
             ->filterByTransactionId($transactionId)
             ->orderByCreatedAt(Criteria::DESC)
             ->findOne();
 
-        if (!$spyPaymentStatusHistoryQuery) {
+        if (!$spyPaymentStatusHistoryEntity) {
             $this->fail(sprintf('Payment status history not found for transaction id "%s".', $transactionId));
         }
 
-        $this->assertSame($expectedPaymentStatus, $spyPaymentStatusHistoryQuery->getStatus());
+        $this->assertSame($expectedPaymentStatus, $spyPaymentStatusHistoryEntity->getStatus());
     }
 
     public function havePaymentForTransactionId(
